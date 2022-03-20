@@ -24,3 +24,4 @@ classes = ('plane', 'car', 'bird', 'cat',
            'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 print('Hello')
+print(' Steve!')
