@@ -3,7 +3,7 @@ import torchvision
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 import numpy as np
-
+#https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
@@ -12,12 +12,12 @@ transform = transforms.Compose(
 batch_size = 4 #number of samples per batch
 
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
-                                        download=True, transform=transform)
-#download training set, store into ./data and apply transform
+                                        download=True, transform=transform) #download training set, store into ./data and apply transform
 
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                          shuffle=True) #load in training set
-
+                                          shuffle=True) #load in training set, num_workers=2 how many subprocesses to
+                                                        # use for data loading. 0 means that the data will be loaded in
+                                                        #the main process.
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                        download=True, transform=transform)
 #download test set, store into ./data and apply transform
