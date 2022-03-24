@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
+import torchvision.transforms as transforms
 
 from cleverhans.torch.attacks.fast_gradient_method import fast_gradient_method
 from cleverhans.torch.attacks.projected_gradient_descent import (
@@ -17,9 +18,15 @@ FLAGS = flags.FLAGS
 class CNN(torch.nn.Module):
     """Basic CNN architecture."""
 
-    def __init__(self, in_channels=1):
-        super(CNN, self).__init__()
+    def __init__(self, in_channels=1): #method thats called when a new CNN instance is created
+        super(CNN, self).__init__() #means to call a bound __init__ from the parent class that follows SomeBaseClass's
+        # child class (the one that defines this method) in the instance's Method Resolution Order (MRO)
+        # in this case calls __init__ of torch.nn.Module
         self.conv1 = nn.Conv2d(in_channels, 64, 8, 1)
+        # in_channels = 1 = number of input stacks (e.g, colours),
+        # out_channels= 64 = number of output stacks/number of filters in the layer ,
+        # kernel_size= 8 = size of each convolution filter (8x8),
+        # stride=1 (shift of kernel/filter from left to right, top to bottom when convolution is performed)
         self.conv2 = nn.Conv2d(64, 128, 6, 2)
         self.conv3 = nn.Conv2d(128, 128, 5, 2)
         self.fc = nn.Linear(128 * 3 * 3, 10)
@@ -35,25 +42,27 @@ class CNN(torch.nn.Module):
 
 def ld_cifar10():
     """Load training and test data."""
-    train_transforms = torchvision.transforms.Compose(
-        [torchvision.transforms.ToTensor()]
-    )
-    test_transforms = torchvision.transforms.Compose(
-        [torchvision.transforms.ToTensor()]
-    )
-    train_dataset = torchvision.datasets.CIFAR10(
-        root="/tmp/data", train=True, transform=train_transforms, download=True
-    )
-    test_dataset = torchvision.datasets.CIFAR10(
-        root="/tmp/data", train=False, transform=test_transforms, download=True
-    )
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=128, shuffle=True, num_workers=2
-    )
-    test_loader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=128, shuffle=False, num_workers=2
-    )
-    return EasyDict(train=train_loader, test=test_loader)
+    transform = transforms.Compose(
+        [transforms.ToTensor()]
+    )# convert PIL image into tensor and normalize
+
+    batch_size = 4  # number of samples per batch
+
+    trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
+                                            download=True, transform=transform)
+    # download training set, store into ./data and apply transform
+
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+                                              shuffle=True)  # load in training set
+
+    testset = torchvision.datasets.CIFAR10(root='./data', train=False,
+                                           download=True, transform=transform)
+    # download test set, store into ./data and apply transform
+
+    testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
+                                             shuffle=False)  # load in test set
+
+    return EasyDict(train=trainloader, test=testloader)
 
 
 def main(_):
@@ -123,7 +132,8 @@ def main(_):
     )
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": #only runs when this file/module is the main module (module that you run)
+                            #doesnt run if this file/module is called from or imported from another module
     flags.DEFINE_integer("nb_epochs", 8, "Number of epochs.")
     flags.DEFINE_float("eps", 0.3, "Total epsilon for FGM and PGD attacks.")
     flags.DEFINE_bool(
