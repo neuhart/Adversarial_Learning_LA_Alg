@@ -12,6 +12,11 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
     projected_gradient_descent,
 )
 
+"""
+https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html
+https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
+"""
+
 FLAGS = flags.FLAGS
 
 
