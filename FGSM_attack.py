@@ -13,8 +13,10 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
 )
 
 """
-https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html
-https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
+1) https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html
+2) https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
+3) https://stackoverflow.com/questions/48001598/why-do-we-need-to-call-zero-grad-in-pytorch
+4) https://discuss.pytorch.org/t/how-are-optimizer-step-and-loss-backward-related/7350
 """
 
 FLAGS = flags.FLAGS
@@ -32,22 +34,18 @@ class CNN(torch.nn.Module):
         # out_channels= 64 = number of output stacks/number of filters in the layer ,
         # kernel_size= 8 = size of each convolution filter (8x8),
         # stride=1 (shift of kernel/filter from left to right, top to bottom when convolution is performed)
-        # convoluted image with width W_after= [W_before-(kernel size-1)]/stride and
-        # height H_after = [H_before-(kernel size-1)]/stride
+        # in this case: convoluted image with width W_after= [W_before-(kernel size-1)]/stride and
+        # height H_after = [H_before-(kernel size-1)]/stride , else see 1)
         self.conv2 = nn.Conv2d(64, 128, 6, 2)
         self.conv3 = nn.Conv2d(128, 128, 5, 2)
         self.fc = nn.Linear(128 * 3 * 3, 10) #image dimensions 3x3 with 128 channels (128,3,3)
 
     def forward(self, x):
-        print(x.size())
         x = F.relu(self.conv1(x))
-        print(x.size())
         x = F.relu(self.conv2(x))
-        print(x.size())
         x = F.relu(self.conv3(x))
-        print(x.size())
-        x = x.view(-1, 128 * 3 * 3) #image dimensions 3x3 with 128 channels (128,3,3)
-        print(x.size())
+        x = x.view(-1, 128 * 3 * 3) # reshapes tensor from (batch_size, #channels, height, width) to
+        # (batch_size, 128*3*3); (image dimensions 3x3 with 128 channels (128,3,3))
         x = self.fc(x)
         return x
 
@@ -83,26 +81,26 @@ def main(_):
 
     # Instantiate model, loss, and optimizer for training
     net = CNN(in_channels=3)
-    device = "cuda" if torch.cuda.is_available() else "cpu" #check if gpu is available
+    device = "cuda" if torch.cuda.is_available() else "cpu" # check if gpu is available
     if device == "cuda":
         net = net.cuda() #transfers to gpu
-    loss_fn = torch.nn.CrossEntropyLoss(reduction="mean") #averages over all losses
-    optimizer = torch.optim.Adam(net.parameters(), lr=1e-3) 
+    loss_fn = torch.nn.CrossEntropyLoss(reduction="mean") # averages over all losses
+    optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
 
     # Train vanilla model
     net.train()
     for epoch in range(1, FLAGS.nb_epochs + 1):
         train_loss = 0.0
-        for x, y in data.train:
+        for x, y in data.train:  # take batches of batch_size inputes stored in x and targets stored in y
             x, y = x.to(device), y.to(device)
             if FLAGS.adv_train:
                 # Replace clean example with adversarial example for adversarial training
                 x = projected_gradient_descent(net, x, FLAGS.eps, 0.01, 40, np.inf)
-            optimizer.zero_grad()
-            loss = loss_fn(net(x), y)
-            loss.backward()
-            optimizer.step()
-            train_loss += loss.item()
+            optimizer.zero_grad()  # explained in 3). Sets the gradient to zero
+            loss = loss_fn(net(x), y)  # creates a new loss_fn (torch.nn.crossentropyloss) class instance
+            loss.backward()  # computes the gradient - see also 4)
+            optimizer.step()  # updates the parameters - see also 4)
+            train_loss += loss.item()  # extracts loss value
         print(
             "epoch: {}/{}, train loss: {:.3f}".format(
                 epoch, FLAGS.nb_epochs, train_loss
