@@ -32,15 +32,22 @@ class CNN(torch.nn.Module):
         # out_channels= 64 = number of output stacks/number of filters in the layer ,
         # kernel_size= 8 = size of each convolution filter (8x8),
         # stride=1 (shift of kernel/filter from left to right, top to bottom when convolution is performed)
+        # convoluted image with width W_after= [W_before-(kernel size-1)]/stride and
+        # height H_after = [H_before-(kernel size-1)]/stride
         self.conv2 = nn.Conv2d(64, 128, 6, 2)
         self.conv3 = nn.Conv2d(128, 128, 5, 2)
-        self.fc = nn.Linear(128 * 3 * 3, 10)
+        self.fc = nn.Linear(128 * 3 * 3, 10) #image dimensions 3x3 with 128 channels (128,3,3)
 
     def forward(self, x):
+        print(x.size())
         x = F.relu(self.conv1(x))
+        print(x.size())
         x = F.relu(self.conv2(x))
+        print(x.size())
         x = F.relu(self.conv3(x))
-        x = x.view(-1, 128 * 3 * 3)
+        print(x.size())
+        x = x.view(-1, 128 * 3 * 3) #image dimensions 3x3 with 128 channels (128,3,3)
+        print(x.size())
         x = self.fc(x)
         return x
 
@@ -49,7 +56,7 @@ def ld_cifar10():
     """Load training and test data."""
     transform = transforms.Compose(
         [transforms.ToTensor()]
-    )# convert PIL image into tensor and normalize
+    )# convert PIL image into tensor
 
     batch_size = 4  # number of samples per batch
 
@@ -76,11 +83,11 @@ def main(_):
 
     # Instantiate model, loss, and optimizer for training
     net = CNN(in_channels=3)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cuda" if torch.cuda.is_available() else "cpu" #check if gpu is available
     if device == "cuda":
-        net = net.cuda()
-    loss_fn = torch.nn.CrossEntropyLoss(reduction="mean")
-    optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
+        net = net.cuda() #transfers to gpu
+    loss_fn = torch.nn.CrossEntropyLoss(reduction="mean") #averages over all losses
+    optimizer = torch.optim.Adam(net.parameters(), lr=1e-3) 
 
     # Train vanilla model
     net.train()
