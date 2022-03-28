@@ -114,15 +114,16 @@ def main(_):
         x, y = x.to(device), y.to(device)
         x_fgm = fast_gradient_method(net, x, FLAGS.eps, np.inf)
         x_pgd = projected_gradient_descent(net, x, FLAGS.eps, 0.01, 40, np.inf)
-        _, y_pred = net(x).max(1)  # model prediction on clean examples
+        _, y_pred = net(x).max(1)  # model prediction on clean examples, net(x) returns a (batch_size, #classes) tensor
+        # with a 10-dimensional class probability vector in the second dim, .max(1) takes maximum value of prob. vector
         _, y_pred_fgm = net(x_fgm).max(
             1
         )  # model prediction on FGM adversarial examples
         _, y_pred_pgd = net(x_pgd).max(
             1
         )  # model prediction on PGD adversarial examples
-        report.nb_test += y.size(0)
-        report.correct += y_pred.eq(y).sum().item()
+        report.nb_test += y.size(0) #counts how many examples are in the batch
+        report.correct += y_pred.eq(y).sum().item() #counts how many examples in the batch are predicted correctly
         report.correct_fgm += y_pred_fgm.eq(y).sum().item()
         report.correct_pgd += y_pred_pgd.eq(y).sum().item()
     print(
@@ -144,7 +145,7 @@ def main(_):
 
 if __name__ == "__main__": #only runs when this file/module is the main module (module that you run)
                             #doesnt run if this file/module is called from or imported from another module
-    flags.DEFINE_integer("nb_epochs", 8, "Number of epochs.")
+    flags.DEFINE_integer("nb_epochs", 1, "Number of epochs.")
     flags.DEFINE_float("eps", 0.3, "Total epsilon for FGM and PGD attacks.")
     flags.DEFINE_bool(
         "adv_train", False, "Use adversarial training (on PGD adversarial examples)."
