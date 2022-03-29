@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
+import time
 
 from cleverhans.torch.attacks.fast_gradient_method import fast_gradient_method
 from cleverhans.torch.attacks.projected_gradient_descent import (
@@ -57,21 +58,21 @@ def ld_cifar10():
         [transforms.ToTensor()]
     )# convert PIL image into tensor
 
-    batch_size = 4  # number of samples per batch
+    batch_size = 5  # number of samples per batch
 
     trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                             download=True, transform=transform)
     # download training set, store into ./data and apply transform
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                              shuffle=True)  # load in training set
+                                              shuffle=True, num_workers=4)  # load in training set
 
     testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                            download=True, transform=transform)
     # download test set, store into ./data and apply transform
 
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
-                                             shuffle=False)  # load in test set
+                                             shuffle=False, num_workers=4)  # load in test set
 
     return EasyDict(train=trainloader, test=testloader)
 
@@ -79,7 +80,6 @@ def ld_cifar10():
 def main(_):
     # Load training and test data
     data = ld_cifar10()
-
     # Instantiate model, loss, and optimizer for training
     net = CNN(in_channels=3)
     device = "cuda" if torch.cuda.is_available() else "cpu" # check if gpu is available
@@ -90,9 +90,11 @@ def main(_):
 
     # Train vanilla model
     net.train()
+    start_time = time.time()
     for epoch in range(1, FLAGS.nb_epochs + 1):
+        epoch_start_time = time.time()
         train_loss = 0.0
-        for x, y in data.train:  # take batches of batch_size inputes stored in x and targets stored in y
+        for x, y in data.train:  # take batches of batch_size many inputs stored in x and targets stored in y
             x, y = x.to(device), y.to(device)
             if FLAGS.adv_train:
                 # Replace clean example with adversarial example for adversarial training
@@ -107,11 +109,23 @@ def main(_):
                 epoch, FLAGS.nb_epochs, train_loss
             )
         )
+        print(
+            "epoch {}/{}, runtime: {:.3f}".format(
+                epoch, FLAGS.nb_epochs, time.time() - epoch_start_time
+            )
+        )
+    print(
+        "training time: {:.3f}".format(
+            time.time()-start_time
+        )
+    )
+    start_test_time = time.time()
 
     # Evaluate on clean and adversarial data
     net.eval()
     report = EasyDict(nb_test=0, correct=0, correct_fgm=0, correct_pgd=0)
     for x, y in data.test:
+        start_test_ex = time.time()
         x, y = x.to(device), y.to(device)
         x_fgm = fast_gradient_method(net, x, FLAGS.eps, np.inf)
         x_pgd = projected_gradient_descent(net, x, FLAGS.eps, 0.01, 40, np.inf)
@@ -127,6 +141,7 @@ def main(_):
         report.correct += y_pred.eq(y).sum().item() #counts how many examples in the batch are predicted correctly
         report.correct_fgm += y_pred_fgm.eq(y).sum().item()
         report.correct_pgd += y_pred_pgd.eq(y).sum().item()
+
     print(
         "test acc on clean examples (%): {:.3f}".format(
             report.correct / report.nb_test * 100.0
