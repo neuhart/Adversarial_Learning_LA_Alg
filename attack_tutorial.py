@@ -77,7 +77,6 @@ def ld_cifar10():
 
 
 def main(_):
-    print(FLAGS.nb_epochs, type(FLAGS.nb_epochs))
     # Load training and test data
     data = ld_cifar10()
 
