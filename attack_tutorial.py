@@ -17,9 +17,10 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
 2) https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
 3) https://stackoverflow.com/questions/48001598/why-do-we-need-to-call-zero-grad-in-pytorch
 4) https://discuss.pytorch.org/t/how-are-optimizer-step-and-loss-backward-related/7350
+5) https://abseil.io/docs/python/guides/flags
 """
 
-FLAGS = flags.FLAGS
+FLAGS = flags.FLAGS #see 5) defines globals variables
 
 
 class CNN(torch.nn.Module):
@@ -76,6 +77,7 @@ def ld_cifar10():
 
 
 def main(_):
+    print(FLAGS.nb_epochs, type(FLAGS.nb_epochs))
     # Load training and test data
     data = ld_cifar10()
 
@@ -151,4 +153,4 @@ if __name__ == "__main__": #only runs when this file/module is the main module (
         "adv_train", False, "Use adversarial training (on PGD adversarial examples)."
     )
 
-    app.run(main)
+    app.run(main) #runs function main function
