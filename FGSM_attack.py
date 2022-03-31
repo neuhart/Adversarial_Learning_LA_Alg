@@ -75,6 +75,11 @@ def fast_gradient_method(
     # x needs to be a leaf variable, of floating point type and have requires_grad being True for
     # its grad to be computed and stored properly in a backward call
     x = x.clone().detach().to(torch.float).requires_grad_(True)
+    # tensor.clone: Returns a copy of input, This function is differentiable, so gradients will flow back from the
+    # result of this operation to input
+    # tensor.detach: Returns a new Tensor, detached from the current graph.
+    # tensor.to(torch.float): changes dtype of tensor to float
+    # requires_grad_(True): states that gradients need to be computed for this tensor
     if y is None:
         # Using model predictions as ground truth to avoid label leaking
         _, y = torch.max(model_fn(x), 1)
