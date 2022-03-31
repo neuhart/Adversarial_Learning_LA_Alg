@@ -82,6 +82,11 @@ def fast_gradient_method(
     # requires_grad_(True): states that gradients need to be computed for this tensor
     if y is None:
         # Using model predictions as ground truth to avoid label leaking
+        # label leaking can occur for one-step methods like FGSM, where information about the true label is being
+        # leaked in the training process such that at testing time the model classifies an adversarial input X_adv,
+        # created using the true label, (still) correctly but missclassifies a corresponding (coming from the same
+        # clean example x). This suggests that the model recognizes patterns about the FGSM method during training time
+        # and thus is able to spot them in test examples and therefore increasing its test accuracy on those examples.
         _, y = torch.max(model_fn(x), 1)
 
     # Compute loss
@@ -89,6 +94,9 @@ def fast_gradient_method(
     loss = loss_fn(model_fn(x), y)
     # If attack is targeted, minimize loss of target label rather than maximize loss of correct label
     if targeted:
+        # minimizing the loss of the target label means maximizing p(y=target|X)
+        # The goal is to get p(y=target|X_adv)>p(y=correct label|X_adv)
+        # Such that the classifier is fooled but from a human's perspective X_adv and X still belong to the same class
         loss = -loss
 
     # Define gradient of loss wrt input
