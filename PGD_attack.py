@@ -77,6 +77,7 @@ def projected_gradient_descent(
         return x
 
     assert eps_iter <= eps, (eps_iter, eps)
+
     if clip_min is not None and clip_max is not None:
         if clip_min > clip_max:
             raise ValueError(
@@ -105,10 +106,12 @@ def projected_gradient_descent(
         if rand_minmax is None:
             rand_minmax = eps
         eta = torch.zeros_like(x).uniform_(-rand_minmax, rand_minmax)
+        # torch.zeros_like(x) returns tensor of size of input x but filled with only 0s.
+        # .uniform_ fills self tensor with numbers sampled from the continuous uniform distribution:
     else:
         eta = torch.zeros_like(x)
 
-    # Clip eta
+    # Clip eta: Helper function to clip the perturbation to epsilon norm ball.
     eta = clip_eta(eta, norm, eps)
     adv_x = x + eta
     if clip_min is not None or clip_max is not None:
