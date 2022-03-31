@@ -62,6 +62,7 @@ def fast_gradient_method(
             )
         )
         # torch.ge: Computes >=  element-wise; returns boolean tensor
+        # The second argument can be a number or a tensor whose shape is broadcastable with the first argument.
         # torch.all: Tests if all elements in input evaluate to True.
         asserts.append(assert_ge)
 
