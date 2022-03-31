@@ -94,6 +94,7 @@ def fast_gradient_method(
     # Define gradient of loss wrt input
     loss.backward()
     optimal_perturbation = optimize_linear(x.grad, eps, norm)
+    # Optimal_perturbation = argmax_{eta, ||eta||_{norm} < eps} dot(eta, grad)
 
     # Add perturbation to original example to obtain adversarial example
     adv_x = x + optimal_perturbation
@@ -105,8 +106,10 @@ def fast_gradient_method(
                 "One of clip_min and clip_max is None but we don't currently support one-sided clipping"
             )
         adv_x = torch.clamp(adv_x, clip_min, clip_max)
+        # Clamps all elements in input into the range [ min, max ]. Letting min_value and max_value be min and max
 
     if sanity_checks:
         assert np.all(asserts)
+        # raises error if input was not in range
     return adv_x
 
