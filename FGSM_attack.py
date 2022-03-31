@@ -1,7 +1,6 @@
 """The Fast Gradient Method attack."""
 import numpy as np
 import torch
-
 from cleverhans.torch.utils import optimize_linear
 
 
@@ -62,7 +61,6 @@ def fast_gradient_method(
             torch.ge(x, torch.tensor(clip_min, device=x.device, dtype=x.dtype)
             )
         )
-        print(x.size, x.dtype, type(clip_min), type(torch.tensor(clip_min, device=x.device, dtype=x.dtype)))
         # torch.ge: Computes >=  element-wise; returns boolean tensor
         # torch.all: Tests if all elements in input evaluate to True.
         asserts.append(assert_ge)
@@ -106,5 +104,3 @@ def fast_gradient_method(
         assert np.all(asserts)
     return adv_x
 
-x=torch.tensor([[1,2],[1,0.33]])
-fast_gradient_method("model", x, 0.1,np.inf, 0.5)
