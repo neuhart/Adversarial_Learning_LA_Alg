@@ -111,7 +111,8 @@ def projected_gradient_descent(
     else:
         eta = torch.zeros_like(x)
 
-    # Clip eta: Helper function to clip the perturbation to epsilon norm ball.
+    # Clip eta: Helper function to clip the perturbation to epsilon norm ball,
+    # i.e., projects adv_x onto the epsilon norm ball centered at x.
     eta = clip_eta(eta, norm, eps)
     adv_x = x + eta
     if clip_min is not None or clip_max is not None:
