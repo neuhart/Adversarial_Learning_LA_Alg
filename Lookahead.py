@@ -4,7 +4,7 @@ import torch
 from torch.optim.optimizer import Optimizer
 
 
-class Lookahead(Optimizer):
+class Lookahead(Optimizer):  # subclass of Optimizer class
     r"""PyTorch implementation of the lookahead wrapper.
     Lookahead Optimizer: https://arxiv.org/abs/1907.08610
     """
@@ -17,20 +17,25 @@ class Lookahead(Optimizer):
         """
         self.optimizer = optimizer
         self._la_step = 0  # counter for inner optimizer
-        self.la_alpha = la_alpha
-        self._total_la_steps = la_steps
-        pullback_momentum = pullback_momentum.lower()
-        assert pullback_momentum in ["reset", "pullback", "none"]
+        self.la_alpha = la_alpha  # linear interpolation factor: 0 - keeps old slow weight, 1 - picks latest fast weight
+        self._total_la_steps = la_steps  # steps taken at each iteration in the inner loop
+        pullback_momentum = pullback_momentum.lower()  # returns lowercase string
+        assert pullback_momentum in ["reset", "pullback", "none"]  # checks if correct input is given
         self.pullback_momentum = pullback_momentum
 
-        self.state = defaultdict(dict)
+        self.state = defaultdict(dict)  # creates an empty dict of dicts with default set to empty dict entry {}
 
         # Cache the current optimizer parameters
         for group in optimizer.param_groups:
+            # each param_group is a dictionary containing params (parameters) in form of tensors
+            # and corresp. hyperparameters (eps,lr,etc)
+            # one can add a new group of parameters and specify new hyperparameters
+            # standard hyperparameters (e.g. lr, eps) are set to a standard value (lr=0.001) if not spec. otherwise
             for p in group['params']:
-                param_state = self.state[p]
+                param_state = self.state[p]  # creates an empty dict entry for p
                 param_state['cached_params'] = torch.zeros_like(p.data)
-                param_state['cached_params'].copy_(p.data)
+                # creates a 0-tensor with same size as p.data and stores it in cached_params entry of dict entry of p
+                param_state['cached_params'].copy_(p.data)  # copies values from p
                 if self.pullback_momentum == "pullback":
                     param_state['cached_mom'] = torch.zeros_like(p.data)
 
@@ -44,7 +49,7 @@ class Lookahead(Optimizer):
             'pullback_momentum': self.pullback_momentum
         }
 
-    def zero_grad(self):
+    def zero_grad(self):  # inherits functions from Optimizer class
         self.optimizer.zero_grad()
 
     def get_la_step(self):
@@ -63,25 +68,27 @@ class Lookahead(Optimizer):
             for p in group['params']:
                 param_state = self.state[p]
                 param_state['backup_params'] = torch.zeros_like(p.data)
-                param_state['backup_params'].copy_(p.data)
-                p.data.copy_(param_state['cached_params'])
+                param_state['backup_params'].copy_(p.data)  # save current p
+                p.data.copy_(param_state['cached_params'])  # load cached p
 
     def _clear_and_load_backup(self):
         for group in self.optimizer.param_groups:
             for p in group['params']:
                 param_state = self.state[p]
-                p.data.copy_(param_state['backup_params'])
-                del param_state['backup_params']
+                p.data.copy_(param_state['backup_params'])  # load backup in again
+                del param_state['backup_params']  # and delete backup
 
-    @property
+    @property  # pythonic way to use use getters and setters in object-oriented programming.
     def param_groups(self):
+        # in this case a getter function is defined. this is to make sure that param_groups is not directly accessed
+        # or modified but instead through this function
         return self.optimizer.param_groups
 
     def step(self, closure=None):
         """Performs a single Lookahead optimization step.
         Arguments:
             closure (callable, optional): A closure that reevaluates the model
-                and returns the loss.
+                and returns the loss, required for some algorithms like BGFS
         """
         loss = self.optimizer.step(closure)
         self._la_step += 1
@@ -91,9 +98,13 @@ class Lookahead(Optimizer):
             # Lookahead and cache the current optimizer parameters
             for group in self.optimizer.param_groups:
                 for p in group['params']:
-                    param_state = self.state[p]
-                    p.data.mul_(self.la_alpha).add_(param_state['cached_params'], alpha=1.0 - self.la_alpha)  # crucial line
+                    param_state = self.state[p]  # accesses dict entry of tensor p
+                    """updates slow weight"""
+                    p.data.mul_(self.la_alpha).add_(param_state['cached_params'], alpha=1.0 - self.la_alpha)
+                    # old slow weight is stored in cached_params entry in dict of p
+                    # new slow weight= la_alpha * latest fast weight + (1-la_alpha) * old slow weight
                     param_state['cached_params'].copy_(p.data)
+                    # stores new slow weight in cached_params
                     if self.pullback_momentum == "pullback":
                         internal_momentum = self.optimizer.state[p]["momentum_buffer"]
                         self.optimizer.state[p]["momentum_buffer"] = internal_momentum.mul_(self.la_alpha).add_(
