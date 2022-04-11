@@ -21,14 +21,14 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
 5) https://abseil.io/docs/python/guides/flags
 """
 
-FLAGS = flags.FLAGS #see 5) defines globals variables
+FLAGS = flags.FLAGS  # see 5) defines globals variables
 
 
 class CNN(torch.nn.Module):
     """Basic CNN architecture."""
 
-    def __init__(self, in_channels=1): #method thats called when a new CNN instance is created
-        super(CNN, self).__init__() #means to call a bound __init__ from the parent class that follows SomeBaseClass's
+    def __init__(self, in_channels=1):  # method thats called when a new CNN instance is created
+        super(CNN, self).__init__()  # means to call a bound __init__ from the parent class that follows SomeBaseClass's
         # child class (the one that defines this method) in the instance's Method Resolution Order (MRO)
         # in this case calls __init__ of torch.nn.Module
         self.conv1 = nn.Conv2d(in_channels, 64, 8, 1)
@@ -40,13 +40,13 @@ class CNN(torch.nn.Module):
         # height H_after = [H_before-(kernel size-1)]/stride , else see 1)
         self.conv2 = nn.Conv2d(64, 128, 6, 2)
         self.conv3 = nn.Conv2d(128, 128, 5, 2)
-        self.fc = nn.Linear(128 * 3 * 3, 10) #image dimensions 3x3 with 128 channels (128,3,3)
+        self.fc = nn.Linear(128 * 3 * 3, 10)  # image dimensions 3x3 with 128 channels (128,3,3)
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x))
-        x = x.view(-1, 128 * 3 * 3) # reshapes tensor from (batch_size, #channels, height, width) to
+        x = x.view(-1, 128 * 3 * 3)  # reshapes tensor from (batch_size, #channels, height, width) to
         # (batch_size, 128*3*3); (image dimensions 3x3 with 128 channels (128,3,3))
         x = self.fc(x)
         return x
@@ -56,7 +56,7 @@ def ld_cifar10():
     """Load training and test data."""
     transform = transforms.Compose(
         [transforms.ToTensor()]
-    )# convert PIL image into tensor
+    )  # convert PIL image into tensor
 
     batch_size = 5  # number of samples per batch
 
@@ -137,8 +137,8 @@ def main(_):
         _, y_pred_pgd = net(x_pgd).max(
             1
         )  # model prediction on PGD adversarial examples
-        report.nb_test += y.size(0) #counts how many examples are in the batch
-        report.correct += y_pred.eq(y).sum().item() #counts how many examples in the batch are predicted correctly
+        report.nb_test += y.size(0)  # counts how many examples are in the batch
+        report.correct += y_pred.eq(y).sum().item()  # counts how many examples in the batch are predicted correctly
         report.correct_fgm += y_pred_fgm.eq(y).sum().item()
         report.correct_pgd += y_pred_pgd.eq(y).sum().item()
 
@@ -159,8 +159,8 @@ def main(_):
     )
 
 
-if __name__ == "__main__": #only runs when this file/module is the main module (module that you run)
-                            #doesnt run if this file/module is called from or imported from another module
+if __name__ == "__main__":  # only runs when this file/module is the main module (module that you run)
+                            # doesnt run if this file/module is called from or imported from another module
     flags.DEFINE_integer("nb_epochs", 1, "Number of epochs.")
     flags.DEFINE_float("eps", 0.3, "Total epsilon for FGM and PGD attacks.")
     flags.DEFINE_bool(
