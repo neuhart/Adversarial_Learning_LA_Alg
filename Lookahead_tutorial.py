@@ -5,7 +5,9 @@ from torch.optim.optimizer import Optimizer
 
 
 class Lookahead(Optimizer):  # subclass of Optimizer class
-    r"""PyTorch implementation of the lookahead wrapper.
+    r"""
+    Copyright (c) 2020 Michael Zhang, James Lucas, Geoffrey Hinton, Jimmy Ba
+    PyTorch implementation of the lookahead wrapper.
     Lookahead Optimizer: https://arxiv.org/abs/1907.08610
     """
 
