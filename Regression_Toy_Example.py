@@ -114,7 +114,7 @@ def main(net, optimizer, nb_epochs):
 
 if __name__ == '__main__':
     nb_epochs = 50
-    
+
     net = ffNN()
     main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epochs)
 
