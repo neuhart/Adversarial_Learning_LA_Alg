@@ -4,6 +4,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 import time
+import Lookahead_tutorial
 
 """
 https://pytorch.org/hub/pytorch_vision_resnet/
@@ -49,7 +50,7 @@ def main():
     if device == "cuda":
         net = net.cuda() #transfers to gpu
     loss_fn = torch.nn.CrossEntropyLoss(reduction="mean") # averages over all losses
-    optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
+    optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3)) #torch.optim.Adam(net.parameters(), lr=1e-3)
 
     # Train vanilla model
     net.train()
