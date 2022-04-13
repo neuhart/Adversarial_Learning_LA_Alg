@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import torchvision
 import torchvision.transforms as transforms
+import time
 
 """
 https://pytorch.org/hub/pytorch_vision_resnet/
@@ -55,14 +56,15 @@ def main():
     for epoch in range(1, nb_epochs + 1):
         train_loss = 0.0
         for x, y in data.train:  # take batches of batch_size many inputs stored in x and targets stored in y
-            print(x.shape, y.shape)
+            start_time = time.time()
             print('next example')
             x, y = x.to(device), y.to(device)
             optimizer.zero_grad()  # explained in 3). Sets the gradient to zero
             loss = loss_fn(net(x), y)  # creates a new loss_fn (torch.nn.crossentropyloss) class instance
-            print('forward pass completed')
+            f_time = time.time()
+            print('forward pass completed in {:.3f}'.format(f_time-start_time))
             loss.backward()  # computes the gradient - see also 4)
-            print('backward pass completed')
+            print('backward pass completed in {:.3f}'.format(time.time()-f_time))
             optimizer.step()  # updates the parameters - see also 4)
             train_loss += loss.item()  # extracts loss value
         print(
