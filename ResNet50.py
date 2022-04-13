@@ -5,7 +5,7 @@ import torchvision
 import torchvision.transforms as transforms
 import time
 import Lookahead_tutorial
-import load_data
+import project_utils
 
 """
 1) https://pytorch.org/hub/pytorch_vision_resnet/
@@ -24,7 +24,7 @@ transform = transforms.Compose([
 
 if __name__  == "__main__":
     # Load training and test data
-    data = load_data.ld_cifar10(transform=transform, batch_size=batch_size)
+    data = project_utils.ld_cifar10(transform=transform, batch_size=batch_size)
     # Instantiate Resnet50 model, loss, and optimizer for training
     net = torchvision.models.resnet50()
     device = "cuda" if torch.cuda.is_available() else "cpu" # check if gpu is available
