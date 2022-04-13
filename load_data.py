@@ -29,16 +29,17 @@ def ld_cifar10(transform, batch_size):
     return EasyDict(train=trainloader, test=testloader, classes=classes)
 
 
-def imshow(dataloader, batch_size, classes, inv_transform):
+def imshow(dataloader, batch_size, classes, inv_transform=None):
     """Plot a batch of images
     dataloader: dataloader from which to get images
     classes: tuple/list of classes
-    inv_transform: inversion of transformation 
+    inv_transform: inversion of transformation
     """
     data_iter = iter(dataloader)
     images, labels = data_iter.next()
     img = torchvision.utils.make_grid(images)
-    img = inv_transform(img)
+    if inv_transform is not None:
+        img = inv_transform(img)
     npimg = img.numpy()
     print(npimg.shape)
     plt.imshow(np.transpose(npimg, (1, 2, 0)))  # transpose axes (0,1,2) to (1,2,0)
