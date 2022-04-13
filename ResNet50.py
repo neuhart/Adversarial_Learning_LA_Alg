@@ -8,8 +8,8 @@ import Lookahead_tutorial
 import load_data
 
 """
-https://pytorch.org/hub/pytorch_vision_resnet/
-https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html (image transformation for resnet)
+1) https://pytorch.org/hub/pytorch_vision_resnet/
+2) https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html (image transformation for resnet)
 """
 
 batch_size = 50  # number of samples per batch
@@ -20,12 +20,12 @@ transform = transforms.Compose([
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ])  # convert PIL image into tensor
+    ])  # convert PIL image into tensor and transform to match ResNet50 requirements (see 2))
 
 if __name__  == "__main__":
     # Load training and test data
     data = load_data.ld_cifar10(transform=transform, batch_size=batch_size)
-    # Instantiate model, loss, and optimizer for training
+    # Instantiate Resnet50 model, loss, and optimizer for training
     net = torchvision.models.resnet50()
     device = "cuda" if torch.cuda.is_available() else "cpu" # check if gpu is available
     if device == "cuda":
