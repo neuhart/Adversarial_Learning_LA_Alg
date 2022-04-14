@@ -29,9 +29,7 @@ class CNN(torch.nn.Module):
     """Basic CNN architecture."""
 
     def __init__(self, in_channels=1):  # method thats called when a new CNN instance is created
-        super(CNN, self).__init__()  # means to call a bound __init__ from the parent class that follows SomeBaseClass's
-        # child class (the one that defines this method) in the instance's Method Resolution Order (MRO)
-        # in this case calls __init__ of torch.nn.Module
+        super(CNN, self).__init__()
         self.conv1 = nn.Conv2d(in_channels, 64, 8, 1)
         # in_channels = 1 = number of input stacks (e.g, colours),
         # out_channels= 64 = number of output stacks/number of filters in the layer ,
