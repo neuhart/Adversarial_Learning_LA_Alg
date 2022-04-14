@@ -1,4 +1,5 @@
 __pycache__/
+*.pyc
 .idea/Adversarial_Learning_LA_Alg.iml
 *.xml
 data/cifar-10-batches-py/batches.meta
