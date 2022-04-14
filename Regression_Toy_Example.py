@@ -34,16 +34,14 @@ x_values = torch.from_numpy(np.arange(-5, 5, 0.02).astype(np.float32))
 y_values = np.sin(x_values)
 
 trainset = sin_Dataset(x_values,y_values)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                              shuffle=True, num_workers=0)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=0)
 # if num_workers>0 is necessary, trainset needs to be converted into list before that!
 
 x_t_values = torch.from_numpy(np.arange(-4.9, 5.1, 0.02).astype(np.float32))  # float required
 y_t_values = np.sin(x_t_values)
 
 testset = sin_Dataset(x_t_values,y_t_values)
-testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
-                                              shuffle=False, num_workers=0)
+testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=0)
 
 data = EasyDict(train=trainloader, test=testloader)
 
