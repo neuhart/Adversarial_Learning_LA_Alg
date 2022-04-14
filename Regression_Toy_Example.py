@@ -15,7 +15,7 @@ second the Lookahead optimizer
 
 
 class Sin_Dataset(Dataset):
-    """Create own dataset (subclass) in pytorch"""
+    # Create own dataset (subclass) in pytorch
 
     def __init__(self, X, y):
         self.X = X
@@ -36,14 +36,14 @@ y_values = np.sin(x_values)
 
 trainset = Sin_Dataset(x_values, y_values)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                          shuffle=True, num_workers=4)
+                                          shuffle=True, num_workers=0)
 
 x_t_values = torch.from_numpy(np.arange(-4.9, 5.1, 0.02).astype(np.float32))  # float required
 y_t_values = np.sin(x_t_values)
 
 testset = Sin_Dataset(x_t_values, y_t_values)
 testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
-                                         shuffle=False, num_workers=4)
+                                         shuffle=False, num_workers=0)
 
 data = EasyDict(train=trainloader, test=testloader)
 
@@ -53,7 +53,7 @@ class ffNN(torch.nn.Module):
     """Basic CNN architecture."""
 
     def __init__(self):  # method thats called when a new NN instance is created
-        super(ffNN,self).__init__()
+        super(ffNN, self).__init__()
         self.fc1 = nn.Linear(1, 100)
         self.fc2 = nn.Linear(100, 1)
 
@@ -116,24 +116,23 @@ if __name__ == '__main__':
     nb_epoch = 50
 
     net = ffNN()
-    main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epochs=nb_epoch)
-    """
+    main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epoch)
+
     net = ffNN()
     main(net, Lookahead_tutorial.Lookahead(
-        torch.optim.Adam(net.parameters(), lr=1e-3)), nb_epochs
+        torch.optim.Adam(net.parameters(), lr=1e-3)), nb_epoch
          )
 
     net = ffNN()
     main(net, Lookahead_tutorial.Lookahead(
-        torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=5, la_alpha=0.5), nb_epochs
+        torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=5, la_alpha=0.5), nb_epoch
          )
 
     net = ffNN()
     main(net, Lookahead_tutorial.Lookahead(
-        torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=10, la_alpha=0.5), nb_epochs
+        torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=10, la_alpha=0.5), nb_epoch
          )
 
     plt.title('Neural Network Regression Toy Ex.')
     plt.legend(['sine', 'Adam', 'LA: k=5,alpha=0.8', 'LA: k=5,alpha=0.5', 'LA: k=10,alpha=0.5'])
     plt.show()
-    """
