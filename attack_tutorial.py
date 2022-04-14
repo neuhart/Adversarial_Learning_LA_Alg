@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
+import project_utils
 import time
 
 from cleverhans.torch.attacks.fast_gradient_method import fast_gradient_method
@@ -28,9 +29,7 @@ class CNN(torch.nn.Module):
     """Basic CNN architecture."""
 
     def __init__(self, in_channels=1):  # method thats called when a new CNN instance is created
-        super(CNN, self).__init__()  # means to call a bound __init__ from the parent class that follows SomeBaseClass's
-        # child class (the one that defines this method) in the instance's Method Resolution Order (MRO)
-        # in this case calls __init__ of torch.nn.Module
+        super(CNN, self).__init__()
         self.conv1 = nn.Conv2d(in_channels, 64, 8, 1)
         # in_channels = 1 = number of input stacks (e.g, colours),
         # out_channels= 64 = number of output stacks/number of filters in the layer ,
@@ -52,34 +51,14 @@ class CNN(torch.nn.Module):
         return x
 
 
-def ld_cifar10():
-    """Load training and test data."""
-    transform = transforms.Compose(
-        [transforms.ToTensor()]
-    )  # convert PIL image into tensor
-
-    batch_size = 5  # number of samples per batch
-
-    trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
-                                            download=True, transform=transform)
-    # download training set, store into ./data and apply transform
-
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                              shuffle=True, num_workers=4)  # load in training set
-
-    testset = torchvision.datasets.CIFAR10(root='./data', train=False,
-                                           download=True, transform=transform)
-    # download test set, store into ./data and apply transform
-
-    testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
-                                             shuffle=False, num_workers=4)  # load in test set
-
-    return EasyDict(train=trainloader, test=testloader)
+transform = transforms.Compose(
+    [transforms.ToTensor()
+     ])
 
 
 def main(_):
     # Load training and test data
-    data = ld_cifar10()
+    data = project_utils.ld_cifar10(transform, batch_size=5)
     # Instantiate model, loss, and optimizer for training
     net = CNN(in_channels=3)
     device = "cuda" if torch.cuda.is_available() else "cpu" # check if gpu is available
