@@ -10,3 +10,11 @@ data/cifar-10-batches-py/data_batch_3
 data/cifar-10-batches-py/data_batch_2
 data/cifar-10-batches-py/data_batch_1
 data/cifar-10-batches-py/data_batch_5
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
