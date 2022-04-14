@@ -13,6 +13,7 @@ function. Two networks are being trained, although both have the same architectu
 second the Lookahead optimizer
 """
 
+
 class sin_Dataset(Dataset):
     """Create own dataset (subclass) in pytorch"""
 
@@ -30,35 +31,37 @@ class sin_Dataset(Dataset):
 batch_size = 50
 
 # Create toy dataset
-x_values = torch.from_numpy(np.arange(-5,5,0.02).astype(np.float32))
+x_values = torch.from_numpy(np.arange(-5, 5, 0.02).astype(np.float32))
 y_values = np.sin(x_values)
 
-trainset = sin_Dataset(x_values,y_values)
+trainset = sin_Dataset(x_values, y_values)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                              shuffle=True, num_workers=4)
+                                          shuffle=True, num_workers=4)
 
 x_t_values = torch.from_numpy(np.arange(-4.9, 5.1, 0.02).astype(np.float32))  # float required
 y_t_values = np.sin(x_t_values)
 
-testset = sin_Dataset(x_t_values,y_t_values)
+testset = sin_Dataset(x_t_values, y_t_values)
 testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
-                                              shuffle=False, num_workers=4)
+                                         shuffle=False, num_workers=4)
 
 data = EasyDict(train=trainloader, test=testloader)
+
 
 # specify network architecture
 class ffNN(torch.nn.Module):
     """Basic CNN architecture."""
 
-    def __init__(self): #method thats called when a new NN instance is created
-        super(ffNN, self).__init__() #means to call a bound __init__ from the parent class that follows SomeBaseClass's
+    def __init__(self):  # method thats called when a new NN instance is created
+        super(ffNN,
+              self).__init__()  # means to call a bound __init__ from the parent class that follows SomeBaseClass's
         # child class (the one that defines this method) in the instance's Method Resolution Order (MRO)
         # in this case calls __init__ of torch.nn.Module
-        self.fc1 = nn.Linear(1,100)
-        self.fc2 = nn.Linear(100,1)
+        self.fc1 = nn.Linear(1, 100)
+        self.fc2 = nn.Linear(100, 1)
 
     def forward(self, x):
-        x = x.view(-1,1)  # necessary to get correct shape for first layer
+        x = x.view(-1, 1)  # necessary to get correct shape for first layer
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         x = torch.flatten(x)  # reshape x to match shape of y
@@ -78,9 +81,9 @@ def main(net, optimizer, nb_epochs):
         for x, y in data.train:  # take batches of batch_size many inputs stored in x and targets stored in y
             x, y = x.to(device), y.to(device)
             optimizer.zero_grad()  # Sets the gradient to zero
-            loss = loss_fn(net(x), y)  # need to adapt shape of y to shape of x to avoid errors
-            loss.backward()  # computes the gradient - see also 4)
-            optimizer.step()  # updates the parameters - see also 4)
+            loss = loss_fn(net(x), y)  # forward pass
+            loss.backward()  # backward pass
+            optimizer.step()
             train_loss += loss.item()  # extracts loss value
 
         print(
@@ -111,6 +114,7 @@ def main(net, optimizer, nb_epochs):
 
     plt.plot(x_t_values, y_t_values)
     plt.plot(x_t_values, Y_pred.detach().numpy())
+
 
 if __name__ == '__main__':
     nb_epochs = 50
