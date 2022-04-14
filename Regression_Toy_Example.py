@@ -88,15 +88,14 @@ def main(net_model, optimizer, nb_epochs):
                 epoch, nb_epochs, train_loss))
 
     # test and plot
-    net.eval()
+    net_model.eval()
     preds = []
-    report = EasyDict(nb_test=0, correct=0)
     test_loss = 0.0
     for x, y in data.test:
         x, y = x.to(device), y.to(device)
-        y_pred = net(x)
+        y_pred = net_model(x)
 
-        loss = loss_fn(net(x), y)
+        loss = loss_fn(net_model(x), y)
         test_loss += loss.item()
 
         preds.append(y_pred)
@@ -114,11 +113,11 @@ def main(net_model, optimizer, nb_epochs):
 
 
 if __name__ == '__main__':
-    nb_epochs = 50
+    nb_epoch = 50
 
     net = ffNN()
-    main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epochs)
-
+    main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epochs=nb_epoch)
+    """
     net = ffNN()
     main(net, Lookahead_tutorial.Lookahead(
         torch.optim.Adam(net.parameters(), lr=1e-3)), nb_epochs
@@ -137,3 +136,4 @@ if __name__ == '__main__':
     plt.title('Neural Network Regression Toy Ex.')
     plt.legend(['sine', 'Adam', 'LA: k=5,alpha=0.8', 'LA: k=5,alpha=0.5', 'LA: k=10,alpha=0.5'])
     plt.show()
+    """
