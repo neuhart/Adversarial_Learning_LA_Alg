@@ -37,6 +37,7 @@ y_values = np.sin(x_values)
 trainset = Sin_Dataset(x_values, y_values)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                           shuffle=True, num_workers=0)
+# if num_workers>0 is necessary, trainset needs to be converted into list before that!
 
 x_t_values = torch.from_numpy(np.arange(-4.9, 5.1, 0.02).astype(np.float32))  # float required
 y_t_values = np.sin(x_t_values)
@@ -113,7 +114,7 @@ def main(net_model, optimizer, nb_epochs):
 
 
 if __name__ == '__main__':
-    nb_epoch = 50
+    nb_epoch = 500
 
     net = ffNN()
     main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epoch)
