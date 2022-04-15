@@ -25,10 +25,10 @@ if __name__  == "__main__":
     data = project_utils.ld_cifar10(transform=transform, batch_size=batch_size)
     # Instantiate Resnet50 model, loss, and optimizer for training
     net = torchvision.models.resnet50()
-    device = "cuda" if torch.cuda.is_available() else "cpu" # check if gpu is available
+    device = "cuda" if torch.cuda.is_available() else "cpu"  # check if gpu is available
     if device == "cuda":
         net = net.cuda()  # transfers to gpu
-    loss_fn = torch.nn.CrossEntropyLoss(reduction="mean") # averages over all losses
+    loss_fn = torch.nn.CrossEntropyLoss(reduction="mean")  # averages over all losses
     optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
     # torch.optim.Adam(net.parameters(), lr=1e-3)
 
