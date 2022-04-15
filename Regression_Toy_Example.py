@@ -32,7 +32,7 @@ class Sin_Dataset(Dataset):
 
 batch_size = 50
 adv_training = True
-
+adv_attack = True
 
 # Create toy dataset
 x_values = torch.from_numpy(np.arange(-5, 5, 0.02).astype(np.float32))
@@ -102,6 +102,8 @@ def main(net_model, optimizer, nb_epochs):
     test_loss = 0.0
     for x, y in data.test:
         x, y = x.to(device), y.to(device)
+        if adv_attack is True:
+            x = projected_gradient_descent(net_model, x, 0.3, 0.01, 100, np.inf)
         y_pred = net_model(x)
         y = y.view(-1, 1)  # reshapes y to match shape of x (to avoid error message in loss)
 
