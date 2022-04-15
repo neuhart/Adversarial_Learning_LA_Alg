@@ -1,5 +1,3 @@
-from easydict import EasyDict
-import numpy as np
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -29,9 +27,10 @@ if __name__  == "__main__":
     net = torchvision.models.resnet50()
     device = "cuda" if torch.cuda.is_available() else "cpu" # check if gpu is available
     if device == "cuda":
-        net = net.cuda() #transfers to gpu
+        net = net.cuda()  # transfers to gpu
     loss_fn = torch.nn.CrossEntropyLoss(reduction="mean") # averages over all losses
-    optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3)) #torch.optim.Adam(net.parameters(), lr=1e-3)
+    optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
+    # torch.optim.Adam(net.parameters(), lr=1e-3)
 
     # Train vanilla model
     net.train()
