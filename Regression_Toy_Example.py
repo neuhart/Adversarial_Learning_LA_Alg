@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from easydict import EasyDict
 from torch.utils.data import Dataset
+from cleverhans.torch.attacks.projected_gradient_descent import projected_gradient_descent
+
 
 """
 This is a simple example of neural networks used in the regression setting, in this case for approximating the sine
@@ -29,6 +31,8 @@ class Sin_Dataset(Dataset):
 
 
 batch_size = 50
+adv_training = True
+
 
 # Create toy dataset
 x_values = torch.from_numpy(np.arange(-5, 5, 0.02).astype(np.float32))
@@ -64,7 +68,6 @@ class ffNN(torch.nn.Module):
         x = x.view(-1, 1)  # necessary to get correct shape for first layer
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
-        x = torch.flatten(x)  # reshape x to match shape of y
         return x
 
 
@@ -80,8 +83,11 @@ def main(net_model, optimizer, nb_epochs):
         train_loss = 0.0
         for x, y in data.train:  # take batches of batch_size many inputs stored in x and targets stored in y
             x, y = x.to(device), y.to(device)
+            if adv_training is True:
+                x = projected_gradient_descent(net_model, x, 0.3, 0.01, 40, np.inf)
             optimizer.zero_grad()  # Sets the gradient to zero
-            loss = loss_fn(net(x), y)  # forward pass
+            y = y.view(-1,1)  # reshapes y to match shape of x (to avoid error message in loss)
+            loss = loss_fn(input=net_model(x), target=y)  # forward pass
             loss.backward()  # backward pass
             optimizer.step()
             train_loss += loss.item()  # extracts loss value
@@ -97,8 +103,9 @@ def main(net_model, optimizer, nb_epochs):
     for x, y in data.test:
         x, y = x.to(device), y.to(device)
         y_pred = net_model(x)
+        y = y.view(-1, 1)  # reshapes y to match shape of x (to avoid error message in loss)
 
-        loss = loss_fn(net_model(x), y)
+        loss = loss_fn(y_pred, y)
         test_loss += loss.item()
 
         preds.append(y_pred)
@@ -111,20 +118,14 @@ def main(net_model, optimizer, nb_epochs):
         )
     )
 
-    plt.plot(x_t_values, y_t_values)
     plt.plot(x_t_values, Y_pred.detach().numpy())
 
 
 if __name__ == '__main__':
-    nb_epoch = 500
+    nb_epoch = 50
 
     net = ffNN()
     main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epoch)
-
-    net = ffNN()
-    main(net, Lookahead_tutorial.Lookahead(
-        torch.optim.Adam(net.parameters(), lr=1e-3)), nb_epoch
-         )
 
     net = ffNN()
     main(net, Lookahead_tutorial.Lookahead(
@@ -136,6 +137,7 @@ if __name__ == '__main__':
         torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=10, la_alpha=0.5), nb_epoch
          )
 
+    plt.plot(x_t_values, y_t_values)
     plt.title('Neural Network Regression Toy Ex.')
-    plt.legend(['sine', 'Adam', 'LA: k=5,alpha=0.8', 'LA: k=5,alpha=0.5', 'LA: k=10,alpha=0.5'])
+    plt.legend(['Adam', 'LA: k=5,alpha=0.5', 'LA: k=10,alpha=0.5', 'sine'])
     plt.show()
