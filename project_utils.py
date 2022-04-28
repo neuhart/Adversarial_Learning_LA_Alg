@@ -3,14 +3,59 @@ import torchvision
 from easydict import EasyDict
 import matplotlib.pyplot as plt
 import numpy as np
+from torch.utils.data import Subset
+from torch.utils.data import random_split
 
 
-def ld_cifar10(transform, batch_size):
-    """Load training and test data."""
+def ld_cifar10(transform, batch_size, valid_size=None):
+    """Load training and test data.
+    OPTIONAL: valid_size: Size of validation set
+    create random_split of training data
+    """
 
     trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                             download=True, transform=transform)
     # download training set, store into ./data and apply transform
+
+    if valid_size is not None:  # create train/validation split of training set
+
+        assert valid_size < len(trainset), \
+            "Size of validation set has to be smaller than {}".format(len(trainset))
+
+        trainset, validset = random_split(trainset, lengths=[len(trainset)-valid_size,valid_size]
+                                          , generator=torch.Generator().manual_seed(42))
+
+        validloader = torch.utils.data.DataLoader(validset, batch_size=batch_size,
+                                              shuffle=True, num_workers=0)
+        # load in training set: num_workers = how many subprocesses to use for data loading.
+
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+                                                  shuffle=True, num_workers=0)
+    if valid_size is None:  # no validation set
+        validloader = None
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+                                                  shuffle=True, num_workers=0)
+
+    testset = torchvision.datasets.CIFAR10(root='./data', train=False,
+                                           download=True, transform=transform)
+    testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
+                                             shuffle=False, num_workers=0)  # load in test set
+
+    classes = ('plane', 'car', 'bird', 'cat',
+               'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+
+    return EasyDict(train=trainloader, valid=validloader, test=testloader, classes=classes)
+
+
+def ld_cifar10_subset(transform, indices, batch_size):
+    """Load SUBSET of cifar10 dataset for training and test data."""
+
+    trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
+                                            download=True, transform=transform)
+    # download training set, store into ./data and apply transform
+
+    trainset = Subset(trainset, indices=indices)
+    # Loads only a subset (given by the indices) of the dataset
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                               shuffle=True, num_workers=0)
@@ -19,6 +64,8 @@ def ld_cifar10(transform, batch_size):
     testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                            download=True, transform=transform)
     # download test set, store into ./data and apply transform
+
+    testset = Subset(testset,indices=indices)
 
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                              shuffle=False, num_workers=0)  # load in test set
