@@ -65,7 +65,7 @@ def ld_cifar10_subset(transform, indices, batch_size):
                                            download=True, transform=transform)
     # download test set, store into ./data and apply transform
 
-    testset = Subset(testset,indices=indices)
+    testset = Subset(testset, indices=indices)
 
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                              shuffle=False, num_workers=0)  # load in test set
