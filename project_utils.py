@@ -83,24 +83,11 @@ def dataset_spec(transform,batch_size):
     Currently no training/validation split possible
     Currently no choice of RANDOM subset possible
     """
-    print('Run on whole dataset?')
-    wd = input('(y/n):')
-    while wd not in ['y', 'n']:
-        print('expected "y" or "n" ')
-        wd = input('(y/n):')
-
-    if wd == 'y':
+    if yes_no_check('Run on whole dataset?'):
         return ld_cifar10(transform=transform, batch_size=batch_size)
-    elif wd == 'n':
-        s_size = input('Subset size:')
-        while isinstance(s_size, int) is False:
-            try:
-                s_size = int(s_size)
-            except:
-                print('Integer expected')
-                s_size = input('Subset size:')
+    else:
+        s_size = int_query('Subset size')
         return ld_cifar10_subset(transform=transform, indices=range(s_size), batch_size=batch_size)
-
 
 
 def imshow(dataloader, batch_size, classes, inv_transform=None):
@@ -121,5 +108,27 @@ def imshow(dataloader, batch_size, classes, inv_transform=None):
     print(' '.join(f'{classes[labels[j]]:5s}' for j in range(batch_size)))  # print labels
 
 
+def yes_no_check(question):
+    """
+    Ask a 'yes or no'-question
+    return True for yes and False for no
+    """
+    x = input(question + ' (y/n):')
+    while x not in ['y', 'n']:
+        print('expected "y" or "n" ')
+        x = input(question + ' (y/n):')
+    return True if x == 'y' else False
 
 
+def int_query(query):
+    """
+    Query an integer
+    """
+    x = input(query + ' (int):')
+    while isinstance(x, int) is False:
+        try:
+            x = int(x)
+        except:
+            print('Integer expected')
+            x = input(query + ' (int):')
+    return x
