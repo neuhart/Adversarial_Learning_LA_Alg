@@ -120,7 +120,7 @@ def main(net_model, optimizer, nb_epochs):
         )
     )
 
-    plt.plot(x_t_values, Y_pred.detach().numpy())
+    plt.plot(x_t_values, Y_pred.cpu().detach().numpy())
 
 
 if __name__ == '__main__':
