@@ -10,6 +10,7 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
     projected_gradient_descent,
 )
 from absl import app, flags
+import time
 
 """
 1) https://pytorch.org/hub/pytorch_vision_resnet/
@@ -30,6 +31,7 @@ transform = transforms.Compose([
 
 def cifar10_training(train_set, net, optimizer, loss_fn, device, adv_train=False):
     for epoch in range(1, FLAGS.nb_epochs + 1):
+        start_t = time.time()
         train_loss = 0.0
         for x, y in train_set:  # take batches of batch_size many inputs stored in x and targets stored in y
             x, y = x.to(device), y.to(device)
@@ -41,8 +43,8 @@ def cifar10_training(train_set, net, optimizer, loss_fn, device, adv_train=False
             optimizer.step()  # updates the parameters - see also 4)
             train_loss += loss.item()  # extracts loss value
         print(
-            "epoch: {}/{}, train loss: {:.3f}".format(
-                epoch, FLAGS.nb_epochs, train_loss
+            "epoch: {}/{}, train loss: {:.3f} computed in {:.3f} seconds".format(
+                epoch, FLAGS.nb_epochs, train_loss, time.time()-start_t
             )
         )
 
@@ -96,7 +98,7 @@ def main(_):
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction="mean")  # averages over all losses
 
-    optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
+    optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3), la_alpha=0.5)
     # or: torch.optim.Adam(net.parameters(), lr=1e-3)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"  # check if gpu is available
