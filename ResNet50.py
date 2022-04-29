@@ -17,8 +17,8 @@ from absl import app, flags
 """
 
 FLAGS = flags.FLAGS
-batch_size = 50  # number of samples per batch
 
+batch_size = 50  # number of samples per batch
 
 transform = transforms.Compose([
             transforms.RandomResizedCrop(224),
@@ -90,7 +90,7 @@ def cifar10_evaluation(test_set, net, device):
 
 
 def main(_):
-    data = project_utils.ld_cifar10_subset(transform=transform, indices=range(100), batch_size=batch_size)
+    data = project_utils.dataset_spec(transform, batch_size)
 
     net = torchvision.models.resnet50()
 
