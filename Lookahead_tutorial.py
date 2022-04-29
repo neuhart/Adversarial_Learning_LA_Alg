@@ -105,6 +105,7 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
                     param_state = self.state[p]  # accesses dict entry of tensor p
                     """updates slow weight"""
                     p.data.mul_(self.la_alpha).add_(param_state['cached_params'].to(device), alpha=1.0 - self.la_alpha)
+                    # param_state['cached_params'].to(device) necessary because 
                     # old slow weight is stored in cached_params entry in dict of p
                     # new slow weight= la_alpha * latest fast weight + (1-la_alpha) * old slow weight
                     param_state['cached_params'].copy_(p.data)
