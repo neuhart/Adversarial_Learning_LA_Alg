@@ -120,25 +120,28 @@ def main(net_model, optimizer, nb_epochs):
         )
     )
 
-    plt.plot(x_t_values, Y_pred.detach().cpu().numpy())
+    return Y_pred
 
 
 if __name__ == '__main__':
     nb_epoch = 50
 
-    net = ffNN()
-    main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epoch)
+    preds=[]
 
     net = ffNN()
-    main(net, Lookahead_tutorial.Lookahead(
-        torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=5, la_alpha=0.5), nb_epoch
-         )
+    preds.append(main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epoch))
 
     net = ffNN()
-    main(net, Lookahead_tutorial.Lookahead(
+    preds.append(main(net, Lookahead_tutorial.Lookahead(
+        torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=5, la_alpha=0.5), nb_epoch))
+
+    net = ffNN()
+    preds.append(main(net, Lookahead_tutorial.Lookahead(
         torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=10, la_alpha=0.5), nb_epoch
-         )
+         ))
 
+    for p in preds:
+        plt.plot(x_t_values, p.cpu().detach().numpy())
     plt.plot(x_t_values, y_t_values)
     plt.title('Neural Network Regression Toy Ex.')
     plt.legend(['Adam', 'LA: k=5,alpha=0.5', 'LA: k=10,alpha=0.5', 'sine'])
