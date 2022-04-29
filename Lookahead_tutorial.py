@@ -26,6 +26,7 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
 
         self.state = defaultdict(dict)  # creates an empty dict of dicts with default set to empty dict entry {}
 
+
         # Cache the current optimizer parameters
         for group in optimizer.param_groups:
             # each param_group is a dictionary containing params (parameters) in form of tensors
@@ -79,7 +80,7 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
                 p.data.copy_(param_state['backup_params'])  # load backup in again
                 del param_state['backup_params']  # and delete backup
 
-    @property  # pythonic way to use use getters and setters in object-oriented programming.
+    @property  # pythonic way to use getters and setters in object-oriented programming.
     def param_groups(self):
         # in this case a getter function is defined. this is to make sure that param_groups is not directly accessed
         # or modified but instead through this function
@@ -97,11 +98,14 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
         if self._la_step >= self._total_la_steps:
             self._la_step = 0
             # Lookahead and cache the current optimizer parameters
+            device = "cuda" if torch.cuda.is_available() else "cpu"  # check if gpu is available
+
             for group in self.optimizer.param_groups:
                 for p in group['params']:
                     param_state = self.state[p]  # accesses dict entry of tensor p
                     """updates slow weight"""
-                    p.data.mul_(self.la_alpha).add_(param_state['cached_params'], alpha=1.0 - self.la_alpha)
+                    p.data.mul_(self.la_alpha).add_(param_state['cached_params'].to(device), alpha=1.0 - self.la_alpha)
+                    # param_state['cached_params'].to(device) to have all tensors on same device
                     # old slow weight is stored in cached_params entry in dict of p
                     # new slow weight= la_alpha * latest fast weight + (1-la_alpha) * old slow weight
                     param_state['cached_params'].copy_(p.data)
