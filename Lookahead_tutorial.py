@@ -26,7 +26,6 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
 
         self.state = defaultdict(dict)  # creates an empty dict of dicts with default set to empty dict entry {}
 
-        device = "cuda" if torch.cuda.is_available() else "cpu"  # check if gpu is available
 
         # Cache the current optimizer parameters
         for group in optimizer.param_groups:
@@ -38,7 +37,7 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
                 param_state = self.state[p]  # creates an empty dict entry for p
                 param_state['cached_params'] = torch.zeros_like(p.data)
                 # creates a 0-tensor with same size as p.data and stores it in cached_params entry of dict entry of p
-                param_state['cached_params'].copy_(p.data).to(device)  # copies values from p
+                param_state['cached_params'].copy_(p.data)  # copies values from p
                 if self.pullback_momentum == "pullback":
                     param_state['cached_mom'] = torch.zeros_like(p.data)
 
@@ -99,11 +98,13 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
         if self._la_step >= self._total_la_steps:
             self._la_step = 0
             # Lookahead and cache the current optimizer parameters
+            device = "cuda" if torch.cuda.is_available() else "cpu"  # check if gpu is available
+
             for group in self.optimizer.param_groups:
                 for p in group['params']:
                     param_state = self.state[p]  # accesses dict entry of tensor p
                     """updates slow weight"""
-                    p.data.mul_(self.la_alpha).add_(param_state['cached_params'], alpha=1.0 - self.la_alpha)
+                    p.data.mul_(self.la_alpha).add_(param_state['cached_params'].to(device), alpha=1.0 - self.la_alpha)
                     # old slow weight is stored in cached_params entry in dict of p
                     # new slow weight= la_alpha * latest fast weight + (1-la_alpha) * old slow weight
                     param_state['cached_params'].copy_(p.data)
