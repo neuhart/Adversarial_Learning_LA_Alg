@@ -19,8 +19,6 @@ import time
 
 FLAGS = flags.FLAGS
 
-batch_size = 50  # number of samples per batch
-
 transform = transforms.Compose([
             transforms.RandomResizedCrop(224),
             transforms.RandomHorizontalFlip(),
@@ -92,7 +90,7 @@ def cifar10_evaluation(test_set, net, device):
 
 
 def main(_):
-    data = project_utils.dataset_spec(transform, batch_size)
+    data = project_utils.dataset_spec(transform, FLAGS.batch_size)
 
     net = torchvision.models.resnet50()
 
@@ -114,8 +112,9 @@ def main(_):
     cifar10_evaluation(data.test, net, device)
 
 
-def settings(nb_epochs=1,eps=0.3,adv_train=True, fgsm_att=False, pgd_att=False):
+def settings(nb_epochs=1, batch_size=50, eps=0.3,adv_train=True, fgsm_att=False, pgd_att=False):
     flags.DEFINE_integer("nb_epochs", nb_epochs, "Number of epochs.")
+    flags.DEFINE_integer("batch_size", batch_size, "Size of Minibatch")
     flags.DEFINE_float("eps", eps, "Total epsilon for FGM and PGD attacks.")
     flags.DEFINE_bool(
         "adv_train", adv_train, "Use adversarial training (on PGD adversarial examples)."
@@ -135,6 +134,7 @@ if __name__ == "__main__":
     else:
         settings(
             nb_epochs=project_utils.int_query('Number of epochs'),
+            batch_size=project_utils.int_query('Batch size'),
             adv_train=project_utils.yes_no_check('Adversarial Training?'),
             fgsm_att=project_utils.yes_no_check('FGSM Attack during testing?'),
             pgd_att=project_utils.yes_no_check('PGD Attack during testing')
