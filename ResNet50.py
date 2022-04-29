@@ -112,7 +112,7 @@ def main(_):
     cifar10_evaluation(data.test, net, device)
 
 
-def settings(nb_epochs=1, batch_size=50, eps=0.3,adv_train=True, fgsm_att=False, pgd_att=False):
+def settings(nb_epochs=50, batch_size=50, eps=0.3,adv_train=False, fgsm_att=False, pgd_att=False):
     flags.DEFINE_integer("nb_epochs", nb_epochs, "Number of epochs.")
     flags.DEFINE_integer("batch_size", batch_size, "Size of Minibatch")
     flags.DEFINE_float("eps", eps, "Total epsilon for FGM and PGD attacks.")
