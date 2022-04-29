@@ -112,17 +112,31 @@ def main(_):
     cifar10_evaluation(data.test, net, device)
 
 
+def settings(nb_epochs=1,eps=0.3,adv_train=True, fgsm_att=False, pgd_att=False):
+    flags.DEFINE_integer("nb_epochs", nb_epochs, "Number of epochs.")
+    flags.DEFINE_float("eps", eps, "Total epsilon for FGM and PGD attacks.")
+    flags.DEFINE_bool(
+        "adv_train", adv_train, "Use adversarial training (on PGD adversarial examples)."
+    )
+    flags.DEFINE_bool(
+        "fgsm_att", fgsm_att, "Use FGSM attack in evaluation"
+    )
+    flags.DEFINE_bool(
+        "pgd_att", pgd_att, "Use PGD attack in evaluation"
+    )
+
+
 if __name__ == "__main__":
-    flags.DEFINE_integer("nb_epochs", 1, "Number of epochs.")
-    flags.DEFINE_float("eps", 0.3, "Total epsilon for FGM and PGD attacks.")
-    flags.DEFINE_bool(
-        "adv_train", True, "Use adversarial training (on PGD adversarial examples)."
-    )
-    flags.DEFINE_bool(
-        "fgsm_att", False, "Use FGSM attack in evaluation"
-    )
-    flags.DEFINE_bool(
-        "pgd_att", False, "Use PGD attack in evaluation"
-    )
+
+    if project_utils.yes_no_check('Run on standard settings?'):
+        settings()
+    else:
+        settings(
+            nb_epochs=project_utils.int_query('Number of epochs'),
+            adv_train=project_utils.yes_no_check('Adversarial Training?'),
+            fgsm_att=project_utils.yes_no_check('FGSM Attack during testing?'),
+            pgd_att=project_utils.yes_no_check('PGD Attack during testing')
+            )
+
     app.run(main)
 
