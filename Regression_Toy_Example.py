@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
     net = ffNN()
     preds.append(main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epoch))
-
+    """
     net = ffNN()
     preds.append(main(net, Lookahead_tutorial.Lookahead(
         torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=5, la_alpha=0.5), nb_epoch))
@@ -139,10 +139,10 @@ if __name__ == '__main__':
     preds.append(main(net, Lookahead_tutorial.Lookahead(
         torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=10, la_alpha=0.5), nb_epoch
          ))
-
+    """
     for p in preds:
         plt.plot(x_t_values, p.cpu().detach().numpy())
     plt.plot(x_t_values, y_t_values)
     plt.title('Neural Network Regression Toy Ex.')
-    plt.legend(['Adam', 'LA: k=5,alpha=0.5', 'LA: k=10,alpha=0.5', 'sine'])
+    #plt.legend(['Adam', 'LA: k=5,alpha=0.5', 'LA: k=10,alpha=0.5', 'sine'])
     plt.show()
