@@ -76,6 +76,33 @@ def ld_cifar10_subset(transform, indices, batch_size):
     return EasyDict(train=trainloader, test=testloader, classes=classes)
 
 
+def dataset_spec(transform,batch_size):
+    """
+    Specify whether the whole dataset or just a subset of it shall be loaded
+    If Subset, specify size of subset
+    Currently no training/validation split possible
+    Currently no choice of RANDOM subset possible
+    """
+    print('Run on whole dataset?')
+    wd = input('(y/n):')
+    while wd not in ['y', 'n']:
+        print('expected "y" or "n" ')
+        wd = input('(y/n):')
+
+    if wd == 'y':
+        return ld_cifar10(transform=transform, batch_size=batch_size)
+    elif wd == 'n':
+        s_size = input('Subset size:')
+        while isinstance(s_size, int) is False:
+            try:
+                s_size = int(s_size)
+            except:
+                print('Integer expected')
+                s_size = input('Subset size:')
+        return ld_cifar10_subset(transform=transform, indices=range(s_size), batch_size=batch_size)
+
+
+
 def imshow(dataloader, batch_size, classes, inv_transform=None):
     """Plot a batch of images
     dataloader: dataloader from which to get images
