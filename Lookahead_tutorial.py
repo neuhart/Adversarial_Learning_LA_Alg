@@ -26,6 +26,8 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
 
         self.state = defaultdict(dict)  # creates an empty dict of dicts with default set to empty dict entry {}
 
+        device = "cuda" if torch.cuda.is_available() else "cpu"  # check if gpu is available
+
         # Cache the current optimizer parameters
         for group in optimizer.param_groups:
             # each param_group is a dictionary containing params (parameters) in form of tensors
@@ -36,7 +38,7 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
                 param_state = self.state[p]  # creates an empty dict entry for p
                 param_state['cached_params'] = torch.zeros_like(p.data)
                 # creates a 0-tensor with same size as p.data and stores it in cached_params entry of dict entry of p
-                param_state['cached_params'].copy_(p.data)  # copies values from p
+                param_state['cached_params'].copy_(p.data).to(device)  # copies values from p
                 if self.pullback_momentum == "pullback":
                     param_state['cached_mom'] = torch.zeros_like(p.data)
 
@@ -79,7 +81,7 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
                 p.data.copy_(param_state['backup_params'])  # load backup in again
                 del param_state['backup_params']  # and delete backup
 
-    @property  # pythonic way to use use getters and setters in object-oriented programming.
+    @property  # pythonic way to use getters and setters in object-oriented programming.
     def param_groups(self):
         # in this case a getter function is defined. this is to make sure that param_groups is not directly accessed
         # or modified but instead through this function
