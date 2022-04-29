@@ -8,6 +8,7 @@ from easydict import EasyDict
 from torch.utils.data import Dataset
 from cleverhans.torch.attacks.projected_gradient_descent import projected_gradient_descent
 
+print(torch.cuda.is_available())
 
 """
 This is a simple example of neural networks used in the regression setting, in this case for approximating the sine
