@@ -142,7 +142,5 @@ def save_results(optimizer, results):
         df = pd.read_csv(filename)
     except:
         df = pd.DataFrame()
-    print(results)
-    print(pd.Series(results).shape)
-    df[optimizer] = pd.Series(results)
+    df = pd.concat([df, pd.Series(results, name=optimizer)], axis=1)
     df.to_csv(filename, index=False)
