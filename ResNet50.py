@@ -12,6 +12,7 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
 from absl import app, flags
 import time
 
+
 """
 1) https://pytorch.org/hub/pytorch_vision_resnet/
 2) https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html (image transformation for resnet)
@@ -28,6 +29,7 @@ transform = transforms.Compose([
 
 
 def cifar10_training(train_set, net, optimizer, loss_fn, device, adv_train=False):
+    results = []
     for epoch in range(1, FLAGS.nb_epochs + 1):
         start_t = time.time()
         train_loss = 0.0
@@ -40,11 +42,14 @@ def cifar10_training(train_set, net, optimizer, loss_fn, device, adv_train=False
             loss.backward()  # computes the gradient - see also 4)
             optimizer.step()  # updates the parameters - see also 4)
             train_loss += loss.item()  # extracts loss value
+        end_t = time.time()
         print(
             "epoch: {}/{}, train loss: {:.3f} computed in {:.3f} seconds".format(
-                epoch, FLAGS.nb_epochs, train_loss, time.time()-start_t
+                epoch, FLAGS.nb_epochs, train_loss, end_t-start_t
             )
         )
+        results.append(train_loss)
+    project_utils.save_results(optimizer.__class__.__name__, results=results)
 
 
 def cifar10_evaluation(test_set, net, device):
