@@ -99,9 +99,9 @@ def main(_):
     optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3), la_alpha=0.5)
     # or: torch.optim.Adam(net.parameters(), lr=1e-3)
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"  # check if gpu is available
-    if device == "cuda":
-        net = net.cuda()  # transfers to gpu
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+    net.to(device)  # transfers to gpu
 
     # Train ResNet50 model
     net.train()
