@@ -136,7 +136,7 @@ def int_query(query):
 
 
 def save_results(optimizer, results):
-    assert optimizer in ['Adam', 'Lookahead', 'SGD']
+    # assert optimizer in ['Adam', 'Lookahead', 'SGD']
     filename = 'data/results.csv'
     try:
         df = pd.read_csv(filename)
