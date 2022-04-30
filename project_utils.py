@@ -1,3 +1,4 @@
+import pandas as pd
 import torch
 import torchvision
 from easydict import EasyDict
@@ -132,3 +133,14 @@ def int_query(query):
             print('Integer expected')
             x = input(query + ' (int):')
     return x
+
+
+def save_results(optimizer, results):
+    assert optimizer in ['Adam', 'Lookahead', 'SGD']
+    filename = 'data/results.csv'
+    try:
+        df = pd.read_csv(filename)
+    except:
+        df = pd.DataFrame()
+    df[optimizer] = results
+    df.to_csv(filename, index=False)
