@@ -49,7 +49,7 @@ def ld_cifar10(transform, batch_size, valid_size=None):
 
 
 def ld_cifar10_subset(transform, indices, batch_size):
-    """Load SUBSET of cifar10 dataset for training and test data."""
+    """Load SUBSET of cifar10 dataset for training data."""
 
     trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                             download=True, transform=transform)
@@ -65,8 +65,6 @@ def ld_cifar10_subset(transform, indices, batch_size):
     testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                            download=True, transform=transform)
     # download test set, store into ./data and apply transform
-
-    testset = Subset(testset, indices=indices)
 
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                              shuffle=False, num_workers=0)  # load in test set
