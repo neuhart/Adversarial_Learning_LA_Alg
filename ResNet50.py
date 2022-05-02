@@ -101,8 +101,10 @@ def main(_):
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction="mean")  # averages over all losses
 
-    optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3), la_alpha=0.5)
-    # or: torch.optim.Adam(net.parameters(), lr=1e-3)
+    if project_utils.get_opt() == 'Lookahead':
+        optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3), la_alpha=0.5)
+    else:
+        optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
