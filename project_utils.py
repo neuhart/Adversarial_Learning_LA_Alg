@@ -144,3 +144,9 @@ def save_results(optimizer, results):
         df = pd.DataFrame()
     df = pd.concat([df, pd.Series(results, name=optimizer)], axis=1)
     df.to_csv(filename, index=False)
+
+
+def get_opt():
+    x = input('Lookahead or Adam? Choice:')
+    assert x in ['Lookahead', 'Adam'], 'Choose between "Lookahead" or "Adam"'
+    return x
