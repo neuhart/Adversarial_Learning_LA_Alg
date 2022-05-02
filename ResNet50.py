@@ -101,7 +101,8 @@ def main(_):
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction="mean")  # averages over all losses
 
-    if project_utils.get_opt() == 'Lookahead':
+    optimizer_name = project_utils.get_opt()
+    if optimizer_name == 'Lookahead':
         optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3), la_alpha=0.5)
     else:
         optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
