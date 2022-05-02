@@ -28,12 +28,12 @@ transform = transforms.Compose([
     ])  # convert PIL image into tensor and transform to match ResNet50 requirements (see 2))
 
 
-def cifar10_training(train_set, net, optimizer, loss_fn, device, adv_train=False):
+def cifar10_training(train_loader, net, optimizer, loss_fn, device, adv_train=False):
     results = []
     for epoch in range(1, FLAGS.nb_epochs + 1):
         start_t = time.time()
         train_loss = 0.0
-        for x, y in train_set:  # take batches of batch_size many inputs stored in x and targets stored in y
+        for x, y in train_loader:  # take batches of batch_size many inputs stored in x and targets stored in y
             x, y = x.to(device), y.to(device)
             if adv_train:
                 x = projected_gradient_descent(net, x, FLAGS.eps, 0.01, 40, np.inf)
@@ -45,16 +45,16 @@ def cifar10_training(train_set, net, optimizer, loss_fn, device, adv_train=False
         end_t = time.time()
         print(
             "epoch: {}/{}, train loss: {:.3f} computed in {:.3f} seconds".format(
-                epoch, FLAGS.nb_epochs, train_loss, end_t-start_t
+                epoch, FLAGS.nb_epochs, train_loss/len(train_loader), end_t-start_t
             )
         )
         results.append(train_loss)
     project_utils.save_results(optimizer.__class__.__name__, results=results)
 
 
-def cifar10_evaluation(test_set, net, device):
+def cifar10_evaluation(test_loader, net, device):
     report = EasyDict(nb_test=0, correct=0, correct_fgm=0, correct_pgd=0)
-    for x, y in test_set:
+    for x, y in test_loader:
         x, y = x.to(device), y.to(device)
 
         _, y_pred = net(x).max(1)  # model prediction on clean examples
@@ -99,7 +99,7 @@ def main(_):
 
     net = torchvision.models.resnet50()
 
-    loss_fn = torch.nn.CrossEntropyLoss(reduction="mean")  # averages over all losses
+    loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")  # averages over all losses
 
     optimizer_name = project_utils.get_opt()
     if optimizer_name == 'Lookahead':
