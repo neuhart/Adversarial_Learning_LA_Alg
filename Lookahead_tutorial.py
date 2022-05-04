@@ -1,4 +1,6 @@
 from collections import defaultdict
+#  The functionality of both dictionaries and defaultdict are almost same except for the fact that defaultdict
+#  never raises a KeyError. It provides a default value for the key that does not exists.
 import torch
 from torch.optim.optimizer import Optimizer
 
@@ -25,7 +27,6 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
         self.pullback_momentum = pullback_momentum
 
         self.state = defaultdict(dict)  # creates an empty dict of dicts with default set to empty dict entry {}
-
 
         # Cache the current optimizer parameters
         for group in optimizer.param_groups:
