@@ -49,7 +49,7 @@ def cifar10_training(train_loader, net, optimizer, loss_fn, device, adv_train=Fa
             )
         )
         results.append(train_loss)
-    project_utils.save_results(optimizer.__class__.__name__, results=results)
+    project_utils.save_results(optimizer.__class__.__name__, bool_adv_train=FLAGS.adv_train, results=results)
 
 
 def cifar10_evaluation(test_loader, net, device):
@@ -120,7 +120,7 @@ def main(_):
     cifar10_evaluation(data.test, net, device)
 
 
-def settings(nb_epochs=50, batch_size=50, eps=0.3,adv_train=False, fgsm_att=False, pgd_att=False):
+def settings(nb_epochs=20, batch_size=100, eps=0.3, adv_train=False, fgsm_att=False, pgd_att=False):
     flags.DEFINE_integer("nb_epochs", nb_epochs, "Number of epochs.")
     flags.DEFINE_integer("batch_size", batch_size, "Size of Minibatch")
     flags.DEFINE_float("eps", eps, "Total epsilon for FGM and PGD attacks.")

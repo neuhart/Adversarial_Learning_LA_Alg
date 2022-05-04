@@ -133,9 +133,9 @@ def int_query(query):
     return x
 
 
-def save_results(optimizer, results):
+def save_results(optimizer, bool_adv_train, results):
     # assert optimizer in ['Adam', 'Lookahead', 'SGD']
-    filename = 'data/results.csv'
+    filename = 'data/adv_results.csv' if bool_adv_train else 'data/clean_results.csv'
     try:
         df = pd.read_csv(filename)
     except:
