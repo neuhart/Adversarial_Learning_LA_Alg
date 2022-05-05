@@ -43,6 +43,10 @@ def cifar10_training(train_loader, net, optimizer, device, adv_train=False):
             optimizer.zero_grad()  # explained in 3). Sets the gradient to zero
             loss = loss_fn(net(x), y)  # creates a new loss_fn (torch.nn.crossentropyloss) class instance
             loss.backward()  # computes the gradient - see also 4)
+            if optimizer in ['ExtraSGD', 'ExtraAdam']:  # For Extra-SGD/Adam, we need an extrapolation step
+                optimizer.extrapolation()
+                optimizer.zero_grad()
+                loss(net(x), y).backward()
             optimizer.step()  # updates the parameters - see also 4)
             train_loss += loss.item()  # extracts loss value
         end_t = time.time()
