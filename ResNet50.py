@@ -43,7 +43,7 @@ def main(_):
 
     # Train model
     net.train()
-    net = cifar10_pn_utils.cifar10_training(data.train, net, optimizer, device)
+    cifar10_pn_utils.cifar10_training(data.train, net, optimizer, device)
 
     # Evaluation
     net.eval()
