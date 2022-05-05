@@ -49,7 +49,6 @@ def int_query(query):
 
 
 def save_results(optimizer, bool_adv_train, results):
-    # assert optimizer in ['Adam', 'Lookahead', 'SGD']
     filename = 'data/adv_results.csv' if bool_adv_train else 'data/clean_results.csv'
     try:
         df = pd.read_csv(filename)
@@ -60,6 +59,7 @@ def save_results(optimizer, bool_adv_train, results):
 
 
 def get_opt():
-    x = input('Lookahead or Adam? Choice:')
-    assert x in ['Lookahead', 'Adam'], 'Choose between "Lookahead" or "Adam"'
+    implemented_optims = ['SGD', 'Lookahead', 'Adam', 'ExtraSGD', 'ExtraAdam']
+    x = input('Select an opimizer {}:'.format(implemented_optims))
+    assert x in implemented_optims, 'Implemented optimizer: {}'.format(implemented_optims)
     return x

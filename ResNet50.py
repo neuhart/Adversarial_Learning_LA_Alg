@@ -2,6 +2,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 import Lookahead_tutorial
+import extragradient
 import project_utils
 import cifar10_pn_utils
 from absl import app
@@ -29,8 +30,16 @@ def main(_):
     optimizer_name = project_utils.get_opt()
     if optimizer_name == 'Lookahead':
         optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
-    else:
+    elif optimizer_name == 'Adam':
         optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
+    elif optimizer_name == 'ExtraSGD':
+        optimizer = extragradient.ExtraSGD(net.parameters(), lr=1e-3)
+    elif optimizer_name == 'ExtraAdam':
+        optimizer = extragradient.ExtraAdam(net.parameters(), lr=1e-3)
+    elif optimizer_name == 'SGD':
+        optimizer = torch.optim.SGD(net.parameters(), lr=1e-3)
+    else:
+        raise 'Wrong optimizer'
 
     # Train model
     net.train()
