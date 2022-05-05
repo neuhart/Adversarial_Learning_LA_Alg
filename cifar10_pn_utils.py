@@ -46,7 +46,8 @@ def cifar10_training(train_loader, net, optimizer, device, adv_train=False):
             if optimizer.__class__.__name__ in ['ExtraSGD', 'ExtraAdam']:  # For Extra-SGD/Adam, we need an extrapolation step
                 optimizer.extrapolation()
                 optimizer.zero_grad()
-                loss(net(x), y).backward()
+                loss = loss_fn(net(x), y)
+                loss.backward()
             optimizer.step()  # updates the parameters - see also 4)
             train_loss += loss.item()  # extracts loss value
         end_t = time.time()
