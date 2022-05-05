@@ -58,6 +58,7 @@ def cifar10_training(train_loader, net, optimizer, device, adv_train=False):
         )
         results.append(train_loss)
     project_utils.save_results(optimizer.__class__.__name__, bool_adv_train=FLAGS.adv_train, results=results)
+    return net
 
 
 def cifar10_evaluation(test_loader, net, device):
