@@ -12,7 +12,7 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
     Lookahead Optimizer: https://arxiv.org/abs/1907.08610
     """
 
-    def __init__(self, optimizer, la_steps=5, la_alpha=0.8, pullback_momentum="none"):
+    def __init__(self, optimizer, la_steps=5, la_alpha=0.5, pullback_momentum="none"):
         """optimizer: inner optimizer
         la_steps (int): number of lookahead steps
         la_alpha (float): linear interpolation factor. 1.0 recovers the inner optimizer.

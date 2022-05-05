@@ -23,16 +23,14 @@ def main(_):
     data = cifar10_pn_utils.dataset_spec(transform)
 
     net = torchvision.models.resnet50()
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    net.to(device)  # transfers to gpu if available
 
     optimizer_name = project_utils.get_opt()
     if optimizer_name == 'Lookahead':
-        optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3), la_alpha=0.5)
+        optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
     else:
         optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
-
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
-    net.to(device)  # transfers to gpu if available
 
     # Train model
     net.train()
