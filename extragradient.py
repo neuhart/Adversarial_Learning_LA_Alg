@@ -55,7 +55,9 @@ class Extragradient(Optimizer):
             for p in group['params']:
                 u = self.update(p, group)
                 if is_empty:
-                    # Save the current parameters for the update step. Several extrapolation step can be made before each update but only the parameters before the first extrapolation step are saved.
+                    # Save the current parameters for the update step.
+                    # Several extrapolation step can be made before each update
+                    # but only the parameters before the first extrapolation step are saved.
                     self.params_copy.append(p.data.clone())
                 if u is None:
                     continue
@@ -86,10 +88,10 @@ class Extragradient(Optimizer):
                 # Update the parameters saved during the extrapolation step
                 p.data = self.params_copy[i].add_(u)
 
-
         # Free the old parameters
         self.params_copy = []
         return loss
+
 
 class ExtraSGD(Extragradient):
     """Implements stochastic gradient descent with extrapolation step (optionally with momentum).
