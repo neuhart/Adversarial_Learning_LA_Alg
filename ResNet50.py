@@ -33,7 +33,7 @@ def main(_):
     elif optimizer_name == 'Adam':
         optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
     elif optimizer_name == 'ExtraSGD':
-        optimizer = extragradient.ExtraSGD(net.parameters(), lr=1e-2)
+        optimizer = extragradient.ExtraSGD(net.parameters(), lr=1e-3)
     elif optimizer_name == 'ExtraAdam':
         optimizer = extragradient.ExtraAdam(net.parameters(), lr=1e-3)
     elif optimizer_name == 'SGD':
