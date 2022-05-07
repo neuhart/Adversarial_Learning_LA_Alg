@@ -33,9 +33,9 @@ def main(_):
     elif optimizer_name == 'LA-Adam':
         optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
     elif optimizer_name == 'LA-ExtraSGD':
-        optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
+        optimizer = Lookahead_tutorial.Lookahead(extragradient.ExtraSGD(net.parameters(), lr=1e-3))
     elif optimizer_name == 'LA-ExtraAdam':
-        optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
+        optimizer = Lookahead_tutorial.Lookahead(extragradient.ExtraAdam(net.parameters(), lr=1e-3))
     elif optimizer_name == 'Adam':
         optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
     elif optimizer_name == 'ExtraSGD':
