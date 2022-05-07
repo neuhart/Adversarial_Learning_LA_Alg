@@ -45,10 +45,14 @@ def cifar10_training(train_loader, net, optimizer, device, adv_train=False):
             loss = loss_fn(net(x), y)  # creates a new loss_fn (torch.nn.crossentropyloss) class instance
             loss.backward()  # computes the gradient - see also 4)
 
-            if project_utils.get_optim_name(optimizer) in \
-                    ['Lookahead-ExtraAdam', 'Lookahead-ExtraSGD', 'ExtraSGD', 'ExtraAdam']:
+            if project_utils.get_optim_name(optimizer) in ['ExtraSGD', 'ExtraAdam']:
                 # For Extra-SGD/Adam, we need an extrapolation step
                 optimizer.extrapolation()
+                optimizer.zero_grad()
+                loss = loss_fn(net(x), y)
+                loss.backward()
+            elif project_utils.get_optim_name(optimizer) in ['Lookahead-ExtraSGD', 'Lookahead-ExtraAdam']:
+                optimizer.optimizer.extrapolation()
                 optimizer.zero_grad()
                 loss = loss_fn(net(x), y)
                 loss.backward()
