@@ -54,15 +54,20 @@ def save_results(optimizer, bool_adv_train, results):
         df = pd.read_csv(filename)
     except:
         df = pd.DataFrame()
-    optimizer_name = optimizer.__class__.__name__
-    if optimizer_name == 'Lookahead':
-        optimizer_name += '-' + optimizer.optimizer.__class__.__name__
-    df = pd.concat([df, pd.Series(results, name=optimizer_name)], axis=1)
+
+    df = pd.concat([df, pd.Series(results, name=get_optim_name(optimizer))], axis=1)
     df.to_csv(filename, index=False)
 
 
-def get_opt():
+def query_optim():
     implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-ExtraSGD', 'SGD', 'Adam', 'ExtraSGD', 'ExtraAdam']
     x = input('Select an opimizer {}:'.format(implemented_optims))
     assert x in implemented_optims, 'Implemented optimizer: {}'.format(implemented_optims)
     return x
+
+
+def get_optim_name(optimizer):
+    optimizer_name = optimizer.__class__.__name__
+    if optimizer_name == 'Lookahead':
+        optimizer_name += '-' + optimizer.optimizer.__class__.__name__
+    return optimizer_name

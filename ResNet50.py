@@ -27,7 +27,7 @@ def main(_):
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     net.to(device)  # transfers to gpu if available
 
-    optimizer_name = project_utils.get_opt()
+    optimizer_name = project_utils.query_optim()
     if optimizer_name == 'LA-SGD':
         optimizer = Lookahead_tutorial.Lookahead(torch.optim.SGD(net.parameters(), lr=1e-3))
     elif optimizer_name == 'LA-Adam':
