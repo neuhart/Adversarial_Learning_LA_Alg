@@ -28,7 +28,13 @@ def main(_):
     net.to(device)  # transfers to gpu if available
 
     optimizer_name = project_utils.get_opt()
-    if optimizer_name == 'Lookahead':
+    if optimizer_name == 'LA-SGD':
+        optimizer = Lookahead_tutorial.Lookahead(torch.optim.SGD(net.parameters(), lr=1e-3))
+    elif optimizer_name == 'LA-Adam':
+        optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
+    elif optimizer_name == 'LA-ExtraSGD':
+        optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
+    elif optimizer_name == 'LA-ExtraAdam':
         optimizer = Lookahead_tutorial.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
     elif optimizer_name == 'Adam':
         optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
