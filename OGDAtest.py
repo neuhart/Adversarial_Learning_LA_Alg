@@ -9,7 +9,7 @@ import numpy as np
 from easydict import EasyDict
 from torch.utils.data import Dataset
 from cleverhans.torch.attacks.projected_gradient_descent import projected_gradient_descent
-
+import time
 
 """
 This is a simple example of neural networks used in the regression setting, in this case for approximating the sine
@@ -126,5 +126,8 @@ if __name__ == '__main__':
     nb_epoch = 50
 
     net = ffNN()
+    start_t= time.time()
     main(net, OGDA.OGDA(net.parameters(), lr=1e-3), nb_epoch)
+    #main(net, torch.optim.SGD(net.parameters(), lr=1e-3), nb_epoch)
+    print(time.time()-start_t)
 

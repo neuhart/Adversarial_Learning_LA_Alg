@@ -7,6 +7,7 @@ class OGDA(Optimizer):
 
     def __init__(self, params, lr=1e-3):
         self.prev_grad = []
+        self.first = True
         defaults = dict(lr=lr)
         super().__init__(params, defaults)
 
@@ -18,35 +19,30 @@ class OGDA(Optimizer):
                 loss = closure()
 
         for group in self.param_groups:
-            i=-1-1
+            i=-1
             for p in group['params']:
-                i+=1
-
-                print(self.prev_grad)
-                print('param')
 
                 if p.grad is None:
                     continue
                 grad = p.grad
 
-                if len(self.prev_grad) == 0:
+                if self.first:
                     self.prev_grad.append(grad.clone())
                     old_grad = torch.zeros_like(p)
 
                 else:
+                    i += 1
                     old_grad = self.prev_grad[i]
 
                 state = self.state[p]
-                print('state', state)
                 if len(state) == 0:
                     state['step'] = torch.tensor(0.)
                 state['step'] += 1
 
-                print(p.data.shape, grad.shape, old_grad.shape)
-                p.data.add_(grad, alpha=-2).add_(old_grad)
+                p.data.add_(grad, alpha=-2*group['lr']).add_(old_grad, alpha=group['lr'])
 
                 self.prev_grad[i] = grad.clone()
-                print('step for param finished')
+        self.first = False
         return loss
 
 
