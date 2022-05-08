@@ -60,7 +60,7 @@ def save_results(optimizer, bool_adv_train, results):
 
 
 def query_optim():
-    implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-ExtraSGD', 'SGD', 'Adam', 'ExtraSGD', 'ExtraAdam']
+    implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-ExtraSGD', 'LA-OGDA', 'OGDA', 'SGD', 'Adam', 'ExtraSGD', 'ExtraAdam']
     x = input('Select an opimizer {}:'.format(implemented_optims))
     assert x in implemented_optims, 'Implemented optimizer: {}'.format(implemented_optims)
     return x

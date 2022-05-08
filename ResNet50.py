@@ -2,6 +2,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 import Lookahead_tutorial
+import OGDA
 import extragradient
 import project_utils
 import cifar10_pn_utils
@@ -36,6 +37,8 @@ def main(_):
         optimizer = Lookahead_tutorial.Lookahead(extragradient.ExtraSGD(net.parameters(), lr=1e-3))
     elif optimizer_name == 'LA-ExtraAdam':
         optimizer = Lookahead_tutorial.Lookahead(extragradient.ExtraAdam(net.parameters(), lr=1e-3))
+    elif optimizer_name == 'LA-OGDA':
+        optimizer = Lookahead_tutorial.Lookahead(OGDA.OGDA(net.parameters(), lr=1e-3))
     elif optimizer_name == 'Adam':
         optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
     elif optimizer_name == 'ExtraSGD':
@@ -44,6 +47,8 @@ def main(_):
         optimizer = extragradient.ExtraAdam(net.parameters(), lr=1e-3)
     elif optimizer_name == 'SGD':
         optimizer = torch.optim.SGD(net.parameters(), lr=1e-3)
+    elif optimizer_name == 'OGDA':
+        optimizer = OGDA.OGDA(net.parameters(), lr=1e-3)
     else:
         raise 'Wrong optimizer'
 
