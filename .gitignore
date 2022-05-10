@@ -19,3 +19,8 @@ data/cifar-10-batches-py/data_batch_5
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+data/MNIST/raw/t10k-images-idx3-ubyte
+*.gz
+data/MNIST/raw/t10k-labels-idx1-ubyte
+data/MNIST/raw/train-images-idx3-ubyte
+data/MNIST/raw/train-labels-idx1-ubyte
