@@ -5,7 +5,7 @@ import Lookahead_tutorial
 import OGDA
 import extragradient
 import project_utils
-import cifar10_pn_utils
+import data_utils
 from absl import app
 
 """
@@ -22,7 +22,7 @@ transform = transforms.Compose([
 
 
 def main(_):
-    data = cifar10_pn_utils.dataset_spec(transform)
+    data = data_utils.ld_dataset(transform)
 
     net = torchvision.models.resnet50()
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -54,19 +54,20 @@ def main(_):
 
     # Train model
     net.train()
-    cifar10_pn_utils.cifar10_training(data.train, net, optimizer, device)
+    data_utils.my_training(data.train, net, optimizer, device)
 
     # Evaluation
     net.eval()
-    cifar10_pn_utils.cifar10_evaluation(data.test, net, device)
+    data_utils.my_evaluation(data.test, net, device)
 
 
 if __name__ == "__main__":
 
     if project_utils.yes_no_check('Run on standard settings?'):
-        cifar10_pn_utils.settings()
+        data_utils.settings(dataset=project_utils.query_dataset())
     else:
-        cifar10_pn_utils.settings(
+        data_utils.settings(
+            dataset=project_utils.query_dataset(),
             nb_epochs=project_utils.int_query('Number of epochs'),
             adv_train=project_utils.yes_no_check('Adversarial Training?'),
             fgsm_att=project_utils.yes_no_check('FGSM Attack during testing?'),

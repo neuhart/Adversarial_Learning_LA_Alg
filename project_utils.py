@@ -37,6 +37,7 @@ def yes_no_check(question):
 def int_query(query):
     """
     Query an integer
+    query: str - question to be asked
     """
     x = input(query + ' (int):')
     while isinstance(x, int) is False:
@@ -48,8 +49,15 @@ def int_query(query):
     return x
 
 
-def save_results(optimizer, bool_adv_train, results):
-    filename = 'data/adv_results.csv' if bool_adv_train else 'data/clean_results.csv'
+def save_results(optimizer, dataset, adv_train, results):
+    """
+    saves results to csv-file
+    optimizer: torch optimizer
+    dataset: string
+    adv_train: bool
+    results: list
+    """
+    filename = 'data/{}-adv_results.csv'.format(dataset) if adv_train else 'data/{}-clean_results.csv'.format(dataset)
     try:
         df = pd.read_csv(filename)
     except:
@@ -59,14 +67,24 @@ def save_results(optimizer, bool_adv_train, results):
     df.to_csv(filename, index=False)
 
 
+def query_dataset():
+    """queries dataset to use for both training and testing"""
+    implemented_datasets = ['MNIST', 'CIFAR10']
+    x = input('Select a dataset {}:'.format(implemented_datasets)).upper()
+    assert x in implemented_datasets, '{} not implemented'.format(x)
+    return x
+
+
 def query_optim():
+    """queries optimizer"""
     implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-ExtraSGD', 'LA-OGDA', 'OGDA', 'SGD', 'Adam', 'ExtraSGD', 'ExtraAdam']
     x = input('Select an opimizer {}:'.format(implemented_optims))
-    assert x in implemented_optims, 'Implemented optimizer: {}'.format(implemented_optims)
+    assert x in implemented_optims, '{} not implemented'.format(x)
     return x
 
 
 def get_optim_name(optimizer):
+    """returns name of the specified optimization algorithm"""
     optimizer_name = optimizer.__class__.__name__
     if optimizer_name == 'Lookahead':
         optimizer_name += '-' + optimizer.optimizer.__class__.__name__
