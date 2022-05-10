@@ -13,16 +13,9 @@ from absl import app
 2) https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html (image transformation for resnet)
 """
 
-transform = transforms.Compose([
-            transforms.RandomResizedCrop(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ])  # convert PIL image into tensor and transform to match ResNet50 requirements (see 2))
-
 
 def main(_):
-    data = data_utils.ld_dataset(transform)
+    data = data_utils.ld_dataset()
 
     net = torchvision.models.resnet50()
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')

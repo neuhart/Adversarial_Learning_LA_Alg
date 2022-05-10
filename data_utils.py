@@ -11,6 +11,7 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
 from absl import flags
 import time
 import project_utils
+import torchvision.transforms as transforms
 
 FLAGS = flags.FLAGS
 
@@ -112,9 +113,23 @@ def my_evaluation(test_loader, net, device):
         )
 
 
-def ld_dataset(transform):
+def ld_dataset():
     """Load training and test data."""
-
+    if FLAGS.dataset == 'MNIST':
+        transform = transforms.Compose([
+            transforms.Grayscale(3),
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])  # convert PIL image into tensor and transform to match ResNet50 requirements (see 2))
+    else:
+        transform = transforms.Compose([
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])  # convert PIL image into tensor and transform to match ResNet50 requirements (see 2))
     trainset = getattr(torchvision.datasets, FLAGS.dataset)(root='./data', train=True,
                                             download=True, transform=transform)
     # download training set, store into ./data and apply transform
