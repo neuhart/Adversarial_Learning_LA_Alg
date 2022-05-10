@@ -115,21 +115,15 @@ def my_evaluation(test_loader, net, device):
 
 def ld_dataset():
     """Load training and test data."""
-    if FLAGS.dataset == 'MNIST':
-        transform = transforms.Compose([
-            transforms.Grayscale(3),
-            transforms.RandomResizedCrop(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-        ])  # convert PIL image into tensor and transform to match ResNet50 requirements (see 2))
-    else:
-        transform = transforms.Compose([
-            transforms.RandomResizedCrop(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-        ])  # convert PIL image into tensor and transform to match ResNet50 requirements (see 2))
+    transform = transforms.Compose([
+        transforms.RandomResizedCrop(224),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ])  # convert PIL image into tensor and transform to match ResNet50 requirements (see 2))
+    if FLAGS.dataset == 'MNIST':  # need to transform 1-channel MNIST images to 3-channel format for ResNet model
+        transform = transforms.Compose([transforms.Grayscale(3), transform])
+
     trainset = getattr(torchvision.datasets, FLAGS.dataset)(root='./data', train=True,
                                             download=True, transform=transform)
     # download training set, store into ./data and apply transform
