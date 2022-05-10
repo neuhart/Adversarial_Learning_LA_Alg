@@ -136,7 +136,7 @@ def ld_dataset():
     batch_size = project_utils.int_query('Batch size')
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                              shuffle=True, num_workers=0)
+                                              shuffle=True, num_workers=4)
     # load in training set: num_workers = how many subprocesses to use for data loading.
 
     testset = getattr(torchvision.datasets, FLAGS.dataset)(root='./data', train=False,
