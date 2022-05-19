@@ -1,4 +1,4 @@
-import Lookahead_tutorial
+import Lookahead
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -132,11 +132,11 @@ if __name__ == '__main__':
     preds.append(main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epoch))
 
     net = ffNN()
-    preds.append(main(net, Lookahead_tutorial.Lookahead(
+    preds.append(main(net, Lookahead.Lookahead(
         torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=5, la_alpha=0.5), nb_epoch))
 
     net = ffNN()
-    preds.append(main(net, Lookahead_tutorial.Lookahead(
+    preds.append(main(net, Lookahead.Lookahead(
         torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=10, la_alpha=0.5), nb_epoch
          ))
 
