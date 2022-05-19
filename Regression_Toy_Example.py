@@ -1,4 +1,4 @@
-import Lookahead
+from Optimizer import Lookahead
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -126,7 +126,7 @@ def main(net_model, optimizer, nb_epochs):
 if __name__ == '__main__':
     nb_epoch = 50
 
-    preds=[]
+    preds = []
 
     net = ffNN()
     preds.append(main(net, torch.optim.Adam(net.parameters(), lr=1e-3), nb_epoch))
@@ -138,7 +138,7 @@ if __name__ == '__main__':
     net = ffNN()
     preds.append(main(net, Lookahead.Lookahead(
         torch.optim.Adam(net.parameters(), lr=1e-3), la_steps=10, la_alpha=0.5), nb_epoch
-         ))
+        ))
 
     for p in preds:
         plt.plot(x_t_values, p.cpu().detach().numpy())

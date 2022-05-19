@@ -1,9 +1,6 @@
 import torch
 import torchvision
-import torchvision.transforms as transforms
-import Lookahead
-import OGDA
-import extragradient
+from Optimizer import extragradient, Lookahead, OGDA
 import project_utils
 import data_utils
 from absl import app

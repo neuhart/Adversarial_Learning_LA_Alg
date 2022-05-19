@@ -1,7 +1,6 @@
 import torch
 import torchvision
 from torch.utils.data import Subset
-from torch.utils.data import random_split
 from easydict import EasyDict
 import numpy as np
 from cleverhans.torch.attacks.fast_gradient_method import fast_gradient_method
