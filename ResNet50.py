@@ -7,17 +7,18 @@ from absl import app
 
 """
 1) https://pytorch.org/hub/pytorch_vision_resnet/
-2) https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html (image transformation for resnet)
+
 """
 
 
 def main(_):
     data = data_utils.ld_dataset()
 
-    net = torchvision.models.resnet50()
+    net = torchvision.models.resnet50()  # 1)
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     net.to(device)  # transfers to gpu if available
 
+    # Determine which optimizer to use
     optimizer_name = project_utils.query_optim()
     if optimizer_name == 'LA-SGD':
         optimizer = Lookahead.Lookahead(torch.optim.SGD(net.parameters(), lr=1e-3))
@@ -52,7 +53,7 @@ def main(_):
 
 
 if __name__ == "__main__":
-
+    # query hyperparameters and training/testing settings
     if project_utils.yes_no_check('Run on standard settings?'):
         data_utils.settings(dataset=project_utils.query_dataset())
     else:

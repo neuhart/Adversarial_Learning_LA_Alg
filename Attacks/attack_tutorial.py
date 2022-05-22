@@ -4,7 +4,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision
 import torchvision.transforms as transforms
 import project_utils
 import time
@@ -63,7 +62,7 @@ def main(_):
     net = CNN(in_channels=3)
     device = "cuda" if torch.cuda.is_available() else "cpu" # check if gpu is available
     if device == "cuda":
-        net = net.cuda() #transfers to gpu
+        net = net.cuda()  # transfers to gpu
     loss_fn = torch.nn.CrossEntropyLoss(reduction="mean") # averages over all losses
     optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
 
@@ -146,4 +145,4 @@ if __name__ == "__main__":  # only runs when this file/module is the main module
         "adv_train", False, "Use adversarial training (on PGD adversarial examples)."
     )
 
-    app.run(main) #runs main function
+    app.run(main)  # runs main function
