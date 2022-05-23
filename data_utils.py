@@ -126,12 +126,13 @@ def my_evaluation(test_loader, net, device):
         )
 
 
-def ld_dataset(dataset, transform):
+def ld_dataset(dataset_name, transform):
     """
     Load training and test data.
     """
+    flags.DEFINE_string("dataset", dataset_name, "Name of dataset")
 
-    trainset = getattr(torchvision.datasets, dataset)(root='./data', train=True,
+    trainset = getattr(torchvision.datasets, dataset_name)(root='./data', train=True,
                                                             download=True, transform=transform)
     # download training set, store into ./data and apply transform
 
@@ -143,10 +144,10 @@ def ld_dataset(dataset, transform):
     batch_size = project_utils.int_query('Batch size')
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                              shuffle=True, num_workers=0)
+                                              shuffle=True, num_workers=4)
     # load in training set: num_workers = how many subprocesses to use for data loading.
 
-    testset = getattr(torchvision.datasets, dataset)(root='./data', train=False,
+    testset = getattr(torchvision.datasets, dataset_name)(root='./data', train=False,
                                            download=True, transform=transform)
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                              shuffle=False, num_workers=0)  # load in test set

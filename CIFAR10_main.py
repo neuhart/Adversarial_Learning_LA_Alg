@@ -11,7 +11,7 @@ from Models import models, data_transformations
 def main(_):
     data_utils.settings()  # specify general settings
 
-    data = data_utils.ld_dataset(dataset='CIFAR10', transform=data_transformations.standard_transform())
+    data = data_utils.ld_dataset(dataset_name='CIFAR10', transform=data_transformations.standard_transform())
 
     net = models.CIFAR10_CNN()
 
