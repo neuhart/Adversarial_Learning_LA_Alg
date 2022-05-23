@@ -15,7 +15,7 @@ import torchvision.transforms as transforms
 FLAGS = flags.FLAGS
 
 
-def settings():
+def _settings():
     """queries hyperparameters and defines settings via global variables"""
 
     if project_utils.yes_no_check('Run on standard settings?'):
@@ -130,6 +130,7 @@ def ld_dataset(dataset_name, transform):
     """
     Load training and test data.
     """
+    # global variable needed for saving results in correct file
     flags.DEFINE_string("dataset", dataset_name, "Name of dataset")
 
     trainset = getattr(torchvision.datasets, dataset_name)(root='./data', train=True,
