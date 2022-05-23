@@ -117,22 +117,27 @@ def my_evaluation(test_loader, net, device):
         )
 
 
-def ld_dataset():
+def ld_dataset(model):
     """
     Load training and test data.
     1) https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html (image transformation for resnet)
     """
-    transform = transforms.Compose([
-        transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ])  # convert PIL image into tensor and transform to match ResNet50 requirements (see 1))
-    if FLAGS.dataset == 'MNIST':  # need to transform 1-channel MNIST images to 3-channel format for ResNet model
-        transform = transforms.Compose([transforms.Grayscale(3), transform])
+    if model.__class__.__name__ == 'ResNet':
+        transform = transforms.Compose([
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])  # convert PIL image into tensor and transform to match ResNet50 requirements (see 1))
+        if FLAGS.dataset == 'MNIST':  # need to transform 1-channel MNIST images to 3-channel format for ResNet model
+            transform = transforms.Compose([transforms.Grayscale(3), transform])
+    elif model.__class__.__name__ == 'BasicCNN':
+        transform = transforms.Compose([transforms.ToTensor()])
+    else:
+        raise 'Transformation not implemented for {}'.format(model.__class__.__name__)
 
     trainset = getattr(torchvision.datasets, FLAGS.dataset)(root='./data', train=True,
-                                            download=True, transform=transform)
+                                                            download=True, transform=transform)
     # download training set, store into ./data and apply transform
 
     if project_utils.yes_no_check('Run on whole dataset?') is False:
@@ -143,7 +148,7 @@ def ld_dataset():
     batch_size = project_utils.int_query('Batch size')
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                              shuffle=True, num_workers=4)
+                                              shuffle=True, num_workers=0)
     # load in training set: num_workers = how many subprocesses to use for data loading.
 
     testset = getattr(torchvision.datasets, FLAGS.dataset)(root='./data', train=False,
