@@ -10,12 +10,11 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
 from absl import flags
 import time
 import project_utils
-import torchvision.transforms as transforms
 
 FLAGS = flags.FLAGS
 
 
-def _settings():
+def code_settings():
     """queries hyperparameters and defines settings via global variables"""
 
     if project_utils.yes_no_check('Run on standard settings?'):
