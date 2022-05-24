@@ -10,23 +10,31 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
 from absl import flags
 import time
 import project_utils
-import torchvision.transforms as transforms
 
 FLAGS = flags.FLAGS
 
 
-def settings(dataset, nb_epochs=10, adv_train=True, fgsm_att=False, pgd_att=False):
-    """defines settings via global variables"""
-    flags.DEFINE_string("dataset", dataset, "Dataset to train and test on.")
-    flags.DEFINE_integer("nb_epochs", nb_epochs, "Number of epochs.")
+def code_settings():
+    """queries hyperparameters and defines settings via global variables"""
+
+    if project_utils.yes_no_check('Run on standard settings?'):
+        settings = EasyDict(nb_epochs=10, adv_train=True, fgsm_att=False, pgd_att=False)
+    else:
+        settings = EasyDict(
+            nb_epochs=project_utils.int_query('Number of epochs'),
+            adv_train=project_utils.yes_no_check('Adversarial Training?'),
+            fgsm_att=project_utils.yes_no_check('FGSM Attack during testing?'),
+            pgd_att=project_utils.yes_no_check('PGD Attack during testing')
+        )
+    flags.DEFINE_integer("nb_epochs", settings.nb_epochs, "Number of epochs.")
     flags.DEFINE_bool(
-        "adv_train", adv_train, "Use adversarial training (on PGD adversarial examples)."
+        "adv_train", settings.adv_train, "Use adversarial training (on PGD adversarial examples)."
     )
     flags.DEFINE_bool(
-        "fgsm_att", fgsm_att, "Use FGSM attack in evaluation"
+        "fgsm_att", settings.fgsm_att, "Use FGSM attack in evaluation"
     )
     flags.DEFINE_bool(
-        "pgd_att", pgd_att, "Use PGD attack in evaluation"
+        "pgd_att", settings.pgd_att, "Use PGD attack in evaluation"
     )
 
 
@@ -117,12 +125,14 @@ def my_evaluation(test_loader, net, device):
         )
 
 
-def ld_dataset(transform):
+def ld_dataset(dataset_name, transform):
     """
     Load training and test data.
     """
+    # global variable needed for saving results in correct file
+    flags.DEFINE_string("dataset", dataset_name, "Name of dataset")
 
-    trainset = getattr(torchvision.datasets, FLAGS.dataset)(root='./data', train=True,
+    trainset = getattr(torchvision.datasets, dataset_name)(root='./data', train=True,
                                                             download=True, transform=transform)
     # download training set, store into ./data and apply transform
 
@@ -134,10 +144,10 @@ def ld_dataset(transform):
     batch_size = project_utils.int_query('Batch size')
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                              shuffle=True, num_workers=0)
+                                              shuffle=True, num_workers=4)
     # load in training set: num_workers = how many subprocesses to use for data loading.
 
-    testset = getattr(torchvision.datasets, FLAGS.dataset)(root='./data', train=False,
+    testset = getattr(torchvision.datasets, dataset_name)(root='./data', train=False,
                                            download=True, transform=transform)
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                              shuffle=False, num_workers=0)  # load in test set

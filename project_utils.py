@@ -2,6 +2,8 @@ import pandas as pd
 import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
+from Optimizer import Lookahead, extragradient, OGDA
+import torch
 
 
 def imshow(dataloader, batch_size, classes, inv_transform=None):
@@ -75,12 +77,36 @@ def query_dataset():
     return x
 
 
-def query_optim():
+def set_optim(net):
     """queries optimizer"""
     implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-ExtraSGD', 'LA-OGDA', 'OGDA', 'SGD', 'Adam', 'ExtraSGD', 'ExtraAdam']
     x = input('Select an opimizer {}:'.format(implemented_optims))
     assert x in implemented_optims, '{} not implemented'.format(x)
-    return x
+
+    if x == 'LA-SGD':
+        optimizer = Lookahead.Lookahead(torch.optim.SGD(net.parameters(), lr=1e-3))
+    elif x == 'LA-Adam':
+        optimizer = Lookahead.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
+    elif x == 'LA-ExtraSGD':
+        optimizer = Lookahead.Lookahead(extragradient.ExtraSGD(net.parameters(), lr=1e-3))
+    elif x == 'LA-ExtraAdam':
+        optimizer = Lookahead.Lookahead(extragradient.ExtraAdam(net.parameters(), lr=1e-3))
+    elif x == 'LA-OGDA':
+        optimizer = Lookahead.Lookahead(OGDA.OGDA(net.parameters(), lr=1e-3))
+    elif x == 'Adam':
+        optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
+    elif x == 'ExtraSGD':
+        optimizer = extragradient.ExtraSGD(net.parameters(), lr=1e-3)
+    elif x == 'ExtraAdam':
+        optimizer = extragradient.ExtraAdam(net.parameters(), lr=1e-3)
+    elif x == 'SGD':
+        optimizer = torch.optim.SGD(net.parameters(), lr=1e-3)
+    elif x == 'OGDA':
+        optimizer = OGDA.OGDA(net.parameters(), lr=1e-3)
+    else:
+        raise 'Wrong optimizer'
+
+    return optimizer
 
 
 def get_optim_name(optimizer):
