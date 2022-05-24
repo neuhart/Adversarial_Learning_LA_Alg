@@ -78,10 +78,10 @@ def my_training(train_loader, net, optimizer, device):
             )
         )
         results.append(train_loss)
-    project_utils.save_results(optimizer, dataset=FLAGS.dataset, adv_train=FLAGS.adv_train, results=results)
+    project_utils.save_train_results(optimizer, dataset=FLAGS.dataset, adv_train=FLAGS.adv_train, results=results)
 
 
-def my_evaluation(test_loader, net, device):
+def my_evaluation(test_loader, net, optimizer, device):
     """performs model evaluation/testing"""
 
     report = EasyDict(nb_test=0, correct=0, correct_fgm=0, correct_pgd=0)
@@ -105,11 +105,13 @@ def my_evaluation(test_loader, net, device):
 
             report.correct_pgd += y_pred_pgd.eq(y).sum().item()  # counts correctly predicted pgd examples
 
+    results=[]
     print(
         "test acc on clean examples (%): {:.3f}".format(
             report.correct / report.nb_test * 100.0
         )
     )
+    results.append(report.correct / report.nb_test)
 
     if FLAGS.fgsm_att is True:
         print(
@@ -117,12 +119,16 @@ def my_evaluation(test_loader, net, device):
                 report.correct_fgm / report.nb_test * 100.0
             )
         )
+        results.append(report.correct_fgm / report.nb_test)
     if FLAGS.pgd_att is True:
         print(
             "test acc on PGD adversarial examples (%): {:.3f}".format(
                 report.correct_pgd / report.nb_test * 100.0
             )
         )
+        results.append(report.correct_pgd / report.nb_test)
+
+    project_utils.save_test_results(optimizer, dataset=FLAGS.dataset, adv_train=FLAGS.adv_train, results=results)
 
 
 def ld_dataset(dataset_name, transform):

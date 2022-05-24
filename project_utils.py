@@ -51,7 +51,7 @@ def int_query(query):
     return x
 
 
-def save_results(optimizer, dataset, adv_train, results):
+def save_train_results(optimizer, dataset, adv_train, results):
     """
     saves results to csv-file
     optimizer: torch optimizer
@@ -60,6 +60,28 @@ def save_results(optimizer, dataset, adv_train, results):
     results: list
     """
     filename = 'data/{}-adv_results.csv'.format(dataset) if adv_train else 'data/{}-clean_results.csv'.format(dataset)
+    try:
+        df = pd.read_csv(filename)
+    except:
+        df = pd.DataFrame()
+
+    df = pd.concat([df, pd.Series(results, name=get_optim_name(optimizer))], axis=1)
+    df.to_csv(filename, index=False)
+
+
+def save_test_results(optimizer, dataset, adv_train, results):
+    """
+        saves results to csv-file
+        optimizer: torch optimizer
+        dataset: string
+        adv_train: bool
+        results: list
+        """
+    if adv_train:
+        filename = 'data/{}-adv_test_results.csv'.format(dataset)
+    else:
+        filename = 'data/{}-clean_test_results.csv'.format(dataset)
+        
     try:
         df = pd.read_csv(filename)
     except:

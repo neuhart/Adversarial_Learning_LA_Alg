@@ -30,7 +30,7 @@ def main(_):
 
     # Evaluation
     net.eval()
-    data_utils.my_evaluation(data.test, net, device)
+    data_utils.my_evaluation(data.test, net, optimizer, device)
 
 
 if __name__ == "__main__":
