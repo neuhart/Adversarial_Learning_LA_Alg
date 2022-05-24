@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.transforms as transforms
+
+import data_utils
 import project_utils
 import time
 
@@ -57,7 +59,7 @@ transform = transforms.Compose(
 
 def main(_):
     # Load training and test data
-    data = project_utils.ld_cifar10(transform, batch_size=5)
+    data = data_utils.ld_dataset(dataset_name='CIFAR10', transform=transform)
     # Instantiate model, loss, and optimizer for training
     net = CNN(in_channels=3)
     device = "cuda" if torch.cuda.is_available() else "cpu" # check if gpu is available
