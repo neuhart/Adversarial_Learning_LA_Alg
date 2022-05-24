@@ -81,7 +81,7 @@ def save_test_results(optimizer, dataset, adv_train, results):
         filename = 'data/{}-adv_test_results.csv'.format(dataset)
     else:
         filename = 'data/{}-clean_test_results.csv'.format(dataset)
-        
+
     try:
         df = pd.read_csv(filename)
     except:
