@@ -100,32 +100,44 @@ def query_dataset():
     return x
 
 
-def set_optim(net):
-    """queries optimizer"""
-    implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-ExtraSGD', 'LA-OGDA', 'OGDA', 'SGD', 'Adam', 'ExtraSGD', 'ExtraAdam']
-    x = input('Select an opimizer {}:'.format(implemented_optims))
-    assert x in implemented_optims, '{} not implemented'.format(x)
+def get_optims():
+    """queries optimizers"""
+    implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-ExtraSGD', 'LA-OGDA', 'OGDA', 'SGD', 'Adam',
+                          'ExtraSGD', 'ExtraAdam']
+    print('Separate with ","!')
+    optims_list = input('Select optimizers \n{}:'.format(implemented_optims))
+    optims_list = optims_list.split(',')  # separate by ',' and convert to list
+    for optim in optims_list:
+        assert optim in implemented_optims, '{} not implemented'.format(optim)
+    return optims_list
 
-    if x == 'LA-SGD':
-        optimizer = Lookahead.Lookahead(torch.optim.SGD(net.parameters(), lr=1e-3))
-    elif x == 'LA-Adam':
-        optimizer = Lookahead.Lookahead(torch.optim.Adam(net.parameters(), lr=1e-3))
-    elif x == 'LA-ExtraSGD':
-        optimizer = Lookahead.Lookahead(extragradient.ExtraSGD(net.parameters(), lr=1e-3))
-    elif x == 'LA-ExtraAdam':
-        optimizer = Lookahead.Lookahead(extragradient.ExtraAdam(net.parameters(), lr=1e-3))
-    elif x == 'LA-OGDA':
-        optimizer = Lookahead.Lookahead(OGDA.OGDA(net.parameters(), lr=1e-3))
-    elif x == 'Adam':
-        optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
-    elif x == 'ExtraSGD':
-        optimizer = extragradient.ExtraSGD(net.parameters(), lr=1e-3)
-    elif x == 'ExtraAdam':
-        optimizer = extragradient.ExtraAdam(net.parameters(), lr=1e-3)
-    elif x == 'SGD':
-        optimizer = torch.optim.SGD(net.parameters(), lr=1e-3)
-    elif x == 'OGDA':
-        optimizer = OGDA.OGDA(net.parameters(), lr=1e-3)
+
+def set_optim(optim, model):
+    """Sets optimizer
+    Arguments:
+        optim(str): name of optimizer to use
+        model(torch.nn.Module): model providing the parameters to be optimized
+    """
+    if optim == 'LA-SGD':
+        optimizer = Lookahead.Lookahead(torch.optim.SGD(model.parameters(), lr=1e-3))
+    elif optim == 'LA-Adam':
+        optimizer = Lookahead.Lookahead(torch.optim.Adam(model.parameters(), lr=1e-3))
+    elif optim == 'LA-ExtraSGD':
+        optimizer = Lookahead.Lookahead(extragradient.ExtraSGD(model.parameters(), lr=1e-3))
+    elif optim == 'LA-ExtraAdam':
+        optimizer = Lookahead.Lookahead(extragradient.ExtraAdam(model.parameters(), lr=1e-3))
+    elif optim == 'LA-OGDA':
+        optimizer = Lookahead.Lookahead(OGDA.OGDA(model.parameters(), lr=1e-3))
+    elif optim == 'Adam':
+        optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    elif optim == 'ExtraSGD':
+        optimizer = extragradient.ExtraSGD(model.parameters(), lr=1e-3)
+    elif optim == 'ExtraAdam':
+        optimizer = extragradient.ExtraAdam(model.parameters(), lr=1e-3)
+    elif optim == 'SGD':
+        optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+    elif optim == 'OGDA':
+        optimizer = OGDA.OGDA(model.parameters(), lr=1e-3)
     else:
         raise 'Wrong optimizer'
 
