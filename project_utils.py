@@ -104,8 +104,8 @@ def get_optims():
     """queries optimizers"""
     implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-ExtraSGD', 'LA-OGDA', 'OGDA', 'SGD', 'Adam',
                           'ExtraSGD', 'ExtraAdam']
-    optims_list = input('Select optimizers \n{}:'.format(implemented_optims))
     print('Separate with ","!')
+    optims_list = input('Select optimizers \n{}:'.format(implemented_optims))
     optims_list.replace(" ", "")  # remove whitespaces
     optims_list = optims_list.split(',')  # separate by ',' and convert to list
     for optim in optims_list:

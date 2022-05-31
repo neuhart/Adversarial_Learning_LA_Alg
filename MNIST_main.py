@@ -1,6 +1,7 @@
 import torch
 import project_utils
 import data_utils
+from absl import app
 from Models import models, data_transformations
 """
 1) https://pytorch.org/hub/pytorch_vision_resnet/
@@ -36,5 +37,5 @@ if __name__ == "__main__":
     # query which optimizers to use for training
     optims_list = project_utils.get_optims()
     for optim in optims_list:
-        main(optim)
+        app.run(main(optim))
 
