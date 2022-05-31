@@ -8,7 +8,7 @@ from Models import models, data_transformations
 """
 
 
-def main(_):
+def main(optim):
     data_utils.code_settings()  # specify general settings
 
     data = data_utils.ld_dataset(dataset_name='MNIST', transform=data_transformations.standard_transform())
