@@ -1,14 +1,13 @@
 import torch
 import project_utils
 import data_utils
-from absl import app
 from Models import models, data_transformations
 """
 1) https://pytorch.org/hub/pytorch_vision_resnet/
 """
 
 
-def main(_):
+def main(optim):
     data_utils.code_settings()  # specify general settings
 
     data = data_utils.ld_dataset(dataset_name='MNIST', transform=data_transformations.standard_transform())
@@ -22,7 +21,7 @@ def main(_):
     net.to(device)  # transfers to gpu if available
 
     # Determine which optimizer to use
-    optimizer = project_utils.set_optim(net)
+    optimizer = project_utils.set_optim(optim=optim, model=net)
 
     # Train model
     net.train()
@@ -34,5 +33,8 @@ def main(_):
 
 
 if __name__ == "__main__":
-    app.run(main)
+    # query which optimizers to use for training
+    optims_list = project_utils.get_optims()
+    for optim in optims_list:
+        main(optim)
 
