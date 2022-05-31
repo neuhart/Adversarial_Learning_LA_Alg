@@ -106,7 +106,6 @@ def get_optims():
                           'ExtraSGD', 'ExtraAdam']
     print('Separate with ","!')
     optims_list = input('Select optimizers \n{}:'.format(implemented_optims))
-    optims_list.replace(" ", "")  # remove whitespaces
     optims_list = optims_list.split(',')  # separate by ',' and convert to list
     for optim in optims_list:
         assert optim in implemented_optims, '{} not implemented'.format(optim)
