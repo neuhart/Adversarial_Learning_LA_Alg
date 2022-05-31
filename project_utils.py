@@ -71,12 +71,13 @@ def save_train_results(optimizer, dataset, adv_train, results):
 
 def save_test_results(optimizer, dataset, adv_train, results):
     """
-        saves results to csv-file
-        optimizer: torch optimizer
-        dataset: string
-        adv_train: bool
-        results: list
-        """
+    saves results to csv-file
+    optimizer: torch optimizer
+    dataset: string
+    adv_train: bool
+    results: list
+    """
+
     if adv_train:
         filename = 'data/{}-adv_test_results.csv'.format(dataset)
     else:
@@ -93,8 +94,8 @@ def save_test_results(optimizer, dataset, adv_train, results):
 
 def query_dataset():
     """queries dataset to use for both training and testing"""
-    implemented_datasets = ['MNIST', 'CIFAR10']
-    x = input('Select a dataset {}:'.format(implemented_datasets)).upper()
+    implemented_datasets = ['MNIST', 'FashionMNIST', 'CIFAR10']
+    x = input('Select a dataset {}:'.format(implemented_datasets))
     assert x in implemented_datasets, '{} not implemented'.format(x)
     return x
 
