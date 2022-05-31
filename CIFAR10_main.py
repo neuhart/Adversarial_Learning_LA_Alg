@@ -3,9 +3,6 @@ import project_utils
 import data_utils
 from absl import app
 from Models import models, data_transformations
-"""
-1) https://pytorch.org/hub/pytorch_vision_resnet/
-"""
 
 
 def main(_):
@@ -13,24 +10,25 @@ def main(_):
 
     data = data_utils.ld_dataset(dataset_name='CIFAR10', transform=data_transformations.standard_transform())
 
-    net = models.CIFAR10_CNN()
+    # query which optimizers to use for training
+    optims_list = project_utils.get_optims()
 
-    # data = data_utils.ld_dataset(transform=data_transformations.resnet_transform())
-    # net = torchvision.models.resnet50()  # 1)
+    for optim in optims_list:
+        net = models.CIFAR10_CNN()
 
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    net.to(device)  # transfers to gpu if available
+        device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+        net.to(device)  # transfers to gpu if available
 
-    # Determine which optimizer to use
-    optimizer = project_utils.set_optim(net)
+        # Determine which optimizer to use
+        optimizer = project_utils.set_optim(optim, net)
 
-    # Train model
-    net.train()
-    data_utils.my_training(data.train, net, optimizer, device)
+        # Train model
+        net.train()
+        data_utils.my_training(data.train, net, optimizer, device)
 
-    # Evaluation
-    net.eval()
-    data_utils.my_evaluation(data.test, net, optimizer, device)
+        # Evaluation
+        net.eval()
+        data_utils.my_evaluation(data.test, net, optimizer, device)
 
 
 if __name__ == "__main__":
