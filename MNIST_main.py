@@ -8,7 +8,7 @@ from Models import models, data_transformations
 """
 
 
-def main(optim):
+def main(_):
     data_utils.code_settings()  # specify general settings
 
     data = data_utils.ld_dataset(dataset_name='MNIST', transform=data_transformations.standard_transform())
@@ -37,5 +37,5 @@ if __name__ == "__main__":
     # query which optimizers to use for training
     optims_list = project_utils.get_optims()
     for optim in optims_list:
-        app.run(main(optim))
+        app.run(main)
 
