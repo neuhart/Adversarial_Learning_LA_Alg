@@ -5,21 +5,21 @@ from absl import app
 from Models import models, data_transformations
 """
 1) https://pytorch.org/hub/pytorch_vision_resnet/
+data = data_utils.ld_dataset(transform=data_transformations.resnet_transform())
+net = torchvision.models.resnet50()  # 1)
 """
 
 
 def main(_):
+    data_utils.code_settings()  # specify general settings
+
+    data = data_utils.ld_dataset(dataset_name='MNIST', transform=data_transformations.standard_transform())
+
     # query which optimizers to use for training
     optims_list = project_utils.get_optims()
+
     for optim in optims_list:
-        data_utils.code_settings()  # specify general settings
-
-        data = data_utils.ld_dataset(dataset_name='MNIST', transform=data_transformations.standard_transform())
-
         net = models.MNIST_CNN()
-
-        # data = data_utils.ld_dataset(transform=data_transformations.resnet_transform())
-        # net = torchvision.models.resnet50()  # 1)
 
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         net.to(device)  # transfers to gpu if available
