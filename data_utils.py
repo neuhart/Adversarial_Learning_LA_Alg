@@ -18,7 +18,7 @@ def code_settings():
     """queries hyperparameters and defines settings via global variables"""
 
     if project_utils.yes_no_check('Run on standard settings?'):
-        settings = EasyDict(nb_epochs=10, adv_train=True, fgsm_att=False, pgd_att=False)
+        settings = EasyDict(nb_epochs=50, adv_train=True, fgsm_att=False, pgd_att=False)
     else:
         settings = EasyDict(
             nb_epochs=project_utils.int_query('Number of epochs'),
@@ -52,7 +52,7 @@ def my_training(train_loader, net, optimizer, device):
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
 
-    scheduler = project_utils.set_lr_scheduler()
+    scheduler = project_utils.set_lr_scheduler(optimizer)
 
     results = []
     for epoch in range(1, adj_epochs(optimizer) + 1):
