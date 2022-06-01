@@ -10,7 +10,7 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
 from absl import flags
 import time
 import project_utils
-
+from torch.optim.lr_scheduler import MultiStepLR
 FLAGS = flags.FLAGS
 
 
@@ -52,6 +52,8 @@ def my_training(train_loader, net, optimizer, device):
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
 
+    scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
+
     results = []
     for epoch in range(1, adj_epochs(optimizer) + 1):
         start_t = time.time()
@@ -82,6 +84,9 @@ def my_training(train_loader, net, optimizer, device):
             optimizer.step()
 
             train_loss += loss.item()
+
+        scheduler.step()
+
         end_t = time.time()
         print(
             "epoch: {}/{}, train loss: {:.3f} computed in {:.3f} seconds".format(
