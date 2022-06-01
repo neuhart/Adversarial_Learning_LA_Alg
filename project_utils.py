@@ -102,8 +102,7 @@ def query_dataset():
 
 def get_optims():
     """queries optimizers"""
-    implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-OGDA', 'OGDA', 'SGD', 'Adam',
-                          'ExtraAdam']
+    implemented_optims = ['SGD', 'Adam', 'OGDA', 'ExtraAdam', 'LA-SGD', 'LA-Adam', 'LA-OGDA', 'LA-ExtraAdam']
     print('Separate with ","!', 'Type "A" for all optimizers!')
     optims_list = input('Select optimizers \n{}:'.format(implemented_optims))
     if optims_list == 'A':
