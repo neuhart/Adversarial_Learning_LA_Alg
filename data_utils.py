@@ -38,6 +38,13 @@ def code_settings():
     )
 
 
+def adj_epochs(optimizer_name):
+    """For Optimizers that require 2 gradient evaluations per step,
+    only half the number epochs are available"""
+    if optimizer_name in ['LA-ExtraAdam', 'ExtraAdam']:
+        FLAGS.nb_epochs = FLAGS.nb_epochs // 2
+
+
 def my_training(train_loader, net, optimizer, device):
     """trains the network on the provided training set using the given optimizer"""
 
@@ -56,13 +63,13 @@ def my_training(train_loader, net, optimizer, device):
             loss = loss_fn(net(x), y)
             loss.backward()
 
-            if project_utils.get_optim_name(optimizer) in ['ExtraSGD', 'ExtraAdam']:
+            if project_utils.get_optim_name(optimizer) in ['ExtraAdam']:
                 # For Extra-SGD/Adam, we need an extrapolation step
                 optimizer.extrapolation()
                 optimizer.zero_grad()
                 loss = loss_fn(net(x), y)
                 loss.backward()
-            elif project_utils.get_optim_name(optimizer) in ['Lookahead-ExtraSGD', 'Lookahead-ExtraAdam']:
+            elif project_utils.get_optim_name(optimizer) in ['Lookahead-ExtraAdam']:
                 # For LA-Extra Algs we need to perform an extrapolation step with the inner optimizer
                 optimizer.optimizer.extrapolation()
                 optimizer.zero_grad()

@@ -19,6 +19,8 @@ def main(_):
     optims_list = project_utils.get_optims()
 
     for optim in optims_list:
+        data_utils.adj_epochs(optim)
+
         net = models.MNIST_CNN()
 
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
