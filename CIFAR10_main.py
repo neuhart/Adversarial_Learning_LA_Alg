@@ -7,6 +7,8 @@ from Models import models, data_transformations
 
 def main(_):
     data_utils.code_settings()  # specify general settings
+    device = torch.device(project_utils.int_query('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device(
+        'cpu')
 
     data = data_utils.ld_dataset(dataset_name='CIFAR10', transform=data_transformations.standard_transform())
 
@@ -15,8 +17,6 @@ def main(_):
 
     for optim in optims_list:
         net = models.CIFAR10_CNN()
-
-        device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         net.to(device)  # transfers to gpu if available
 
         # Determine which optimizer to use
