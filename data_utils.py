@@ -84,7 +84,7 @@ def my_training(train_loader, net, optimizer, device):
         end_t = time.time()
         print(
             "epoch: {}/{}, train loss: {:.3f} computed in {:.3f} seconds".format(
-                epoch, FLAGS.nb_epochs, train_loss/len(train_loader), end_t-start_t
+                epoch, adj_epochs(optimizer), train_loss/len(train_loader), end_t-start_t
             )
         )
         results.append(train_loss)
