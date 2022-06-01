@@ -104,8 +104,10 @@ def get_optims():
     """queries optimizers"""
     implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-OGDA', 'OGDA', 'SGD', 'Adam',
                           'ExtraAdam']
-    print('Separate with ","!')
+    print('Separate with ","!', 'Type "A" for all optimizers!')
     optims_list = input('Select optimizers \n{}:'.format(implemented_optims))
+    if optims_list == 'A':
+        return implemented_optims
     optims_list = optims_list.split(',')  # separate by ',' and convert to list
     for optim in optims_list:
         assert optim in implemented_optims, '{} not implemented'.format(optim)
