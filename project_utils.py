@@ -114,20 +114,23 @@ def get_optims():
     return optims_list
 
 
-def set_optim(optim, model):
+def set_optim(optim, model, device):
     """Sets optimizer
     Arguments:
         optim(str): name of optimizer to use
         model(torch.nn.Module): model providing the parameters to be optimized
+        device (torch.device): device where computations are performed, cpu or gpu
     """
     if optim == 'LA-SGD':
-        optimizer = Lookahead.Lookahead(torch.optim.SGD(model.parameters(), lr=1e-3))
+        optimizer = Lookahead.Lookahead(torch.optim.SGD(model.parameters(), lr=1e-3), device=device)
     elif optim == 'LA-Adam':
-        optimizer = Lookahead.Lookahead(torch.optim.Adam(model.parameters(), lr=1e-3))
+        optimizer = Lookahead.Lookahead(torch.optim.Adam(model.parameters(), lr=1e-3), device=device)
+    elif optim == 'LA-ExtraSGD':
+        optimizer = Lookahead.Lookahead(extragradient.ExtraSGD(model.parameters(), lr=1e-5), device=device)
     elif optim == 'LA-ExtraAdam':
-        optimizer = Lookahead.Lookahead(extragradient.ExtraAdam(model.parameters(), lr=1e-3))
+        optimizer = Lookahead.Lookahead(extragradient.ExtraAdam(model.parameters(), lr=1e-3), device=device)
     elif optim == 'LA-OGDA':
-        optimizer = Lookahead.Lookahead(OGDA.OGDA(model.parameters(), lr=1e-4))
+        optimizer = Lookahead.Lookahead(OGDA.OGDA(model.parameters(), lr=1e-4), device=device)
     elif optim == 'Adam':
         optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     elif optim == 'ExtraAdam':
@@ -138,8 +141,6 @@ def set_optim(optim, model):
         optimizer = OGDA.OGDA(model.parameters(), lr=1e-4)
     elif optim == 'ExtraSGD':
         optimizer = extragradient.ExtraSGD(model.parameters(), lr=1e-5)
-    elif optim == 'LA-ExtraSGD':
-        optimizer = Lookahead.Lookahead(extragradient.ExtraSGD(model.parameters(), lr=1e-5))
     else:
         raise 'Wrong optimizer'
 
