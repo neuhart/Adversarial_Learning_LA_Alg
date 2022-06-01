@@ -12,12 +12,14 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
     Lookahead Optimizer: https://arxiv.org/abs/1907.08610
     """
 
-    def __init__(self, optimizer, la_steps=5, la_alpha=0.5, pullback_momentum="none"):
+    def __init__(self, optimizer, la_steps=5, la_alpha=0.5, pullback_momentum="none", device=torch.device('cpu')):
         """optimizer: inner optimizer
         la_steps (int): number of lookahead steps
         la_alpha (float): linear interpolation factor. 1.0 recovers the inner optimizer.
         pullback_momentum (str): change to inner optimizer momentum on interpolation update
+        device (torch.device):
         """
+        self.device = device
         self.optimizer = optimizer
         self._la_step = 0  # counter for inner optimizer
         self.la_alpha = la_alpha  # linear interpolation factor: 0 - keeps old slow weight, 1 - picks latest fast weight
@@ -98,14 +100,12 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
 
         if self._la_step >= self._total_la_steps:
             self._la_step = 0
-            # Lookahead and cache the current optimizer parameters
-            device = "cuda" if torch.cuda.is_available() else "cpu"  # check if gpu is available
 
             for group in self.optimizer.param_groups:
                 for p in group['params']:
                     param_state = self.state[p]  # accesses dict entry of tensor p
                     """updates slow weight"""
-                    p.data.mul_(self.la_alpha).add_(param_state['cached_params'].to(device), alpha=1.0 - self.la_alpha)
+                    p.data.mul_(self.la_alpha).add_(param_state['cached_params'].to(self.device), alpha=1.0 - self.la_alpha)
                     # param_state['cached_params'].to(device) to have all tensors on same device
                     # old slow weight is stored in cached_params entry in dict of p
                     # new slow weight= la_alpha * latest fast weight + (1-la_alpha) * old slow weight
