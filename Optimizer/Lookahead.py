@@ -38,7 +38,7 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
             # standard hyperparameters (e.g. lr, eps) are set to a standard value (lr=0.001) if not spec. otherwise
             for p in group['params']:
                 param_state = self.state[p]  # creates an empty dict entry for p
-                param_state['cached_params'] = torch.zeros_like(p.data)
+                param_state['cached_params'] = torch.zeros_like(p.data).to(self.device)
                 # creates a 0-tensor with same size as p.data and stores it in cached_params entry of dict entry of p
                 param_state['cached_params'].copy_(p.data)  # copies values from p
                 if self.pullback_momentum == "pullback":
@@ -105,7 +105,7 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
                 for p in group['params']:
                     param_state = self.state[p]  # accesses dict entry of tensor p
                     """updates slow weight"""
-                    p.data.mul_(self.la_alpha).add_(param_state['cached_params'].to(self.device), alpha=1.0 - self.la_alpha)
+                    p.data.mul_(self.la_alpha).add_(param_state['cached_params'], alpha=1.0 - self.la_alpha)
                     # param_state['cached_params'].to(device) to have all tensors on same device
                     # old slow weight is stored in cached_params entry in dict of p
                     # new slow weight= la_alpha * latest fast weight + (1-la_alpha) * old slow weight
