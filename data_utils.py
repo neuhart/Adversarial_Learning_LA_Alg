@@ -41,7 +41,6 @@ def code_settings():
 def adj_epochs(optimizer):
     """For Optimizers that require 2 gradient evaluations per step,
     only half the number epochs are available"""
-    print(project_utils.get_optim_name(optimizer))
     if project_utils.get_optim_name(optimizer) in ['Lookahead-ExtraAdam', 'ExtraAdam']:
         return FLAGS.nb_epochs // 2
     else:
