@@ -132,7 +132,7 @@ def set_optim(optim, model):
     elif optim == 'ExtraAdam':
         optimizer = extragradient.ExtraAdam(model.parameters(), lr=1e-3)
     elif optim == 'SGD':
-        optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+        optimizer = torch.optim.SGD(model.parameters(), lr=1e-2)
     elif optim == 'OGDA':
         optimizer = OGDA.OGDA(model.parameters(), lr=1e-3)
     else:
