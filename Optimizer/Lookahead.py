@@ -38,7 +38,7 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
             # standard hyperparameters (e.g. lr, eps) are set to a standard value (lr=0.001) if not spec. otherwise
             for p in group['params']:
                 param_state = self.state[p]  # creates an empty dict entry for p
-                param_state['cached_params'] = torch.zeros_like(p.data).to(self.device)
+                param_state['cached_params'] = torch.zeros_like(p.data)  # .to(self.device)
                 # creates a 0-tensor with same size as p.data and stores it in cached_params entry of dict entry of p
                 param_state['cached_params'].copy_(p.data)  # copies values from p
                 if self.pullback_momentum == "pullback":
