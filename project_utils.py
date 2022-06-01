@@ -122,7 +122,7 @@ def set_optim(optim, model, device):
         device (torch.device): device where computations are performed, cpu or gpu
     """
     if optim == 'LA-SGD':
-        optimizer = Lookahead.Lookahead(torch.optim.SGD(model.parameters(), lr=1e-3), device=device)
+        optimizer = Lookahead.Lookahead(torch.optim.SGD(model.parameters(), lr=1e-3))
     elif optim == 'LA-Adam':
         optimizer = Lookahead.Lookahead(torch.optim.Adam(model.parameters(), lr=1e-3), device=device)
     elif optim == 'LA-ExtraSGD':

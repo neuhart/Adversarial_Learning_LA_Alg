@@ -12,14 +12,14 @@ class Lookahead(Optimizer):  # subclass of Optimizer class
     Lookahead Optimizer: https://arxiv.org/abs/1907.08610
     """
 
-    def __init__(self, optimizer, la_steps=5, la_alpha=0.5, pullback_momentum="none", device=torch.device('cpu')):
+    def __init__(self, optimizer, la_steps=5, la_alpha=0.5, pullback_momentum="none"):
         """optimizer: inner optimizer
         la_steps (int): number of lookahead steps
         la_alpha (float): linear interpolation factor. 1.0 recovers the inner optimizer.
         pullback_momentum (str): change to inner optimizer momentum on interpolation update
         device (torch.device):
         """
-        self.device = device
+        #self.device = device
         self.optimizer = optimizer
         self._la_step = 0  # counter for inner optimizer
         self.la_alpha = la_alpha  # linear interpolation factor: 0 - keeps old slow weight, 1 - picks latest fast weight
