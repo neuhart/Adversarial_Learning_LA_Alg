@@ -38,13 +38,22 @@ def code_settings():
     )
 
 
+def adj_epochs(optimizer):
+    """For Optimizers that require 2 gradient evaluations per step,
+    only half the number epochs are available"""
+    if project_utils.get_optim_name(optimizer) in ['Lookahead-ExtraAdam', 'ExtraAdam']:
+        return FLAGS.nb_epochs // 2
+    else:
+        return FLAGS.nb_epochs
+
+
 def my_training(train_loader, net, optimizer, device):
     """trains the network on the provided training set using the given optimizer"""
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
 
     results = []
-    for epoch in range(1, FLAGS.nb_epochs + 1):
+    for epoch in range(1, adj_epochs(optimizer) + 1):
         start_t = time.time()
         train_loss = 0.0
         for x, y in train_loader:
@@ -56,13 +65,13 @@ def my_training(train_loader, net, optimizer, device):
             loss = loss_fn(net(x), y)
             loss.backward()
 
-            if project_utils.get_optim_name(optimizer) in ['ExtraSGD', 'ExtraAdam']:
+            if project_utils.get_optim_name(optimizer) in ['ExtraAdam']:
                 # For Extra-SGD/Adam, we need an extrapolation step
                 optimizer.extrapolation()
                 optimizer.zero_grad()
                 loss = loss_fn(net(x), y)
                 loss.backward()
-            elif project_utils.get_optim_name(optimizer) in ['Lookahead-ExtraSGD', 'Lookahead-ExtraAdam']:
+            elif project_utils.get_optim_name(optimizer) in ['Lookahead-ExtraAdam']:
                 # For LA-Extra Algs we need to perform an extrapolation step with the inner optimizer
                 optimizer.optimizer.extrapolation()
                 optimizer.zero_grad()
@@ -74,7 +83,7 @@ def my_training(train_loader, net, optimizer, device):
         end_t = time.time()
         print(
             "epoch: {}/{}, train loss: {:.3f} computed in {:.3f} seconds".format(
-                epoch, FLAGS.nb_epochs, train_loss/len(train_loader), end_t-start_t
+                epoch, adj_epochs(optimizer), train_loss/len(train_loader), end_t-start_t
             )
         )
         results.append(train_loss)

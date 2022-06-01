@@ -102,8 +102,8 @@ def query_dataset():
 
 def get_optims():
     """queries optimizers"""
-    implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-ExtraSGD', 'LA-OGDA', 'OGDA', 'SGD', 'Adam',
-                          'ExtraSGD', 'ExtraAdam']
+    implemented_optims = ['LA-SGD', 'LA-Adam', 'LA-ExtraAdam', 'LA-OGDA', 'OGDA', 'SGD', 'Adam',
+                          'ExtraAdam']
     print('Separate with ","!')
     optims_list = input('Select optimizers \n{}:'.format(implemented_optims))
     optims_list = optims_list.split(',')  # separate by ',' and convert to list
@@ -122,16 +122,12 @@ def set_optim(optim, model):
         optimizer = Lookahead.Lookahead(torch.optim.SGD(model.parameters(), lr=1e-3))
     elif optim == 'LA-Adam':
         optimizer = Lookahead.Lookahead(torch.optim.Adam(model.parameters(), lr=1e-3))
-    elif optim == 'LA-ExtraSGD':
-        optimizer = Lookahead.Lookahead(extragradient.ExtraSGD(model.parameters(), lr=1e-3))
     elif optim == 'LA-ExtraAdam':
         optimizer = Lookahead.Lookahead(extragradient.ExtraAdam(model.parameters(), lr=1e-3))
     elif optim == 'LA-OGDA':
         optimizer = Lookahead.Lookahead(OGDA.OGDA(model.parameters(), lr=1e-3))
     elif optim == 'Adam':
         optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-    elif optim == 'ExtraSGD':
-        optimizer = extragradient.ExtraSGD(model.parameters(), lr=1e-3)
     elif optim == 'ExtraAdam':
         optimizer = extragradient.ExtraAdam(model.parameters(), lr=1e-3)
     elif optim == 'SGD':
