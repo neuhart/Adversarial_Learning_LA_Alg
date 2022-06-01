@@ -60,25 +60,27 @@ def my_training(train_loader, net, optimizer, device):
             x, y = x.to(device), y.to(device)
             if FLAGS.adv_train:
                 x = projected_gradient_descent(net, x, 0.3, 0.01, 40, np.inf)
-
-            optimizer.zero_grad()
-            loss = loss_fn(net(x), y)
-            loss.backward()
+                x = x.detach()
 
             if project_utils.get_optim_name(optimizer) in ['ExtraAdam']:
                 # For Extra-SGD/Adam, we need an extrapolation step
-                optimizer.extrapolation()
                 optimizer.zero_grad()
                 loss = loss_fn(net(x), y)
                 loss.backward()
+                optimizer.extrapolation()
+
             elif project_utils.get_optim_name(optimizer) in ['Lookahead-ExtraAdam']:
                 # For LA-Extra Algs we need to perform an extrapolation step with the inner optimizer
                 optimizer.optimizer.extrapolation()
                 optimizer.zero_grad()
                 loss = loss_fn(net(x), y)
                 loss.backward()
-                
+
+            optimizer.zero_grad()
+            loss = loss_fn(net(x), y)
+            loss.backward()
             optimizer.step()
+
             train_loss += loss.item()
         end_t = time.time()
         print(
