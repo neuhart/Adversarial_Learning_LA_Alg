@@ -13,6 +13,8 @@ net = torchvision.models.resnet50()  # 1)
 def main(_):
     data_utils.code_settings()  # specify general settings
 
+    device = torch.device(project_utils.int_query('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device('cpu')
+
     data = data_utils.ld_dataset(dataset_name='MNIST', transform=data_transformations.standard_transform())
 
     # query which optimizers to use for training
@@ -21,8 +23,6 @@ def main(_):
     for optim in optims_list:
 
         net = models.MNIST_CNN()
-
-        device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         net.to(device)  # transfers to gpu if available
 
         # Determine which optimizer to use
