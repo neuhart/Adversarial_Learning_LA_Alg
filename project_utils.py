@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Optimizer import Lookahead, extragradient, OGDA
 import torch
-
+from torch.optim.lr_scheduler import MultiStepLR
 
 def imshow(dataloader, batch_size, classes, inv_transform=None):
     """Plot a batch of images
@@ -144,6 +144,38 @@ def set_optim(optim, model):
         raise 'Wrong optimizer'
 
     return optimizer
+
+
+def set_lr_scheduler(optimizer):
+    """Sets lr_scheduler
+    Arguments:
+        optimizer(torch.optim): name of optimizer to use
+    """
+    optim = get_optim_name(optimizer)
+    if optim == 'Lookahead-SGD':
+        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
+    elif optim == 'Lookahead-Adam':
+        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
+    elif optim == 'Lookahead-ExtraSGD':
+        scheduler = MultiStepLR(optimizer, milestones=[13, 25], gamma=0.1)
+    elif optim == 'Lookahead-ExtraAdam':
+        scheduler = MultiStepLR(optimizer, milestones=[13, 25], gamma=0.1)
+    elif optim == 'Lookahead-OGDA':
+        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
+    elif optim == 'Adam':
+        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
+    elif optim == 'ExtraAdam':
+        scheduler = MultiStepLR(optimizer, milestones=[13, 25], gamma=0.1)
+    elif optim == 'SGD':
+        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
+    elif optim == 'OGDA':
+        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
+    elif optim == 'ExtraSGD':
+        scheduler = MultiStepLR(optimizer, milestones=[13, 25], gamma=0.1)
+    else:
+        raise 'Wrong optimizer'
+
+    return scheduler
 
 
 def get_optim_name(optimizer):

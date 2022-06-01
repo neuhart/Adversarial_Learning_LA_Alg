@@ -52,7 +52,7 @@ def my_training(train_loader, net, optimizer, device):
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
 
-    scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
+    scheduler = project_utils.set_lr_scheduler()
 
     results = []
     for epoch in range(1, adj_epochs(optimizer) + 1):
@@ -64,14 +64,14 @@ def my_training(train_loader, net, optimizer, device):
                 x = projected_gradient_descent(net, x, 0.3, 0.01, 40, np.inf)
                 x = x.detach()
 
-            if project_utils.get_optim_name(optimizer) in ['ExtraAdam']:
+            if project_utils.get_optim_name(optimizer) in ['ExtraAdam', 'ExtraSGD']:
                 # For Extra-SGD/Adam, we need an extrapolation step
                 optimizer.zero_grad()
                 loss = loss_fn(net(x), y)
                 loss.backward()
                 optimizer.extrapolation()
 
-            elif project_utils.get_optim_name(optimizer) in ['Lookahead-ExtraAdam']:
+            elif project_utils.get_optim_name(optimizer) in ['Lookahead-ExtraAdam', 'Lookahead-ExtraSGD']:
                 # For LA-Extra Algs we need to perform an extrapolation step with the inner optimizer
                 optimizer.optimizer.extrapolation()
                 optimizer.zero_grad()
