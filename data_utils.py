@@ -38,11 +38,13 @@ def code_settings():
     )
 
 
-def adj_epochs(optimizer_name):
+def adj_epochs(optimizer):
     """For Optimizers that require 2 gradient evaluations per step,
     only half the number epochs are available"""
-    if optimizer_name in ['LA-ExtraAdam', 'ExtraAdam']:
-        FLAGS.nb_epochs = FLAGS.nb_epochs // 2
+    if project_utils.get_optim_name(optimizer) in ['Lookahead-ExtraAdam', 'ExtraAdam']:
+        return FLAGS.nb_epochs // 2
+    else:
+        return FLAGS.nb_epochs
 
 
 def my_training(train_loader, net, optimizer, device):
@@ -51,7 +53,7 @@ def my_training(train_loader, net, optimizer, device):
     loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
 
     results = []
-    for epoch in range(1, FLAGS.nb_epochs + 1):
+    for epoch in range(1, adj_epochs(optimizer) + 1):
         start_t = time.time()
         train_loss = 0.0
         for x, y in train_loader:
