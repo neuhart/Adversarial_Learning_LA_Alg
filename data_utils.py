@@ -99,7 +99,7 @@ def my_training(train_loader, net, optimizer, device):
     project_utils.save_train_results(optimizer, dataset=FLAGS.dataset, adv_train=FLAGS.adv_train, results=results)
 
 
-def my_evaluation(test_loader, net, optimizer, device):
+def my_evaluation(test_loader, net, device):
     """performs model evaluation/testing"""
 
     report = EasyDict(nb_test=0, correct=0, correct_fgm=0, correct_pgd=0)
