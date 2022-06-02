@@ -69,13 +69,12 @@ def save_train_results(optimizer, dataset, adv_train, results):
     df.to_csv(filename, index=False)
 
 
-def save_test_results(optimizer, dataset, adv_train, results):
+def save_test_results(dataset, adv_train, test_results):
     """
     saves results to csv-file
-    optimizer: torch optimizer
     dataset: string
     adv_train: bool
-    results: list
+    test_results: pandas Dataframe
     """
 
     if adv_train:
@@ -88,7 +87,7 @@ def save_test_results(optimizer, dataset, adv_train, results):
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(results, name=get_optim_name(optimizer))], axis=1)
+    df = pd.concat([df, test_results], axis=0)
     df.to_csv(filename, index=False)
 
 

@@ -10,12 +10,13 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
 from absl import flags
 import time
 import project_utils
-from torch.optim.lr_scheduler import MultiStepLR
+
 FLAGS = flags.FLAGS
 
 
 def code_settings():
-    """queries hyperparameters and defines settings via global variables"""
+    """queries hyperparameters and defines settings via global variables
+    returns: seetings (EasyDict): dict with settings"""
 
     if project_utils.yes_no_check('Run on standard settings?'):
         settings = EasyDict(nb_epochs=50, adv_train=True, fgsm_att=False, pgd_att=False)
@@ -36,6 +37,7 @@ def code_settings():
     flags.DEFINE_bool(
         "pgd_att", settings.pgd_att, "Use PGD attack in evaluation"
     )
+    return settings
 
 
 def adj_epochs(optimizer):
@@ -144,7 +146,7 @@ def my_evaluation(test_loader, net, optimizer, device):
         )
         results.append(report.correct_pgd / report.nb_test)
 
-    project_utils.save_test_results(optimizer, dataset=FLAGS.dataset, adv_train=FLAGS.adv_train, results=results)
+    return results
 
 
 def ld_dataset(dataset_name, transform):
