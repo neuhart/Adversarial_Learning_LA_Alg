@@ -1,3 +1,4 @@
+import pandas as pd
 import torch
 import project_utils
 import data_utils
@@ -11,13 +12,15 @@ net = torchvision.models.resnet50()  # 1)
 
 
 def main(_):
-    data_utils.code_settings()  # specify general settings
+    settings = data_utils.code_settings()  # specify general settings
     device = torch.device(project_utils.int_query('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device('cpu')
 
     data = data_utils.ld_dataset(dataset_name='MNIST', transform=data_transformations.standard_transform())
 
     # query which optimizers to use for training
     optims_list = project_utils.get_optims()
+
+    test_results = pd.DataFrame()
 
     for optim in optims_list:
 
@@ -33,8 +36,10 @@ def main(_):
 
         # Evaluation
         net.eval()
-        data_utils.my_evaluation(data.test, net, optimizer, device)
+        results = data_utils.my_evaluation(data.test, net, optimizer, device)
 
+        test_results = pd.concat([test_results, pd.Series(results, name=project_utils.get_optim_name(optimizer))], axis=1)
+    project_utils.save_test_results('MNIST', settings.adv_train, test_results)
 
 if __name__ == "__main__":
     app.run(main)
