@@ -36,7 +36,7 @@ def main(_):
 
         # Evaluation
         net.eval()
-        results, adv_train = data_utils.my_evaluation(data.test, net, optimizer, device)
+        results = data_utils.my_evaluation(data.test, net, optimizer, device)
 
         test_results = pd.concat([test_results, pd.Series(results, name=project_utils.get_optim_name(optimizer))], axis=1)
     project_utils.save_test_results('MNIST', settings.adv_train, test_results)
