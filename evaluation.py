@@ -6,27 +6,34 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
 )
 
 
-def evaluation(settings, test_loader, net):
-    """performs model evaluation/testing"""
+def evaluation(settings, test_loader, model):
+    """performs model evaluation/testing
+    Arguments:
+        settings(EasyDict): easydict dictionary containing the evaluation settings
+        test_loader(torch Dataloader): Dataloader used for Mini-batching
+        model(torch.nn.Module): trained model to be evaluated
+    returns:
+    results(list): list of test accuracies
+    """
 
     report = EasyDict(nb_test=0, correct=0, correct_fgm=0, correct_pgd=0)
     for x, y in test_loader:
         x, y = x.to(settings.device), y.to(settings.device)
 
-        _, y_pred = net(x).max(1)  # model prediction on clean examples
+        _, y_pred = model(x).max(1)  # model prediction on clean examples
 
         report.nb_test += y.size(0)  # counts how many examples are in the batch
         report.correct += y_pred.eq(y).sum().item()  # counts how many examples in the batch are predicted correctly
 
         if settings.fgsm_att:
-            x_fgm = fast_gradient_method(net, x, 0.3, np.inf)
-            _, y_pred_fgm = net(x_fgm).max(1)  # model prediction on FGM adversarial examples
+            x_fgm = fast_gradient_method(model, x, 0.3, np.inf)
+            _, y_pred_fgm = model(x_fgm).max(1)  # model prediction on FGM adversarial examples
 
             report.correct_fgm += y_pred_fgm.eq(y).sum().item()  # counts correctly predicted fgsm examples
 
         if settings.pgd_att:
-            x_pgd = projected_gradient_descent(net, x, 0.3, 0.01, 40, np.inf)
-            _, y_pred_pgd = net(x_pgd).max(1)  # model prediction on PGD adversarial examples
+            x_pgd = projected_gradient_descent(model, x, 0.3, 0.01, 40, np.inf)
+            _, y_pred_pgd = model(x_pgd).max(1)  # model prediction on PGD adversarial examples
 
             report.correct_pgd += y_pred_pgd.eq(y).sum().item()  # counts correctly predicted pgd examples
 

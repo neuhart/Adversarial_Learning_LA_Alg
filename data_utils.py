@@ -9,6 +9,14 @@ import project_utils
 def ld_dataset(dataset_name, transform):
     """
     Load training and test data.
+    Arguments:
+        dataset_name(str): name of the dataset
+        transform(torchvision.transforms): input transformation
+    returns:
+    EasyDict: easydict dictionary containing:
+        trainloader: torch dataloader for train data
+        testloader: torch dataloader for test data
+        classes: tuple of class names
     """
 
     trainset = getattr(torchvision.datasets, dataset_name)(root='./data', train=True,

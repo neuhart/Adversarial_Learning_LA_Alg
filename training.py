@@ -7,8 +7,14 @@ import time
 import project_utils
 
 
-def train(settings, train_loader, net, optimizer):
-    """trains the network on the provided training set using the given optimizer"""
+def train(settings, train_loader, model, optimizer):
+    """trains the network on the provided training set using the given optimizer
+    Arguments:
+        settings(EasyDict): easydict dictionary containing the training settings
+        train_loader(torch Dataloader): Dataloader used for Mini-batching
+        model(torch.nn.Module): model to be trained
+        optimizer(torch.optim.Optimizer): optimizer used to train the model
+    """
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
 
@@ -21,13 +27,13 @@ def train(settings, train_loader, net, optimizer):
         for x, y in train_loader:
             x, y = x.to(settings.device), y.to(settings.device)
             if settings.adv_train:
-                x = projected_gradient_descent(net, x, 0.3, 0.01, 40, np.inf)
+                x = projected_gradient_descent(model, x, 0.3, 0.01, 40, np.inf)
                 x = x.detach()
 
             if project_utils.get_optim_name(optimizer) in ['ExtraAdam', 'ExtraSGD']:
                 # For Extra-SGD/Adam, we need an extrapolation step
                 optimizer.zero_grad()
-                loss = loss_fn(net(x), y)
+                loss = loss_fn(model(x), y)
                 loss.backward()
                 optimizer.extrapolation()
 
@@ -35,11 +41,11 @@ def train(settings, train_loader, net, optimizer):
                 # For LA-Extra Algs we need to perform an extrapolation step with the inner optimizer
                 optimizer.optimizer.extrapolation()
                 optimizer.zero_grad()
-                loss = loss_fn(net(x), y)
+                loss = loss_fn(model(x), y)
                 loss.backward()
 
             optimizer.zero_grad()
-            loss = loss_fn(net(x), y)
+            loss = loss_fn(model(x), y)
             loss.backward()
             optimizer.step()
 

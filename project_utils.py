@@ -10,7 +10,7 @@ from easydict import EasyDict
 
 def imshow(dataloader, batch_size, classes, inv_transform=None):
     """Plot a batch of images
-    dataloader: dataloader from which to get images
+    dataloader(torch dataloader): dataloader from which to get images
     classes: tuple/list of classes
     inv_transform (OPTIONAL): inversion of transformation
     """
