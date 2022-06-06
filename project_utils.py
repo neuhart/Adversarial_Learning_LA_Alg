@@ -62,7 +62,7 @@ def save_train_results(optimizer, dataset, adv_train, results):
         adv_train(bool): True for adversarial training
         results(list): list of train losses computed after every epoch
         """
-    filename = 'data/{}/adv_results/{}-.csv'.format(dataset, get_optim_name(optimizer)) if \
+    filename = 'data/results/{}/adv_results/{}-.csv'.format(dataset, get_optim_name(optimizer)) if \
         adv_train else 'data/{}/clean_results/{}-.csv'.format(dataset, get_optim_name(optimizer))
     try:
         df = pd.read_csv(filename)
@@ -83,9 +83,9 @@ def save_test_results(dataset, adv_train, test_results):
     """
 
     if adv_train:
-        filename = 'data/{}-adv_test_results.csv'.format(dataset)
+        filename = 'data/results/{}-adv_test_results.csv'.format(dataset)
     else:
-        filename = 'data/{}-clean_test_results.csv'.format(dataset)
+        filename = 'data/results/{}-clean_test_results.csv'.format(dataset)
 
     try:
         df = pd.read_csv(filename)
