@@ -6,6 +6,7 @@ from Optimizer import Lookahead, extragradient, OGDA
 import torch
 from torch.optim.lr_scheduler import MultiStepLR
 from easydict import EasyDict
+from pathlib import Path
 
 
 def imshow(dataloader, batch_size, classes, inv_transform=None):
@@ -62,8 +63,12 @@ def save_train_results(optimizer, dataset, adv_train, results):
         adv_train(bool): True for adversarial training
         results(list): list of train losses computed after every epoch
         """
+    # create directories if necessary
+    Path("data/results/{}/adv_results".format(dataset)).mkdir(parents=True, exist_ok=True)
+    Path("data/results/{}/clean_results".format(dataset)).mkdir(parents=True, exist_ok=True)
+    
     filename = 'data/results/{}/adv_results/{}-.csv'.format(dataset, get_optim_name(optimizer)) if \
-        adv_train else 'data/{}/clean_results/{}-.csv'.format(dataset, get_optim_name(optimizer))
+        adv_train else 'data/results/{}/clean_results/{}-.csv'.format(dataset, get_optim_name(optimizer))
     try:
         df = pd.read_csv(filename)
     except:
