@@ -64,8 +64,8 @@ def save_train_results(optimizer, dataset, adv_train, results):
         results(list): list of train losses computed after every epoch
         """
     # create directories if necessary
-    Path("results/{}/adv_results".format(dataset)).mkdir(parents=True, exist_ok=True)
-    Path("results/{}/clean_results".format(dataset)).mkdir(parents=True, exist_ok=True)
+    Path("results/{}/adv_train_results".format(dataset)).mkdir(parents=True, exist_ok=True)
+    Path("results/{}/clean_train_results".format(dataset)).mkdir(parents=True, exist_ok=True)
 
     filename = 'results/{}/adv_train_results/{}.csv'.format(dataset, get_optim_name(optimizer)) if \
         adv_train else 'results/{}/clean_train_results/{}.csv'.format(dataset, get_optim_name(optimizer))
