@@ -103,11 +103,18 @@ def save_test_results(dataset, adv_train, test_results):
 
 
 def query_dataset():
-    """queries dataset to use for both training and testing"""
+    """queries dataset"""
     implemented_datasets = ['MNIST', 'FashionMNIST', 'CIFAR10']
-    x = input('Select a dataset {}:'.format(implemented_datasets))
-    assert x in implemented_datasets, '{} not implemented'.format(x)
-    return x
+    x = input('Select a dataset (1-3) {}:'.format(implemented_datasets))
+    assert x in implemented_datasets+['1', '2', '3'], '{} not implemented'.format(x)
+    if x == '1':
+        return 'MNIST'
+    elif x == '2':
+        return 'FashionMNIST'
+    elif x == '3':
+        return 'CIFAR10'
+    else:
+        return x
 
 
 def get_optims():
