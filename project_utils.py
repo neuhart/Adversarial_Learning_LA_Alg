@@ -64,11 +64,11 @@ def save_train_results(optimizer, dataset, adv_train, results):
         results(list): list of train losses computed after every epoch
         """
     # create directories if necessary
-    Path("data/results/{}/adv_results".format(dataset)).mkdir(parents=True, exist_ok=True)
-    Path("data/results/{}/clean_results".format(dataset)).mkdir(parents=True, exist_ok=True)
+    Path("results/{}/adv_results".format(dataset)).mkdir(parents=True, exist_ok=True)
+    Path("results/{}/clean_results".format(dataset)).mkdir(parents=True, exist_ok=True)
 
-    filename = 'data/results/{}/adv_train_results/{}.csv'.format(dataset, get_optim_name(optimizer)) if \
-        adv_train else 'data/results/{}/clean_train_results/{}.csv'.format(dataset, get_optim_name(optimizer))
+    filename = 'results/{}/adv_train_results/{}.csv'.format(dataset, get_optim_name(optimizer)) if \
+        adv_train else 'results/{}/clean_train_results/{}.csv'.format(dataset, get_optim_name(optimizer))
     try:
         df = pd.read_csv(filename)
     except:
@@ -88,9 +88,9 @@ def save_test_results(dataset, adv_train, test_results):
     """
 
     if adv_train:
-        filename = 'data/results/{}/adv_test_results.csv'.format(dataset)
+        filename = 'results/{}/adv_test_results.csv'.format(dataset)
     else:
-        filename = 'data/results/{}/clean_test_results.csv'.format(dataset)
+        filename = 'results/{}/clean_test_results.csv'.format(dataset)
 
     try:
         df = pd.read_csv(filename)
