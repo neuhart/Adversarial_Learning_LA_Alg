@@ -5,10 +5,13 @@ import numpy as np
 from Optimizer import Lookahead, extragradient, OGDA
 import torch
 from torch.optim.lr_scheduler import MultiStepLR
+from easydict import EasyDict
+from pathlib import Path
+
 
 def imshow(dataloader, batch_size, classes, inv_transform=None):
     """Plot a batch of images
-    dataloader: dataloader from which to get images
+    dataloader(torch dataloader): dataloader from which to get images
     classes: tuple/list of classes
     inv_transform (OPTIONAL): inversion of transformation
     """
@@ -36,7 +39,7 @@ def yes_no_check(question):
     return True if x == 'y' else False
 
 
-def int_query(query):
+def query_int(query):
     """
     Query an integer
     query: str - question to be asked
@@ -54,33 +57,40 @@ def int_query(query):
 def save_train_results(optimizer, dataset, adv_train, results):
     """
     saves results to csv-file
-    optimizer: torch optimizer
-    dataset: string
-    adv_train: bool
-    results: list
-    """
-    filename = 'data/{}-adv_results.csv'.format(dataset) if adv_train else 'data/{}-clean_results.csv'.format(dataset)
+    Arguments:
+        optimizer(torch.optim.Optimizer): optimizer used for training the model
+        dataset(str): name of the dataset the model was trained on
+        adv_train(bool): True for adversarial training
+        results(list): list of train losses computed after every epoch
+        """
+    # create directories if necessary
+    Path("results/{}/adv_train_results".format(dataset)).mkdir(parents=True, exist_ok=True)
+    Path("results/{}/clean_train_results".format(dataset)).mkdir(parents=True, exist_ok=True)
+
+    filename = 'results/{}/adv_train_results/{}.csv'.format(dataset, get_optim_name(optimizer)) if \
+        adv_train else 'results/{}/clean_train_results/{}.csv'.format(dataset, get_optim_name(optimizer))
     try:
         df = pd.read_csv(filename)
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(results, name=get_optim_name(optimizer))], axis=1)
+    df = pd.concat([df, pd.Series(results)], axis=1)
     df.to_csv(filename, index=False)
 
 
 def save_test_results(dataset, adv_train, test_results):
     """
     saves results to csv-file
-    dataset: string
-    adv_train: bool
-    test_results: pandas Dataframe
+    Arguments:
+        dataset(str): name of the dataset the model was trained on
+        adv_train(bool): True if adversarial training has been performed
+        test_results(pd.Dataframe): Dataframe containing the test accuracies
     """
 
     if adv_train:
-        filename = 'data/{}-adv_test_results.csv'.format(dataset)
+        filename = 'results/{}/adv_test_results.csv'.format(dataset)
     else:
-        filename = 'data/{}-clean_test_results.csv'.format(dataset)
+        filename = 'results/{}/clean_test_results.csv'.format(dataset)
 
     try:
         df = pd.read_csv(filename)
@@ -100,10 +110,12 @@ def query_dataset():
 
 
 def get_optims():
-    """queries optimizers"""
+    """queries optimizers
+    returns: optims_list (list): list of optimizers to be used"""
+
     implemented_optims = ['SGD', 'Adam', 'OGDA', 'ExtraAdam', 'ExtraSGD',
                           'LA-SGD', 'LA-Adam', 'LA-OGDA', 'LA-ExtraSGD', 'LA-ExtraAdam']
-    print('Separate with ","!', 'Type "A" for all optimizers!')
+    print('Separate by ","!', 'Type "A" for all optimizers!')
     optims_list = input('Select optimizers \n{}:'.format(implemented_optims))
     if optims_list == 'A':
         return implemented_optims
@@ -183,3 +195,19 @@ def get_optim_name(optimizer):
     if optimizer_name == 'Lookahead':
         optimizer_name += '-' + optimizer.optimizer.__class__.__name__
     return optimizer_name
+
+
+def g_settings():
+    """queries hyperparameters and general settings
+    returns: settings (EasyDict): dict with settings"""
+
+    if yes_no_check('Run on standard settings?'):
+        settings = EasyDict(nb_epochs=50, adv_train=True, fgsm_att=False, pgd_att=False)
+    else:
+        settings = EasyDict(
+            nb_epochs=query_int('Number of epochs'),
+            adv_train=yes_no_check('Adversarial Training?'),
+            fgsm_att=yes_no_check('FGSM Attack during testing?'),
+            pgd_att=yes_no_check('PGD Attack during testing')
+        )
+    return settings
