@@ -7,6 +7,7 @@ import torch
 from torch.optim.lr_scheduler import MultiStepLR
 from easydict import EasyDict
 from pathlib import Path
+from datetime import datetime
 
 
 def imshow(dataloader, batch_size, classes, inv_transform=None):
@@ -74,7 +75,7 @@ def save_train_results(optimizer, dataset, adv_train, results):
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(results)], axis=1)
+    df = pd.concat([df, pd.Series(results, name="Column {}".format(len(df.columns)+1))], axis=1)
     df.to_csv(filename, index=False)
 
 
