@@ -56,27 +56,30 @@ def query_int(query):
 def save_train_results(optimizer, dataset, adv_train, results):
     """
     saves results to csv-file
-    optimizer: torch optimizer
-    dataset: string
-    adv_train: bool
-    results: list
-    """
-    filename = 'data/{}-adv_results.csv'.format(dataset) if adv_train else 'data/{}-clean_results.csv'.format(dataset)
+    Arguments:
+        optimizer(torch.optim.Optimizer): optimizer used for training the model
+        dataset(str): name of the dataset the model was trained on
+        adv_train(bool): True for adversarial training
+        results(list): list of train losses computed after every epoch
+        """
+    filename = 'data/{}/adv_results/{}-.csv'.format(dataset, get_optim_name(optimizer)) if \
+        adv_train else 'data/{}/clean_results/{}-.csv'.format(dataset, get_optim_name(optimizer))
     try:
         df = pd.read_csv(filename)
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(results, name=get_optim_name(optimizer))], axis=1)
+    df = pd.concat([df, pd.Series(results)], axis=1)
     df.to_csv(filename, index=False)
 
 
 def save_test_results(dataset, adv_train, test_results):
     """
     saves results to csv-file
-    dataset: string
-    adv_train: bool
-    test_results: pandas Dataframe
+    Arguments:
+        dataset(str): name of the dataset the model was trained on
+        adv_train(bool): True if adversarial training has been performed
+        test_results(pd.Dataframe): Dataframe containing the test accuracies
     """
 
     if adv_train:
