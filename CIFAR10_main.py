@@ -3,34 +3,44 @@ import project_utils
 import data_utils
 from absl import app
 from Models import models, data_transformations
+import training
+import evaluation
+import pandas as pd
 
 
-def main(_):
-    data_utils.code_settings()  # specify general settings
-    device = torch.device(project_utils.int_query('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device(
+def main():
+    settings = project_utils.g_settings()  # specify general settings
+    settings.device = torch.device(project_utils.query_int('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device(
         'cpu')
 
-    data = data_utils.ld_dataset(dataset_name='CIFAR10', transform=data_transformations.standard_transform())
+    settings.dataset = 'CIFAR10'
+    data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.standard_transform())
 
     # query which optimizers to use for training
     optims_list = project_utils.get_optims()
 
+    test_results = pd.DataFrame()
+
     for optim in optims_list:
         net = models.CIFAR10_CNN()
-        net.to(device)  # transfers to gpu if available
+        net.to(settings.device)  # transfers to gpu if available
 
         # Determine which optimizer to use
-        optimizer = project_utils.set_optim(optim, net)
+        optimizer = project_utils.set_optim(optim=optim, model=net)
 
         # Train model
         net.train()
-        data_utils.my_training(data.train, net, optimizer, device)
+        training.train(settings, data.train, net, optimizer)
 
         # Evaluation
         net.eval()
-        data_utils.my_evaluation(data.test, net, optimizer, device)
+        results = evaluation.evaluation(settings, data.test, net)
+
+        test_results = pd.concat([test_results, pd.Series(results, name=project_utils.get_optim_name(optimizer))],
+                                 axis=1)
+    project_utils.save_test_results(settings.dataset, settings.adv_train, test_results)
 
 
 if __name__ == "__main__":
-    app.run(main)
+    main()
 
