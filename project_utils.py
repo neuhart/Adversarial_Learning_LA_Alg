@@ -67,8 +67,8 @@ def save_train_results(optimizer, dataset, adv_train, results):
     Path("data/results/{}/adv_results".format(dataset)).mkdir(parents=True, exist_ok=True)
     Path("data/results/{}/clean_results".format(dataset)).mkdir(parents=True, exist_ok=True)
 
-    filename = 'data/results/{}/adv_results/{}.csv'.format(dataset, get_optim_name(optimizer)) if \
-        adv_train else 'data/results/{}/clean_results/{}.csv'.format(dataset, get_optim_name(optimizer))
+    filename = 'data/results/{}/adv_train_results/{}.csv'.format(dataset, get_optim_name(optimizer)) if \
+        adv_train else 'data/results/{}/clean_train_results/{}.csv'.format(dataset, get_optim_name(optimizer))
     try:
         df = pd.read_csv(filename)
     except:
