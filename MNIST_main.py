@@ -2,15 +2,9 @@ import pandas as pd
 import torch
 import project_utils
 import data_utils
-from absl import app
 from Models import models, data_transformations
 import training
 import evaluation
-"""
-1) https://pytorch.org/hub/pytorch_vision_resnet/
-data = data_utils.ld_dataset(transform=data_transformations.resnet_transform())
-net = torchvision.models.resnet50()  # 1)
-"""
 
 
 def main():

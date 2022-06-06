@@ -1,7 +1,6 @@
 import torch
 import project_utils
 import data_utils
-from absl import app
 from Models import models, data_transformations
 import training
 import evaluation
