@@ -213,4 +213,3 @@ def save_test_results(settings, optimizer, scores):
 
 if __name__ == "__main__":
     main()
-    
