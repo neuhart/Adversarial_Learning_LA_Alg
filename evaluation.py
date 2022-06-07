@@ -37,13 +37,13 @@ def evaluation(settings, test_loader, model):
 
             report.correct_pgd += y_pred_pgd.eq(y).sum().item()  # counts correctly predicted pgd examples
 
-    results = []
+    results = EasyDict()
     print(
         "test acc on clean examples (%): {:.3f}".format(
             report.correct / report.nb_test * 100.0
         )
     )
-    results.append(report.correct / report.nb_test)
+    results.clean = report.correct / report.nb_test
 
     if settings.fgsm_att:
         print(
@@ -51,13 +51,13 @@ def evaluation(settings, test_loader, model):
                 report.correct_fgm / report.nb_test * 100.0
             )
         )
-        results.append(report.correct_fgm / report.nb_test)
+        results.fgsm_att = report.correct_fgm / report.nb_test
     if settings.pgd_att:
         print(
             "test acc on PGD adversarial examples (%): {:.3f}".format(
                 report.correct_pgd / report.nb_test * 100.0
             )
         )
-        results.append(report.correct_pgd / report.nb_test)
+        results.pgd_att = report.correct_pgd / report.nb_test
 
     return results

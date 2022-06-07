@@ -18,7 +18,11 @@ def main():
     # query which optimizers to use for training
     optims_list = project_utils.get_optims()
 
-    test_results = pd.DataFrame()
+    clean_scores = pd.DataFrame()
+    if settings.fgsm_att:
+        fgsm_scores = pd.DataFrame()
+    if settings.pgd_att:
+        pgd_scores = pd.DataFrame()
 
     for optim in optims_list:
 
@@ -36,8 +40,20 @@ def main():
         net.eval()
         results = evaluation.evaluation(settings, data.test, net)
 
-        test_results = pd.concat([test_results, pd.Series(results, name=project_utils.get_optim_name(optimizer))], axis=1)
-    project_utils.save_test_results(settings.dataset, settings.adv_train, test_results)
+        clean_scores = pd.concat(
+            [clean_scores, pd.Series(results.clean, name=project_utils.get_optim_name(optimizer))], axis=1)
+        if settings.fgsm_att:
+            fgsm_scores = pd.concat([fgsm_scores, pd.Series(results.fgsm_att,
+                                                              name=project_utils.get_optim_name(optimizer))], axis=1)
+        if settings.pgd_att:
+            pgd_scores = pd.concat([pgd_scores, pd.Series(results.pgd_att,
+                                                              name=project_utils.get_optim_name(optimizer))], axis=1)
+
+    project_utils.save_test_results(settings.dataset, settings.adv_train, clean_scores)
+    if settings.fgsm_att:
+        project_utils.save_test_results(settings.dataset, settings.adv_train, fgsm_scores, attack='fgsm')
+    if settings.pgd_att:
+        project_utils.save_test_results(settings.dataset, settings.adv_train, pgd_scores, attack='pgd')
 
 
 if __name__ == "__main__":

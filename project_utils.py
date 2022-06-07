@@ -7,7 +7,6 @@ import torch
 from torch.optim.lr_scheduler import MultiStepLR
 from easydict import EasyDict
 from pathlib import Path
-from datetime import datetime
 
 
 def imshow(dataloader, batch_size, classes, inv_transform=None):
@@ -79,26 +78,33 @@ def save_train_results(optimizer, dataset, adv_train, results):
     df.to_csv(filename, index=False)
 
 
-def save_test_results(dataset, adv_train, test_results):
+def save_test_results(dataset, adv_train, scores, attack=None):
     """
     saves results to csv-file
     Arguments:
         dataset(str): name of the dataset the model was trained on
-        adv_train(bool): True if adversarial training has been performed
-        test_results(pd.Dataframe): Dataframe containing the test accuracies
+        adv_train(bool): True if adversarial training has been executed
+        scores(pd.Dataframe): Dataframe containing the accuracy scores
+        for each optimizer if an pgd attack has been executed, else None
+        attack(str): states which attack was used, clean=No attack
     """
-
     if adv_train:
-        filename = 'results/{}/adv_test_results.csv'.format(dataset)
+        if attack is not None:
+            filename = 'results/{}/adv_{}_test_results.csv'.format(dataset, attack)
+        else:
+            filename = 'results/{}/adv_test_results.csv'.format(dataset)
     else:
-        filename = 'results/{}/clean_test_results.csv'.format(dataset)
+        if attack is not None:
+            filename = 'results/{}/clean_{}_test_results.csv'.format(dataset, attack)
+        else:
+            filename = 'results/{}/clean_test_results.csv'.format(dataset)
 
     try:
         df = pd.read_csv(filename)
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, test_results], axis=0)
+    df = pd.concat([df, scores], axis=0)
     df.to_csv(filename, index=False)
 
 

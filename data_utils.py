@@ -2,7 +2,6 @@ import torch
 import torchvision
 from torch.utils.data import Subset
 from easydict import EasyDict
-from absl import flags
 import project_utils
 
 
