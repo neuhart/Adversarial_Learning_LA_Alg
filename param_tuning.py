@@ -56,7 +56,7 @@ def main():
                             [scores, pd.Series(results.clean, name='lr={},steps={},alpha={}'.format(
                                 lr, la_steps, la_alpha))], axis=1)
             else:
-                settings.LA = True
+                settings.LA = False
 
                 net = models.MNIST_CNN()
                 net.to(settings.device)  # transfers to gpu if available
