@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import project_utils
+from Utils import project_utils
 import os
 import seaborn as sns
 

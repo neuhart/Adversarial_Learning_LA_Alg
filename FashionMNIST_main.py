@@ -1,6 +1,5 @@
 import torch
-import project_utils
-import data_utils
+from Utils import data_utils, project_utils
 from Models import models, data_transformations
 import training
 import evaluation

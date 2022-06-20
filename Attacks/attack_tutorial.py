@@ -6,8 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.transforms as transforms
 
-import data_utils
-import project_utils
+from Utils import data_utils
 import time
 
 from cleverhans.torch.attacks.fast_gradient_method import fast_gradient_method

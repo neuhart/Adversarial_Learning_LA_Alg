@@ -1,12 +1,12 @@
-import pandas as pd
-import torchvision
+from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
-from Optimizer import Lookahead, extragradient, OGDA
+import pandas as pd
 import torch
-from torch.optim.lr_scheduler import MultiStepLR
+import torchvision
 from easydict import EasyDict
-from pathlib import Path
+from torch.optim.lr_scheduler import MultiStepLR
+from Optimizer import Lookahead, extragradient, OGDA
 
 
 def imshow(dataloader, batch_size, classes, inv_transform=None):

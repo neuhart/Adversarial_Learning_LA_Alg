@@ -1,7 +1,6 @@
 import pandas as pd
 import torch
-import project_utils
-import data_utils
+from Utils import data_utils, project_utils
 from Models import models, data_transformations
 import training
 import evaluation
@@ -44,10 +43,10 @@ def main():
             [clean_scores, pd.Series(results.clean, name=project_utils.get_optim_name(optimizer))], axis=1)
         if settings.fgsm_att:
             fgsm_scores = pd.concat([fgsm_scores, pd.Series(results.fgsm_att,
-                                                              name=project_utils.get_optim_name(optimizer))], axis=1)
+                                                            name=project_utils.get_optim_name(optimizer))], axis=1)
         if settings.pgd_att:
             pgd_scores = pd.concat([pgd_scores, pd.Series(results.pgd_att,
-                                                              name=project_utils.get_optim_name(optimizer))], axis=1)
+                                                          name=project_utils.get_optim_name(optimizer))], axis=1)
 
     project_utils.save_test_results(settings.dataset, settings.adv_train, clean_scores)
     if settings.fgsm_att:

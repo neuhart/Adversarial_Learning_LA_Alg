@@ -4,7 +4,7 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
     projected_gradient_descent,
 )
 import time
-import project_utils
+from Utils import project_utils
 
 
 def train(settings, train_loader, model, optimizer):

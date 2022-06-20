@@ -1,6 +1,5 @@
 import pandas as pd
-import project_utils
-import data_utils
+from Utils import data_utils, project_utils
 from Models import models, data_transformations
 from Optimizer.Lookahead import Lookahead
 from Optimizer.OGDA import OGDA
