@@ -15,7 +15,7 @@ from pathlib import Path
 
 
 def main():
-    settings = EasyDict(nb_epochs=1, adv_train=True)  # specify general settings
+    settings = EasyDict(nb_epochs=3, adv_train=False)  # specify general settings
     settings.device = torch.device(project_utils.query_int('Select GPU [0,3]:')) if \
         torch.cuda.is_available() else torch.device('cpu')
 
@@ -27,7 +27,7 @@ def main():
     scores = pd.DataFrame()
 
     for optim in inner_optims_list:
-        for lr in [1e-3, 3*1e-3, 1e-4]:
+        for lr in [1e-3, 3e-3, 1e-4]:
             settings.lr = lr
             if optim[:3] == 'LA-':  # check if Lookahead is used
                 settings.LA = True
