@@ -66,7 +66,7 @@ def main():
 
                 # Train model
                 net.train()
-                train(settings, data.train, net, optimizer)
+                train(settings, data, net, optimizer)
 
                 # Evaluation
                 net.eval()
