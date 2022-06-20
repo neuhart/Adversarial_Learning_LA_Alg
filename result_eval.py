@@ -36,6 +36,7 @@ def plot_train_results(df):
     """
     for i, col in enumerate(df.columns):
         plt.plot(range(1,df.shape[0]+1), df[col], linestyle='dashed', marker=markers[i], markevery=10)
+    plt.yscale('log')
     plt.xlabel('Epochs')
     plt.ylabel('Training Loss')
     plt.legend(df.columns)
