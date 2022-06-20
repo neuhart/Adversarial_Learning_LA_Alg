@@ -24,10 +24,10 @@ def main():
 
     optim_list = project_utils.get_optims()
 
-    scores = pd.DataFrame()
-
     for optim in optim_list:
-        for lr in [1e-3, 3e-3, 1e-4]:
+        scores = pd.DataFrame()
+
+        for lr in [3e-3, 1e-3, 3e-4, 1e-4]:
             settings.lr = lr
             if optim[:3] == 'LA-':  # check if Lookahead is used
                 settings.LA = True
@@ -158,7 +158,7 @@ def train(settings, data, model, optimizer):
         # Validation
         model.eval()
         with torch.no_grad():
-            valid_results.append(evaluation(settings, data.test, model))
+            valid_results.append(evaluation(settings, data.test, model).clean)
         model.train()
 
     save_train_results(settings, optimizer, results=train_results)
@@ -203,14 +203,17 @@ def save_train_results(settings, optimizer, results):
         optimizer(torch.optim.Optimizer): optimizer used for training the model
         results(list): list of train losses computed after every epoch
         """
-    # create directories if necessary
-    Path("Hyperparam_tuning/{}/adv_train_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
-    Path("Hyperparam_tuning/{}/clean_train_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
 
     if settings.adv_train:
+        # create directory if necessary
+        Path("Hyperparam_tuning/{}/adv_train_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
+
         filename = 'Hyperparam_tuning/{}/adv_train_results/{}.csv'.format(
         settings.dataset, project_utils.get_optim_name(optimizer))
     else:
+        # create directory if necessary
+        Path("Hyperparam_tuning/{}/clean_train_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
+
         filename= 'Hyperparam_tuning/{}/clean_train_results/{}.csv'.format(
             settings.dataset, project_utils.get_optim_name(optimizer))
 
