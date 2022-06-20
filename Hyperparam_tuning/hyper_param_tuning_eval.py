@@ -17,8 +17,8 @@ for file in os.listdir(test_path):
     """Plot of test accuracies of top 5 and bottom 5 hyperparameter settings"""
     df = pd.read_csv(test_path + "/" + file)
 
-    top5_series = df.iloc[0].sort_values(ascending=False)[:5]
-    bottom5_series = df.iloc[0].sort_values(ascending=True)[:5]
+    top5_series = df.iloc[0].sort_values(ascending=False)[:5]  # top 5 settings
+    bottom5_series = df.iloc[0].sort_values(ascending=True)[:5]  # bottom 5 settings
 
     fig, ax = plt.subplots(1, 2, sharey='all')
     sns.barplot(ax=ax[0],x=top5_series.index, y=top5_series)
@@ -46,7 +46,6 @@ for file in os.listdir(test_path):
     plt.ylabel('Accuracy')
     plt.legend(top5_series.index)
     plt.title('{}'.format(file.replace('.csv', '')))
-
     plt.show()
 
 

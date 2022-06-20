@@ -15,7 +15,7 @@ from pathlib import Path
 
 
 def main():
-    settings = EasyDict(nb_epochs=3, adv_train=False)  # specify general settings
+    settings = EasyDict(nb_epochs=20, adv_train=False)  # specify general settings
     settings.device = torch.device(project_utils.query_int('Select GPU [0,3]:')) if \
         torch.cuda.is_available() else torch.device('cpu')
 
