@@ -22,15 +22,16 @@ def main():
     settings.dataset = 'FashionMNIST'
     data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.standard_transform())
 
-    inner_optims_list = project_utils.get_optims()
+    optim_list = project_utils.get_optims()
 
     scores = pd.DataFrame()
 
-    for optim in inner_optims_list:
+    for optim in optim_list:
         for lr in [1e-3, 3e-3, 1e-4]:
             settings.lr = lr
             if optim[:3] == 'LA-':  # check if Lookahead is used
                 settings.LA = True
+                inner_optim = optim[3:]  # delete 'LA-' prefix
 
                 for la_steps in [5, 10, 15]:
                     settings.la_steps = la_steps
@@ -42,7 +43,7 @@ def main():
 
                         # Determine which optimizer to use
                         optimizer = Lookahead(
-                            set_inner_optim(optim, lr=lr, model=net), la_steps=la_steps, la_alpha=la_alpha)
+                            set_inner_optim(inner_optim, lr=lr, model=net), la_steps=la_steps, la_alpha=la_alpha)
 
                         # Train model
                         net.train()
