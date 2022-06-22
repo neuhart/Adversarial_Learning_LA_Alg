@@ -15,11 +15,12 @@ from pathlib import Path
 
 
 def main():
-    settings = EasyDict(nb_epochs=25, adv_train=True)  # specify general settings
+    settings = EasyDict(nb_epochs=project_utils.query_int('Number of epochs?'),
+                        adv_train=project_utils.yes_no_check('Adversarial Training?'))  # specify general settings
     settings.device = torch.device(project_utils.query_int('Select GPU [0,3]:')) if \
         torch.cuda.is_available() else torch.device('cpu')
 
-    settings.dataset = 'FashionMNIST'
+    settings.dataset = project_utils.query_dataset()
     data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.standard_transform())
 
     optim_list = project_utils.get_optims()
@@ -38,7 +39,8 @@ def main():
                     for la_alpha in [0.5, 0.75, 0.9]:
                         settings.la_alpha = la_alpha
 
-                        net = models.MNIST_CNN()
+                        # select correct neural network
+                        net = models.CIFAR10_CNN() if settings.dataset == 'CIFAR10' else models.MNIST_CNN()
                         net.to(settings.device)  # transfers to gpu if available
 
                         # Determine which optimizer to use
