@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import seaborn as sns
-
+import numpy as np
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
@@ -10,10 +10,12 @@ dataset = 'FashionMNIST'
 adv_train = True
 test_path = "{}/adv_test_results".format(dataset) if adv_train else "{}/clean_test_results".format(dataset)
 valid_path = "{}/adv_valid_results".format(dataset) if adv_train else "{}/clean_valid_results".format(dataset)
+train_path = "{}/adv_train_results".format(dataset) if adv_train else "{}/clean_train_results".format(dataset)
 top_settings = pd.DataFrame()
 results= pd.DataFrame()
 barplots = False
 optims = ['SGD', 'Adam', 'OGDA', 'ExtraSGD', 'ExtraAdam']
+
 
 def top5_plots():
     for file in os.listdir(test_path):
@@ -48,6 +50,68 @@ def top5_plots():
         plt.ylabel('Accuracy')
         plt.legend(top5_series.index)
         plt.title('{}'.format(file.replace('.csv', '')))
+        plt.show()
+
+
+def two_scales(ax1,ax2,x_data, data1, data2, series):
+    """Creates a plot with two y-axis
+    Arguments:
+        ax1: first axis
+        ax2: second axis
+        x_data: range of inputs (x-values)
+        data1: y-values for first axis
+        data2: y-values for second axis
+        series(pd.Series): names of data series (used for legend)
+    """
+    for i, setting in enumerate(series.index):
+        ax1.plot(x_data, data1[setting], linestyle='dashed', marker=markers[i], markevery=5)
+        ax2.plot(x_data, data2[setting], linestyle='dashed', marker=markers[i], markevery=5)
+    start, end = ax2.get_ylim()
+    ax2.set_yticks(np.arange(0, end + 1000, 2e4))
+    ax1.legend(series.index)
+
+
+def train_loss_vs_valid_acc():
+    """
+    Creates 2x2 Plot of validation acc and training loss for optimizers and
+    their Lookahead version to allow for comparisons. Top 3 and Bottom 3 settings are plotted
+    """
+
+    for optim in optims:
+        fig, ax = plt.subplots(2, 2, sharey='all', figsize=(15,7))
+
+        valid_df = pd.read_csv(valid_path + "/" + '{}.csv'.format(optim))
+        train_df = pd.read_csv(train_path + "/" + '{}.csv'.format(optim))
+        top3_series = valid_df.iloc[-1].sort_values(ascending=False)[:3]  # top 5 settings
+        bottom3_series = valid_df.iloc[-1].sort_values(ascending=True)[:3]  # bottom 5 settings
+
+        ax2 = ax[0, 0].twinx()
+        two_scales(ax[0, 0], ax2, range(1, valid_df.shape[0] + 1),
+                                         valid_df, train_df, top3_series)
+
+        ax2 = ax[1, 0].twinx()
+        two_scales(ax[1, 0], ax2, range(1, valid_df.shape[0] + 1),
+                                       valid_df, train_df, bottom3_series)
+
+        valid_df_Lookahead = pd.read_csv(valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
+        train_df_Lookahead = pd.read_csv(train_path + "/" + 'Lookahead-{}.csv'.format(optim))
+        top3_LA_series = valid_df_Lookahead.iloc[-1].sort_values(ascending=False)[:3]  # top 5 settings
+        bottom3_LA_series = valid_df_Lookahead.iloc[-1].sort_values(ascending=True)[:3]  # bottom 5 settings
+
+        ax2 = ax[0, 1].twinx()
+        two_scales(ax[0,1], ax2, range(1, valid_df_Lookahead.shape[0] + 1),
+                   valid_df_Lookahead, train_df_Lookahead, top3_LA_series)
+        ax2.set_ylabel('Training Loss')
+        ax2 = ax[1, 1].twinx()
+        two_scales(ax[1, 1], ax2, range(1, valid_df_Lookahead.shape[0] + 1),
+                   valid_df_Lookahead, train_df_Lookahead, bottom3_LA_series)
+        ax2.set_ylabel('Training Loss')
+        ax[0,0].set_title('{}'.format(optim))
+        ax[0,1].set_title('Lookahead-{}'.format(optim))
+        ax[0,0].set_ylabel('Validation Accuracy')
+        ax[1, 0].set_ylabel('Validation Accuracy')
+        ax[1,0].set_xlabel('Epochs')
+        ax[1,1].set_xlabel('Epochs')
         plt.show()
 
 
@@ -191,3 +255,4 @@ def la_alpha_aggregation():
 #lr_aggregation_pairplot()
 #lr_aggregation_summaryplot()
 top5_plots()
+train_loss_vs_valid_acc()
