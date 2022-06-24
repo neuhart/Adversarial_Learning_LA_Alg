@@ -3,10 +3,12 @@ import matplotlib.pyplot as plt
 import os
 import seaborn as sns
 import numpy as np
+from matplotlib.ticker import FormatStrFormatter
+import matplotlib.ticker as mtick
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
-dataset = 'FashionMNIST'
+dataset = 'MNIST'
 adv_train = True
 test_path = "{}/adv_test_results".format(dataset) if adv_train else "{}/clean_test_results".format(dataset)
 valid_path = "{}/adv_valid_results".format(dataset) if adv_train else "{}/clean_valid_results".format(dataset)
@@ -67,6 +69,8 @@ def two_scales(ax1,ax2,x_data, data1, data2, series):
         ax1.plot(x_data, data1[setting], linestyle='dashed', marker=markers[i], markevery=5)
         ax2.plot(x_data, data2[setting], linestyle='dashed', marker=markers[i], markevery=5)
     start, end = ax2.get_ylim()
+    ax1.set_ylim(0,1.1)
+    ax1.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
     ax2.set_yticks(np.arange(0, end + 1000, 2e4))
     ax1.legend(series.index)
 
@@ -254,5 +258,5 @@ def la_alpha_aggregation():
 #la_steps_aggregation()
 #lr_aggregation_pairplot()
 #lr_aggregation_summaryplot()
-top5_plots()
+#top5_plots()
 train_loss_vs_valid_acc()
