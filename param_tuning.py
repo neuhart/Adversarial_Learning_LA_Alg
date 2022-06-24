@@ -61,7 +61,7 @@ def main():
             else:
                 settings.LA = False
 
-                net = models.MNIST_CNN()
+                net = models.CIFAR10_CNN() if settings.dataset == 'CIFAR10' else models.MNIST_CNN()
                 net.to(settings.device)  # transfers to gpu if available
 
                 # Determine which optimizer to use
