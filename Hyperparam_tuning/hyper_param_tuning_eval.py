@@ -3,12 +3,11 @@ import matplotlib.pyplot as plt
 import os
 import seaborn as sns
 import numpy as np
-from matplotlib.ticker import FormatStrFormatter
 import matplotlib.ticker as mtick
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
-dataset = 'MNIST'
+dataset = 'CIFAR10'
 adv_train = True
 test_path = "{}/adv_test_results".format(dataset) if adv_train else "{}/clean_test_results".format(dataset)
 valid_path = "{}/adv_valid_results".format(dataset) if adv_train else "{}/clean_valid_results".format(dataset)

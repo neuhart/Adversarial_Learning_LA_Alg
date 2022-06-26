@@ -140,7 +140,7 @@ def main(_):
 
 if __name__ == "__main__":  # only runs when this file/module is the main module (module that you run)
                             # doesnt run if this file/module is called from or imported from another module
-    flags.DEFINE_integer("nb_epochs", 1, "Number of epochs.")
+    flags.DEFINE_integer("nb_epochs", 25, "Number of epochs.")
     flags.DEFINE_float("eps", 0.3, "Total epsilon for FGM and PGD attacks.")
     flags.DEFINE_bool(
         "adv_train", False, "Use adversarial training (on PGD adversarial examples)."
