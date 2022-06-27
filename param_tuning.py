@@ -1,4 +1,5 @@
 import pandas as pd
+import torchvision.models
 from Utils import data_utils, project_utils
 from Models import models, data_transformations
 from Optimizer.Lookahead import Lookahead
@@ -21,7 +22,8 @@ def main():
         torch.cuda.is_available() else torch.device('cpu')
 
     settings.dataset = project_utils.query_dataset()
-    data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.standard_transform())
+    transform = data_transformations.resnet_transform() if settings.dataset == 'CIFAR10' else data_transformations.standard_transform()
+    data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=transform)
 
     optim_list = project_utils.get_optims()
 
@@ -30,7 +32,7 @@ def main():
 
         for lr in [3e-3, 1e-3, 3e-4, 1e-4, 3e-5]:
             settings.lr = lr
-            if optim[:3] == 'LA-':  # check if Lookahead is used
+            if optim.startswith('LA-'):  # check if Lookahead is used
                 settings.LA = True
                 inner_optim = optim[3:]  # delete 'LA-' prefix
 
@@ -40,7 +42,7 @@ def main():
                         settings.la_alpha = la_alpha
 
                         # select correct neural network
-                        net = models.CIFAR10_CNN() if settings.dataset == 'CIFAR10' else models.MNIST_CNN()
+                        net = torchvision.models.resnet18() if settings.dataset == 'CIFAR10' else models.MNIST_CNN()
                         net.to(settings.device)  # transfers to gpu if available
 
                         # Determine which optimizer to use
@@ -61,7 +63,7 @@ def main():
             else:
                 settings.LA = False
 
-                net = models.CIFAR10_CNN() if settings.dataset == 'CIFAR10' else models.MNIST_CNN()
+                net = torchvision.models.resnet18() if settings.dataset == 'CIFAR10' else models.MNIST_CNN()
                 net.to(settings.device)  # transfers to gpu if available
 
                 # Determine which optimizer to use
