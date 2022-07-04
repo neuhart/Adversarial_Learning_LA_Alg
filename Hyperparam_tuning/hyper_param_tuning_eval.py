@@ -4,6 +4,7 @@ import os
 import seaborn as sns
 import numpy as np
 import matplotlib.ticker as mtick
+import re
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
@@ -14,8 +15,18 @@ valid_path = "{}/adv_valid_results".format(dataset) if adv_train else "{}/clean_
 train_path = "{}/adv_train_results".format(dataset) if adv_train else "{}/clean_train_results".format(dataset)
 top_settings = pd.DataFrame()
 results= pd.DataFrame()
-barplots = True
+barplots = False
 optims = ['SGD', 'Adam', 'OGDA', 'ExtraSGD', 'ExtraAdam']
+
+
+def parameter_formatting(index):
+    """
+    Arguments:
+        index(pandas.core.indexes.base.Index): iterable object containing the hyperparameter settings
+    Returns:
+        list of formatted hyperparameter settings
+    """
+    return [i.replace('alpha', '\u03B1').replace('steps','k').replace('lr','\u03B3') for i in index]
 
 
 def top5_plots():
@@ -45,11 +56,13 @@ def top5_plots():
 
         """Plot of validation accuracies of top5 hyperparameter settings"""
         df = pd.read_csv(valid_path + "/" + file)
-        for i, col in enumerate(top5_series.index):
-            plt.plot(range(1, df.shape[0] + 1), df[col], linestyle='dashed', marker=markers[i])
+        top5_valid_series = df.iloc[0].sort_values(ascending=False)[:5]  # top 5 settings
+
+        for i, col in enumerate(top5_valid_series.index):
+            plt.plot(range(1, df.shape[0] + 1), df[col], linestyle='dashed', marker=markers[i], markevery=5)
         plt.xlabel('Epochs')
         plt.ylabel('Accuracy')
-        plt.legend(top5_series.index)
+        plt.legend(parameter_formatting(top5_series.index))
         plt.title('{}'.format(file.replace('.csv', '')))
         plt.show()
 
@@ -71,7 +84,7 @@ def two_scales(ax1,ax2,x_data, data1, data2, series):
     ax1.set_ylim(0,1.1)
     ax1.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
     ax2.set_yticks(np.arange(0, end + 1000, 2e4))
-    ax1.legend(series.index)
+    ax1.legend(parameter_formatting(series.index))
 
 
 def train_loss_vs_valid_acc():
@@ -161,7 +174,7 @@ def lr_aggregation_summaryplot():
             ax[r,c].plot(range(1, df.shape[0] + 1), df2.mean(axis=1),  linestyle='dashed', marker=markers[i], markevery=5)
 
         ax[r,c].set_title(file.replace('.csv',''))
-        ax[r, c].legend(['lr={}'.format(lr) for lr in learning_rates])
+        ax[r, c].legend(['\u03B3={}'.format(lr) for lr in learning_rates])
     plt.show()
 
 
@@ -198,7 +211,7 @@ def lr_aggregation_pairplot():
         ax[1].set_ylabel('Avg. Accuracy')
         ax[0].set_xlabel('Epochs')
         ax[1].set_xlabel('Epochs')
-        plt.legend(['lr={}'.format(lr) for lr in learning_rates], loc='lower right')
+        plt.legend(['\u03B3={}'.format(lr) for lr in learning_rates], loc='lower right')
         plt.show()
 
 
@@ -220,7 +233,7 @@ def la_steps_aggregation():
 
             plt.plot(range(1, df.shape[0] + 1), df2.mean(axis=1),  linestyle='dashed', marker=markers[i], markevery=5)
 
-        plt.legend(['la_steps={}'.format(la_steps) for la_steps in la_steps_list], loc='lower right')
+        plt.legend(['k={}'.format(la_steps) for la_steps in la_steps_list], loc='lower right')
         plt.title('Lookahead-{}'.format(optim))
         plt.show()
 
@@ -244,13 +257,14 @@ def la_alpha_aggregation():
 
             plt.plot(range(1, df.shape[0] + 1), df2.mean(axis=1),  linestyle='dashed', marker=markers[i], markevery=5)
 
-        plt.legend(['la_steps={}'.format(la_alpha) for la_alpha in la_alphas], loc='lower right')
+        plt.legend(['\u03B1={}'.format(la_alpha) for la_alpha in la_alphas], loc='lower right')
         plt.title('Lookahead-{}'.format(optim))
         plt.show()
 
 #la_alpha_aggregation()
 #la_steps_aggregation()
 #lr_aggregation_pairplot()
-lr_aggregation_summaryplot()
+#lr_aggregation_summaryplot()
+slow_weights_plot()
 #top5_plots()
 #train_loss_vs_valid_acc()

@@ -65,6 +65,17 @@ def plot_test_results(s):
     plt.show()
 
 
+def slow_weights_plot():
+    """
+    for file in os.listdir(test_path):
+        if file.startswith('Lookahead'):
+            df = pd.read_csv(valid_path + "/" + file)
+
+            top5_series = df.iloc[0].sort_values(ascending=False)[:5]  # top 5 settings
+            # plot fast and slow weights
+    """
+
+
 avg_train_results = get_avg_train_result()
 plot_train_results(avg_train_results)
 avg_test_results = get_avg_test_result()
