@@ -14,7 +14,7 @@ valid_path = "{}/adv_valid_results".format(dataset) if adv_train else "{}/clean_
 train_path = "{}/adv_train_results".format(dataset) if adv_train else "{}/clean_train_results".format(dataset)
 top_settings = pd.DataFrame()
 results= pd.DataFrame()
-barplots = False
+barplots = True
 optims = ['SGD', 'Adam', 'OGDA', 'ExtraSGD', 'ExtraAdam']
 
 
@@ -158,14 +158,8 @@ def lr_aggregation_summaryplot():
                     df2 = pd.concat([df2, df[col]], axis=1)
 
             ax[r,c].plot(range(1, df.shape[0] + 1), df2.mean(axis=1),  linestyle='dashed', marker=markers[i], markevery=5)
+            ax[r,c].set_title(file.replace('.csv',''))
 
-
-        """
-        plt.xlabel('Epochs')
-        plt.ylabel('Avg. Accuracy')
-        plt.legend(['lr={}'.format(lr) for lr in learning_rates])
-        plt.title('{}'.format(file.replace('.csv', '')))
-        """
     plt.show()
 
 
@@ -221,7 +215,6 @@ def la_steps_aggregation():
             for col in df.columns:
                 if 'steps={}'.format(la_steps) in col:
                     df2 = pd.concat([df2, df[col]], axis=1)
-                    print('ok')
 
             plt.plot(range(1, df.shape[0] + 1), df2.mean(axis=1),  linestyle='dashed', marker=markers[i], markevery=5)
 
