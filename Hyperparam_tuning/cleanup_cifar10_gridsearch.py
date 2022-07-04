@@ -10,8 +10,16 @@ train_path = "{}/adv_train_results".format(dataset) if adv_train else "{}/clean_
 optims = ['SGD', 'Adam', 'OGDA', 'ExtraSGD', 'ExtraAdam']
 
 for file in os.listdir(train_path):
-    df = pd.read_csv(test_path + "/" + file)
-
+    df = pd.read_csv(train_path + "/" + file)
+    print(file)
+    if file.startswith('Lookahead-Adam'):
+        'Do nothing'
+    else:
+        for col in df.columns:
+            if col.endswith('.1'):
+                df.rename(columns={col: col[:-2]}, inplace=True)
+        df.to_csv(train_path + "/" + file, index=False)
+    """
     if file.startswith('Lookahead-Adam'):
         'Do nothing'
     else:
@@ -21,6 +29,9 @@ for file in os.listdir(train_path):
         dfold.to_csv(
             "C:/Users/phili/OneDrive/Desktop/Uni_Philip/Master Mathematik/Masterarbeit/GitHub/CIFAR10_gridsearch_smallnetwork_backup" + '/' + file,
             index=False)
+    """
+
+
     """
     df = pd.read_csv(train_path + "/" + file)
     if file.startswith('Lookahead'):
