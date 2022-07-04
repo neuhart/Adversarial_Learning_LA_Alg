@@ -147,6 +147,7 @@ def lr_aggregation_summaryplot():
     fig, ax = plt.subplots(5, 2, sharey='all')
     fig.set_figheight(20)
     fig.set_figwidth(13)
+    fig.suptitle('LR Aggregation')
     for file in os.listdir(valid_path):
         r, c = get_indices(file)
         df = pd.read_csv(valid_path + "/" + file)
@@ -158,8 +159,9 @@ def lr_aggregation_summaryplot():
                     df2 = pd.concat([df2, df[col]], axis=1)
 
             ax[r,c].plot(range(1, df.shape[0] + 1), df2.mean(axis=1),  linestyle='dashed', marker=markers[i], markevery=5)
-            ax[r,c].set_title(file.replace('.csv',''))
 
+        ax[r,c].set_title(file.replace('.csv',''))
+        ax[r, c].legend(['lr={}'.format(lr) for lr in learning_rates])
     plt.show()
 
 
@@ -249,6 +251,6 @@ def la_alpha_aggregation():
 #la_alpha_aggregation()
 #la_steps_aggregation()
 #lr_aggregation_pairplot()
-#lr_aggregation_summaryplot()
+lr_aggregation_summaryplot()
 #top5_plots()
-train_loss_vs_valid_acc()
+#train_loss_vs_valid_acc()
