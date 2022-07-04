@@ -15,19 +15,12 @@ for file in os.listdir(train_path):
     if file.startswith('Lookahead-Adam'):
         'Do nothing'
     else:
-        dfnew = df.iloc[1]
-        dfnew.transpose()
-        """
-        dfnew = pd.DataFrame()
-        dfold = pd.DataFrame()
-        dfnew = pd.concat([dfnew,df.iloc[1,:]],axis=1)
-        dfold = pd.concat([dfold, df.iloc[0,:]], axis=1)
-        """
+        dfnew = pd.DataFrame(df.iloc[1]).transpose()
+        dfold = pd.DataFrame(df.iloc[0]).transpose()
         dfnew.to_csv(test_path + '/' + file, index=False)
         dfold.to_csv(
             "C:/Users/phili/OneDrive/Desktop/Uni_Philip/Master Mathematik/Masterarbeit/GitHub/CIFAR10_gridsearch_smallnetwork_backup" + '/' + file,
             index=False)
-    break
     """
     df = pd.read_csv(train_path + "/" + file)
     if file.startswith('Lookahead'):
