@@ -65,7 +65,7 @@ def two_scales(ax1,ax2,x_data, data1, data2, series):
         series(pd.Series): names of data series (used for legend)
     """
     for i, setting in enumerate(series.index):
-        ax1.plot(x_data, data1[setting], linestyle='dashed', marker=markers[i], markevery=5)
+        ax1.plot(x_data, data1[setting], linestyle='solid', marker=markers[i], markevery=5)
         ax2.plot(x_data, data2[setting], linestyle='dashed', marker=markers[i], markevery=5)
     start, end = ax2.get_ylim()
     ax1.set_ylim(0,1.1)
