@@ -9,13 +9,19 @@ valid_path = "{}/adv_valid_results".format(dataset) if adv_train else "{}/clean_
 train_path = "{}/adv_train_results".format(dataset) if adv_train else "{}/clean_train_results".format(dataset)
 optims = ['SGD', 'Adam', 'OGDA', 'ExtraSGD', 'ExtraAdam']
 
-for file in os.listdir(test_path):
-    df = pd.read_csv(test_path + "/" + file)
+for file in os.listdir(train_path):
+    df = pd.read_csv(train_path + "/" + file)
     if file.startswith('Lookahead'):
         if file.startswith('Lookahead-Adam'):
             'Do nothing'
-        'Do'
+        else:
+            dfnew = df.iloc[:, 45:]
+            dfold = df.iloc[:, :45]
+            dfnew.to_csv(train_path + '/' + file, index=False)
+            dfold.to_csv("C:/Users/phili/OneDrive/Desktop/Uni_Philip/Master Mathematik/Masterarbeit/GitHub/CIFAR10_gridsearch_smallnetwork_backup" + '/' + file, index=False)
     else:
-        df = df[5:]
-
+        dfnew = df.iloc[:, 5:]
+        dfold = df.iloc[:, :5]
+        dfnew.to_csv(train_path + '/' + file, index=False)
+        dfold.to_csv("C:/Users/phili/OneDrive/Desktop/Uni_Philip/Master Mathematik/Masterarbeit/GitHub/CIFAR10_gridsearch_smallnetwork_backup" + '/' + file, index=False)
     break
