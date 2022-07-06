@@ -4,7 +4,6 @@ import os
 import seaborn as sns
 import numpy as np
 import matplotlib.ticker as mtick
-import re
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
@@ -265,6 +264,5 @@ def la_alpha_aggregation():
 #la_steps_aggregation()
 #lr_aggregation_pairplot()
 #lr_aggregation_summaryplot()
-slow_weights_plot()
 #top5_plots()
 #train_loss_vs_valid_acc()

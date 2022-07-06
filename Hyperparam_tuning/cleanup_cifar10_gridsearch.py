@@ -77,12 +77,9 @@ def clean_valid(file):
 
     remove_duplicate_1(file, valid_path)
 
-"""
+
 for file in os.listdir(test_path):
     clean_test(file)
     clean_train(file)
     clean_valid(file)
-"""
-remove_duplicate_1('Lookahead-Adam.csv',test_path)
-remove_duplicate_1('Lookahead-Adam.csv',train_path)
-remove_duplicate_1('Lookahead-Adam.csv',valid_path)
+
