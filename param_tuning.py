@@ -30,7 +30,7 @@ def main():
     for optim in optim_list:
         scores = pd.DataFrame()
 
-        for lr in [3e-3, 1e-3, 3e-4, 1e-4, 3e-5]:
+        for lr in [1e-2]:
             settings.lr = lr
             if optim.startswith('LA-'):  # check if Lookahead is used
                 settings.LA = True
