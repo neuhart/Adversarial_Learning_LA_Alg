@@ -33,7 +33,7 @@ def main():
 
         # Train model
         net.train()
-        training.train(settings, data.train, net, optimizer)
+        training.train(settings, data, net, optimizer)
 
         # Evaluation
         net.eval()
@@ -48,11 +48,11 @@ def main():
             pgd_scores = pd.concat([pgd_scores, pd.Series(results.pgd_att,
                                                           name=project_utils.get_optim_name(optimizer))], axis=1)
 
-    project_utils.save_test_results(settings.dataset, settings.adv_train, clean_scores)
+    project_utils.save_test_results(settings, clean_scores)
     if settings.fgsm_att:
-        project_utils.save_test_results(settings.dataset, settings.adv_train, fgsm_scores, attack='fgsm')
+        project_utils.save_test_results(settings, fgsm_scores, attack='fgsm')
     if settings.pgd_att:
-        project_utils.save_test_results(settings.dataset, settings.adv_train, pgd_scores, attack='pgd')
+        project_utils.save_test_results(settings, pgd_scores, attack='pgd')
 
 
 if __name__ == "__main__":

@@ -30,7 +30,7 @@ def main():
     for optim in optim_list:
         scores = pd.DataFrame()
 
-        for lr in [1e-2]:
+        for lr in [1e-2, 3e-3, 1e-3, 3e-4, 1e-4, 3e-5]:
             settings.lr = lr
             if optim.startswith('LA-'):  # check if Lookahead is used
                 settings.LA = True
@@ -277,7 +277,7 @@ def save_test_results(settings, optimizer, scores):
         settings(EasyDict): easydict dictionary containing settings and hyperparameters
         optimizer(torch.optim.Optimizer): optimizer used for training
         scores(pd.Dataframe): Dataframe containing the accuracy scores
-        for each optimizer if an pgd attack has been executed, else None
+        for each optimizer if a pgd attack has been executed, else None
     """
     # create directories if necessary
     Path("Hyperparam_tuning/{}/adv_test_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
