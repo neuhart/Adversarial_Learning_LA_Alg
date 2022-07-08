@@ -60,7 +60,7 @@ def save_train_results(settings, optimizer, results):
         settings(EasyDict): easydict dictionary containing settings and hyperparameters
         optimizer(torch.optim.Optimizer): optimizer used for training the model
         results(list): list of train losses computed after every epoch
-        """
+    """
     # create directories if necessary
     Path("results/{}/adv_train_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
     Path("results/{}/clean_train_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
@@ -106,7 +106,7 @@ def save_test_results(settings, scores, attack=None):
     df.to_csv(filename, index=False)
 
 
-def save_valid_results(settings, optimizer, scores, attack):
+def save_valid_results(settings, optimizer, scores, attack=None):
     """
     saves validation results to csv-file
     Arguments:
