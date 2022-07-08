@@ -17,12 +17,15 @@ from easydict import EasyDict
 
 
 def main():
-    settings = project_utils.g_settings()  # specify general settings
-    settings.device = torch.device(project_utils.query_int('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device(
-        'cpu')
+    settings = EasyDict(
+            nb_epochs=project_utils.query_int('Number of epochs'),
+            adv_train=project_utils.yes_no_check('Adversarial Training?'),
+            device= torch.device(project_utils.query_int('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device('cpu') ,
+            dataset = project_utils.query_dataset()
+    )# specify general settings
 
-    settings.dataset = project_utils.query_dataset()
-    data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.standard_transform())
+    transform = data_transformations.resnet_transform() if settings.dataset == 'CIFAR10' else data_transformations.standard_transform()
+    data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=transform)
 
     # query which optimizers to use for training
     optims_list = project_utils.get_optims()
@@ -40,7 +43,7 @@ def main():
 
         # Train model
         net.train()
-        training.train(settings, data.train, net, optimizer)
+        training.train(settings, data, net, optimizer)
 
         # Evaluation
         net.eval()
