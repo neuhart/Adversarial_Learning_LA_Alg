@@ -57,10 +57,10 @@ def train(settings, data, model, optimizer):
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
 
-    slow_weights_valid_results = []
-    fast_weights_valid_results = []
-
     for epoch in range(1, settings.nb_epochs + 1):
+        slow_weights_valid_results = []
+        fast_weights_valid_results = []
+        
         start_t = time.time()
         for x, y in data.train:
             x, y = x.to(settings.device), y.to(settings.device)
