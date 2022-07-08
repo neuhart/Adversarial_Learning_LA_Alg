@@ -20,8 +20,10 @@ def main():
     settings = EasyDict(
             nb_epochs=project_utils.query_int('Number of epochs'),
             adv_train=project_utils.yes_no_check('Adversarial Training?'),
-            device= torch.device(project_utils.query_int('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device('cpu') ,
-            dataset = project_utils.query_dataset()
+            device=torch.device(project_utils.query_int('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device('cpu') ,
+            dataset=project_utils.query_dataset(),
+            fgsm_att=False,
+            pgd_att=False
     )# specify general settings
 
     transform = data_transformations.resnet_transform() if settings.dataset == 'CIFAR10' else data_transformations.standard_transform()
