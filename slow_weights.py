@@ -93,8 +93,9 @@ def train(settings, data, model, optimizer):
                 fast_weights_valid_results.append(evaluation(settings, data.test, model).clean)
                 model.train()
 
-                save_valid_results(settings, optimizer, scores=slow_weights_valid_results, weights='slow')
-                save_valid_results(settings, optimizer, scores=fast_weights_valid_results, weights='fast')
+        if epoch in [2, 6, 12]:
+            save_valid_results(settings, optimizer, scores=slow_weights_valid_results, weights='slow', epoch=epoch)
+            save_valid_results(settings, optimizer, scores=fast_weights_valid_results, weights='fast', epoch=epoch)
 
         end_t = time.time()
         print(
@@ -104,7 +105,7 @@ def train(settings, data, model, optimizer):
         )
 
 
-def save_valid_results(settings, optimizer, scores, weights):
+def save_valid_results(settings, optimizer, scores, weights, epoch):
     """
     saves validation results to csv-file
     Arguments:
@@ -112,6 +113,7 @@ def save_valid_results(settings, optimizer, scores, weights):
         optimizer(torch.optim.Optimizer): optimizer used for training the model
         scores(list): list of test accuraries computed after every epoch
         weights(str): states on which weights (i.e. fast or slow) validation has been performed
+        epoch(int): current epoch of the training phase
         """
     # create directories if necessary
     Path("slow_weight_evaluation/{}/adv_valid_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
@@ -129,8 +131,8 @@ def save_valid_results(settings, optimizer, scores, weights):
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(scores, name='lr={};steps={};alpha={}'.format(
-        optimizer.optimizer.param_groups[0]['lr'], optimizer._total_la_steps, optimizer.la_alpha))], axis=1)
+    df = pd.concat([df, pd.Series(scores, name='lr={};steps={};alpha={},epoch={}'.format(
+        optimizer.optimizer.param_groups[0]['lr'], optimizer._total_la_steps, optimizer.la_alpha, epoch))], axis=1)
     df.to_csv(filename, index=False)
 
 
