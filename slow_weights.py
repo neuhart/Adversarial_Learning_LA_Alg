@@ -85,27 +85,28 @@ def train(settings, data, model, optimizer):
             loss.backward()
             optimizer.step()
 
+            if epoch in [2,6,12]:
+                # Validation on slow weights
+                optimizer._backup_and_load_cache()
+                model.eval()
+                slow_weights_valid_results.append(evaluation(settings, data.test, model).clean)
+                model.train()
+                optimizer._clear_and_load_backup()
+
+                # Validation on fast weights
+                model.eval()
+                fast_weights_valid_results.append(evaluation(settings, data.test, model).clean)
+                model.train()
+
+                save_valid_results(settings, optimizer, scores=slow_weights_valid_results, weights='slow')
+                save_valid_results(settings, optimizer, scores=fast_weights_valid_results, weights='fast')
+
         end_t = time.time()
         print(
             "epoch: {}/{} computed in {:.3f} seconds".format(
                 epoch, settings.nb_epochs, end_t-start_t
             )
         )
-
-        # Validation on slow weights
-        optimizer._backup_and_load_cache()
-        model.eval()
-        slow_weights_valid_results.append(evaluation(settings, data.test, model).clean)
-        model.train()
-        optimizer._clear_and_load_backup()
-
-        # Validation on fast weights
-        model.eval()
-        fast_weights_valid_results.append(evaluation(settings, data.test, model).clean)
-        model.train()
-
-    save_valid_results(settings, optimizer, scores=slow_weights_valid_results, weights='slow')
-    save_valid_results(settings, optimizer, scores=fast_weights_valid_results, weights='fast')
 
 
 def save_valid_results(settings, optimizer, scores, weights):
