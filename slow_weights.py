@@ -43,7 +43,7 @@ def main():
 
         # Train model
         net.train()
-        training.train(settings, data, net, optimizer)
+        train(settings, data, net, optimizer)
 
 
 def train(settings, data, model, optimizer):
