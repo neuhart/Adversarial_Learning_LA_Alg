@@ -130,7 +130,7 @@ def save_valid_results(settings, optimizer, scores, weights):
         df = pd.DataFrame()
 
     df = pd.concat([df, pd.Series(scores, name='lr={};steps={};alpha={}'.format(
-        optimizer.optimizer.param_groups[0]['lr'], optimizer.la_total_la_steps, optimizer.la_alpha))], axis=1)
+        optimizer.optimizer.param_groups[0]['lr'], optimizer._total_la_steps, optimizer.la_alpha))], axis=1)
     df.to_csv(filename, index=False)
 
 
