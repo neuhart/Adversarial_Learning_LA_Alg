@@ -21,14 +21,11 @@ df1 = pd.read_csv(fast_weights_valid_path)
 df2= pd.read_csv(slow_weights_valid_path)
 
 df3 = df2.iloc[:,0]
-df3 = df3[df3.index % 5 == 0]
-df4 = df1[df1.index % 5 == 0]
-
-
-
-for i in range(3):
-    for j in range(10):
-        plt.plot(range(j,j+4),df1.iloc[j:j+4,i])
-    plt.plot(range(1,10+1),df3[:10], linestyle='dashed')
-    plt.legend(['fast-weights','slow-weights'])
-    plt.show()
+df4 = df1.iloc[:,0]
+df3 = df3[(df3.index + 1) % 5 == 0]
+df4 = df4[(df4.index+ 1) % 5 == 0]
+for j in range(10):
+    plt.plot(range(j*5,5*j+5), df1.iloc[5*j:5*j+5, 0])
+plt.plot([5*i+5 for i in range(10)], df3[:10], linestyle='dashed', marker='x')
+plt.legend(['fast-weights', 'slow-weights'])
+plt.show()
