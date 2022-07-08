@@ -34,8 +34,6 @@ def main():
     if any([0 if optim.startswith('LA-') else 1 for optim in optims_list]):
         raise 'Only implemented for Lookahead'
 
-    test_results = pd.DataFrame()
-
     for optim in optims_list:
         net = torchvision.models.resnet18() if settings.dataset == 'CIFAR10' else models.MNIST_CNN()
         net.to(settings.device)  # transfers to gpu if available
@@ -46,14 +44,6 @@ def main():
         # Train model
         net.train()
         training.train(settings, data, net, optimizer)
-
-        # Evaluation
-        net.eval()
-        results = evaluation.evaluation(settings, data.test, net)
-
-        test_results = pd.concat([test_results, pd.Series(results, name=project_utils.get_optim_name(optimizer))],
-                                 axis=1)
-    project_utils.save_test_results(settings.dataset, settings.adv_train, test_results)
 
 
 def train(settings, data, model, optimizer):
