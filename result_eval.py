@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import project_utils
+from Utils import project_utils
 import os
 import seaborn as sns
 
@@ -63,6 +63,17 @@ def plot_test_results(s):
     plt.xticks(rotation=90)
     plt.tight_layout()
     plt.show()
+
+
+def slow_weights_plot():
+    """
+    for file in os.listdir(test_path):
+        if file.startswith('Lookahead'):
+            df = pd.read_csv(valid_path + "/" + file)
+
+            top5_series = df.iloc[0].sort_values(ascending=False)[:5]  # top 5 settings
+            # plot fast and slow weights
+    """
 
 
 avg_train_results = get_avg_train_result()

@@ -2,7 +2,7 @@ import torch
 import torchvision
 from torch.utils.data import Subset
 from easydict import EasyDict
-import project_utils
+from Utils import project_utils
 
 
 def ld_dataset(dataset_name, transform):

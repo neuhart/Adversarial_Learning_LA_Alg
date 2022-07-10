@@ -1,6 +1,5 @@
 import torch
-import project_utils
-import data_utils
+from Utils import data_utils, project_utils
 from Models import models, data_transformations
 import training
 import evaluation
@@ -18,7 +17,11 @@ def main():
     # query which optimizers to use for training
     optims_list = project_utils.get_optims()
 
-    test_results = pd.DataFrame()
+    clean_scores = pd.DataFrame()
+    if settings.fgsm_att:
+        fgsm_scores = pd.DataFrame()
+    if settings.pgd_att:
+        pgd_scores = pd.DataFrame()
 
     for optim in optims_list:
         net = models.MNIST_CNN()
@@ -29,15 +32,26 @@ def main():
 
         # Train model
         net.train()
-        training.train(settings, data.train, net, optimizer)
+        training.train(settings, data, net, optimizer)
 
         # Evaluation
         net.eval()
         results = evaluation.evaluation(settings, data.test, net)
 
-        test_results = pd.concat([test_results, pd.Series(results, name=project_utils.get_optim_name(optimizer))],
+        clean_scores = pd.concat([clean_scores, pd.Series(results, name=project_utils.get_optim_name(optimizer))],
                                  axis=1)
-    project_utils.save_test_results(settings.dataset, settings.adv_train, test_results)
+        if settings.fgsm_att:
+            fgsm_scores = pd.concat([fgsm_scores, pd.Series(results.fgsm_att,
+                                                            name=project_utils.get_optim_name(optimizer))], axis=1)
+        if settings.pgd_att:
+            pgd_scores = pd.concat([pgd_scores, pd.Series(results.pgd_att,
+                                                          name=project_utils.get_optim_name(optimizer))], axis=1)
+
+    project_utils.save_test_results(settings, clean_scores)
+    if settings.fgsm_att:
+        project_utils.save_test_results(settings, fgsm_scores, attack='fgsm')
+    if settings.pgd_att:
+        project_utils.save_test_results(settings, pgd_scores, attack='pgd')
 
 
 if __name__ == "__main__":

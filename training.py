@@ -4,27 +4,31 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
     projected_gradient_descent,
 )
 import time
-import project_utils
+from Utils import project_utils
+from easydict import EasyDict
+from evaluation import evaluation
 
 
-def train(settings, train_loader, model, optimizer):
+def train(settings, data, model, optimizer):
     """trains the network on the provided training set using the given optimizer
     Arguments:
         settings(EasyDict): easydict dictionary containing the training settings
-        train_loader(torch Dataloader): Dataloader used for Mini-batching
+        data(EasyDict): easydict dict containing dataloaders for training and testing
         model(torch.nn.Module): model to be trained
         optimizer(torch.optim.Optimizer): optimizer used to train the model
     """
 
     loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
 
-    scheduler = project_utils.set_lr_scheduler(optimizer)
+    train_results = []
+    valid_clean_results = []
+    if settings.fgsm_att: valid_fgsm_results = []
+    if settings.pgd_att: valid_pgd_results = []
 
-    results = []
     for epoch in range(1, settings.nb_epochs + 1):
         start_t = time.time()
         train_loss = 0.0
-        for x, y in train_loader:
+        for x, y in data.train:
             x, y = x.to(settings.device), y.to(settings.device)
             if settings.adv_train:
                 x = projected_gradient_descent(model, x, 0.3, 0.01, 40, np.inf)
@@ -51,13 +55,27 @@ def train(settings, train_loader, model, optimizer):
 
             train_loss += loss.item()
 
-        scheduler.step()
-
         end_t = time.time()
         print(
             "epoch: {}/{}, train loss: {:.3f} computed in {:.3f} seconds".format(
-                epoch, settings.nb_epochs, train_loss/len(train_loader), end_t-start_t
+                epoch, settings.nb_epochs, train_loss/len(data.train), end_t-start_t
             )
         )
-        results.append(train_loss)
-    project_utils.save_train_results(optimizer, dataset=settings.dataset, adv_train=settings.adv_train, results=results)
+        train_results.append(train_loss)
+
+        # Validation
+        model.eval()
+        validation_results = evaluation(settings, data.test, model)
+        valid_clean_results.append(validation_results.clean)
+        if settings.fgsm_att: valid_fgsm_results.append(validation_results.fgsm_att)
+        if settings.pgd_att: valid_pgd_results.append(validation_results.pgd_att)
+        model.train()
+
+    project_utils.save_train_results(settings, optimizer, results=train_results)
+    project_utils.save_valid_results(settings, optimizer, scores=valid_clean_results)
+    if settings.fgsm_att:
+        project_utils.save_valid_results(settings, optimizer, scores=valid_fgsm_results, attack='fgsm')
+    if settings.pgd_att:
+        project_utils.save_valid_results(settings, optimizer, scores=valid_fgsm_results, attack='pgd')
+
+

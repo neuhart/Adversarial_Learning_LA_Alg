@@ -1,12 +1,11 @@
-import pandas as pd
-import torchvision
+from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
-from Optimizer import Lookahead, extragradient, OGDA
+import pandas as pd
 import torch
-from torch.optim.lr_scheduler import MultiStepLR
+import torchvision
 from easydict import EasyDict
-from pathlib import Path
+from Optimizer import Lookahead, extragradient, OGDA
 
 
 def imshow(dataloader, batch_size, classes, inv_transform=None):
@@ -54,21 +53,20 @@ def query_int(query):
     return x
 
 
-def save_train_results(optimizer, dataset, adv_train, results):
+def save_train_results(settings, optimizer, results):
     """
     saves results to csv-file
     Arguments:
+        settings(EasyDict): easydict dictionary containing settings and hyperparameters
         optimizer(torch.optim.Optimizer): optimizer used for training the model
-        dataset(str): name of the dataset the model was trained on
-        adv_train(bool): True for adversarial training
         results(list): list of train losses computed after every epoch
-        """
+    """
     # create directories if necessary
-    Path("results/{}/adv_train_results".format(dataset)).mkdir(parents=True, exist_ok=True)
-    Path("results/{}/clean_train_results".format(dataset)).mkdir(parents=True, exist_ok=True)
+    Path("results/{}/adv_train_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
+    Path("results/{}/clean_train_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
 
-    filename = 'results/{}/adv_train_results/{}.csv'.format(dataset, get_optim_name(optimizer)) if \
-        adv_train else 'results/{}/clean_train_results/{}.csv'.format(dataset, get_optim_name(optimizer))
+    filename = 'results/{}/adv_train_results/{}.csv'.format(settings.dataset, get_optim_name(optimizer)) if \
+        settings.adv_train else 'results/{}/clean_train_results/{}.csv'.format(settings.dataset, get_optim_name(optimizer))
     try:
         df = pd.read_csv(filename)
     except:
@@ -78,26 +76,26 @@ def save_train_results(optimizer, dataset, adv_train, results):
     df.to_csv(filename, index=False)
 
 
-def save_test_results(dataset, adv_train, scores, attack=None):
+def save_test_results(settings, scores, attack=None):
     """
     saves results to csv-file
     Arguments:
-        dataset(str): name of the dataset the model was trained on
-        adv_train(bool): True if adversarial training has been executed
-        scores(pd.Dataframe): Dataframe containing the accuracy scores
-        for each optimizer if an pgd attack has been executed, else None
-        attack(str): states which attack was used, clean=No attack
+        settings(EasyDict): easydict dictionary containing settings and hyperparameters
+        scores(pd.Dataframe): Dataframe containing the accuracy scores for each
+        optimizer if a pgd attack has been executed, else None
+        attack(str): states which attack was used for evaluation, clean=No attack
+
     """
-    if adv_train:
+    if settings.adv_train:
         if attack is not None:
-            filename = 'results/{}/adv_{}_test_results.csv'.format(dataset, attack)
+            filename = 'results/{}/adv_{}_test_results.csv'.format(settings.dataset, attack)
         else:
-            filename = 'results/{}/adv_test_results.csv'.format(dataset)
+            filename = 'results/{}/adv_test_results.csv'.format(settings.dataset)
     else:
         if attack is not None:
-            filename = 'results/{}/clean_{}_test_results.csv'.format(dataset, attack)
+            filename = 'results/{}/clean_{}_test_results.csv'.format(settings.dataset, attack)
         else:
-            filename = 'results/{}/clean_test_results.csv'.format(dataset)
+            filename = 'results/{}/clean_test_results.csv'.format(settings.dataset)
 
     try:
         df = pd.read_csv(filename)
@@ -105,6 +103,42 @@ def save_test_results(dataset, adv_train, scores, attack=None):
         df = pd.DataFrame()
 
     df = pd.concat([df, scores], axis=0)
+    df.to_csv(filename, index=False)
+
+
+def save_valid_results(settings, optimizer, scores, attack=None):
+    """
+    saves validation results to csv-file
+    Arguments:
+        settings(EasyDict): easydict dictionary containing settings and hyperparameters
+        optimizer(torch.optim.Optimizer): optimizer used for training the model
+        scores(list): list of test accuraries computed after every epoch
+        attack(str): states which attack was used for evaluation, clean=No attack
+        """
+    # create directories if necessary
+    Path("results/{}/adv_valid_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
+    Path("results/{}/clean_valid_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
+
+    if settings.adv_train:
+        if attack is not None:
+            filename = 'results/{}/adv_{}_valid_results/{}.csv'.format(
+                settings.dataset, attack, get_optim_name(optimizer))
+        else:
+            filename = 'results/{}/adv_valid_results/{}.csv'.format(settings.dataset,
+                                                                    get_optim_name(optimizer))
+    else:
+        if attack is not None:
+            filename = 'results/{}/clean_{}_valid_results/{}.csv'.format(
+                settings.dataset, attack, get_optim_name(optimizer))
+        else:
+            filename = 'results/{}/clean_valid_results/{}.csv'.format(
+                settings.dataset, get_optim_name(optimizer))
+    try:
+        df = pd.read_csv(filename)
+    except:
+        df = pd.DataFrame()
+
+    df = pd.concat([df, pd.Series(scores, name="Column {}".format(len(df.columns) + 1))], axis=1)
     df.to_csv(filename, index=False)
 
 
@@ -169,38 +203,6 @@ def set_optim(optim, model):
         raise 'Wrong optimizer'
 
     return optimizer
-
-
-def set_lr_scheduler(optimizer):
-    """Sets lr_scheduler
-    Arguments:
-        optimizer(torch.optim): name of optimizer to use
-    """
-    optim = get_optim_name(optimizer)
-    if optim == 'Lookahead-SGD':
-        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
-    elif optim == 'Lookahead-Adam':
-        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
-    elif optim == 'Lookahead-ExtraSGD':
-        scheduler = MultiStepLR(optimizer, milestones=[13, 25], gamma=0.1)
-    elif optim == 'Lookahead-ExtraAdam':
-        scheduler = MultiStepLR(optimizer, milestones=[13, 25], gamma=0.1)
-    elif optim == 'Lookahead-OGDA':
-        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
-    elif optim == 'Adam':
-        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
-    elif optim == 'ExtraAdam':
-        scheduler = MultiStepLR(optimizer, milestones=[13, 25], gamma=0.1)
-    elif optim == 'SGD':
-        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
-    elif optim == 'OGDA':
-        scheduler = MultiStepLR(optimizer, milestones=[25, 50], gamma=0.1)
-    elif optim == 'ExtraSGD':
-        scheduler = MultiStepLR(optimizer, milestones=[13, 25], gamma=0.1)
-    else:
-        raise 'Wrong optimizer'
-
-    return scheduler
 
 
 def get_optim_name(optimizer):
