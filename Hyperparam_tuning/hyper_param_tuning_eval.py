@@ -155,7 +155,7 @@ def lr_aggregation_summaryplot():
     averaged over all values of la_steps and la_alpha used in the gridsearch,
     is created for the Lookahead version of the optimizer
     """
-    learning_rates = [3e-3, 1e-3, 3e-4, 1e-4, 3e-5]
+    learning_rates = [1e-2, 3e-3, 1e-3, 3e-4, 1e-4, 3e-5]
     fig, ax = plt.subplots(5, 2, sharey='all')
     fig.set_figheight(20)
     fig.set_figwidth(13)
@@ -183,7 +183,7 @@ def lr_aggregation_pairplot():
     On the right: a plot of the valid. acc. of Lookahead version of the optimizer
     averaged over all la_steps and la_alpha used in the gridsearch
     """
-    learning_rates = [3e-3, 1e-3, 3e-4, 1e-4, 3e-5]
+    learning_rates = [1e-2, 3e-3, 1e-3, 3e-4, 1e-4, 3e-5]
 
     for optim in optims:
         fig, ax = plt.subplots(1, 2, sharey='all')
@@ -223,6 +223,7 @@ def la_steps_aggregation():
     la_steps_list = [5,10,15]
 
     for optim in optims:
+        df_nolook = pd.read_csv(valid_path + "/" + '{}.csv'.format(optim))
         df = pd.read_csv(valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
         for i, la_steps in enumerate(la_steps_list):
             df2 = pd.DataFrame()
@@ -230,9 +231,14 @@ def la_steps_aggregation():
                 if 'steps={}'.format(la_steps) in col:
                     df2 = pd.concat([df2, df[col]], axis=1)
 
-            plt.plot(range(1, df.shape[0] + 1), df2.mean(axis=1),  linestyle='dashed', marker=markers[i], markevery=5)
+            plt.plot(range(1, df.shape[0] + 1), df2.mean(axis=1), marker=markers[i], markevery=5)
 
-        plt.legend(['k={}'.format(la_steps) for la_steps in la_steps_list], loc='lower right')
+        plt.plot(range(1, df_nolook.shape[0]+1), df_nolook[df_nolook.iloc[-1].idxmax()],
+                 linestyle='dashed', marker=markers[-1], markevery=5)
+        plt.plot(range(1, df_nolook.shape[0]+1), df_nolook[df_nolook.iloc[-1].idxmin()],
+                 linestyle='dashed', marker=markers[-2], markevery=5)
+
+        plt.legend(['k={}'.format(la_steps) for la_steps in la_steps_list]+['{}: {}'.format(optim, df_nolook.iloc[-1].idxmax().replace('lr','\u03B3')), '{}: {}'.format(optim, df_nolook.iloc[-1].idxmin().replace('lr','\u03B3'))], loc='lower right')
         plt.title('Lookahead-{}'.format(optim))
         plt.show()
 
@@ -246,17 +252,22 @@ def la_alpha_aggregation():
     la_alphas = [0.5, 0.75, 0.9]
 
     for optim in optims:
+        df_nolook = pd.read_csv(valid_path + "/" + '{}.csv'.format(optim))
         df = pd.read_csv(valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
         for i, la_alpha in enumerate(la_alphas):
             df2 = pd.DataFrame()
             for col in df.columns:
                 if 'alpha={}'.format(la_alpha) in col:
                     df2 = pd.concat([df2, df[col]], axis=1)
-                    print('ok')
 
-            plt.plot(range(1, df.shape[0] + 1), df2.mean(axis=1),  linestyle='dashed', marker=markers[i], markevery=5)
+            plt.plot(range(1, df.shape[0] + 1), df2.mean(axis=1), marker=markers[i], markevery=5)
 
-        plt.legend(['\u03B1={}'.format(la_alpha) for la_alpha in la_alphas], loc='lower right')
+        plt.plot(range(1, df_nolook.shape[0] + 1), df_nolook[df_nolook.iloc[-1].idxmax()], linestyle='dashed',
+                 marker=markers[-1], markevery=5)
+        plt.plot(range(1, df_nolook.shape[0] + 1), df_nolook[df_nolook.iloc[-1].idxmin()], linestyle='dashed',
+                 marker=markers[-2], markevery=5)
+
+        plt.legend(['\u03B1={}'.format(la_alpha) for la_alpha in la_alphas]+['{}: {}'.format(optim, df_nolook.iloc[-1].idxmax().replace('lr','\u03B3')), '{}: {}'.format(optim, df_nolook.iloc[-1].idxmin().replace('lr','\u03B3'))], loc='lower right')
         plt.title('Lookahead-{}'.format(optim))
         plt.show()
 
