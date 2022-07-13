@@ -7,11 +7,18 @@ import matplotlib.ticker as mtick
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
-dataset = 'CIFAR10'
+dataset = 'MNIST'
 adv_train = True
-test_path = "{}/adv_test_results".format(dataset) if adv_train else "{}/clean_test_results".format(dataset)
-valid_path = "{}/adv_valid_results".format(dataset) if adv_train else "{}/clean_valid_results".format(dataset)
+clean_test_path = "{}/adv_test_results".format(dataset) if adv_train else "{}/clean_test_results".format(dataset)
+fgsm_test_path = "{}/adv_fgsm_test_results".format(dataset) if adv_train else "{}/clean_fgsm_test_results".format(dataset)
+pgd_test_path = "{}/adv_pgd_test_results".format(dataset) if adv_train else "{}/clean_pgd_test_results".format(dataset)
+
+clean_valid_path = "{}/adv_valid_results".format(dataset) if adv_train else "{}/clean_valid_results".format(dataset)
+fgsm_valid_path = "{}/adv_fgsm_valid_results".format(dataset) if adv_train else "{}/clean_fgsm_valid_results".format(dataset)
+pgd_valid_path = "{}/adv_pgd_valid_results".format(dataset) if adv_train else "{}/clean_pgd_valid_results".format(dataset)
+
 train_path = "{}/adv_train_results".format(dataset) if adv_train else "{}/clean_train_results".format(dataset)
+
 top_settings = pd.DataFrame()
 results= pd.DataFrame()
 barplots = False
@@ -29,9 +36,9 @@ def parameter_formatting(index):
 
 
 def top5_plots():
-    for file in os.listdir(test_path):
+    for file in os.listdir(clean_test_path):
         """Plot of test accuracies of top 5 and bottom 5 hyperparameter settings"""
-        df = pd.read_csv(test_path + "/" + file)
+        df = pd.read_csv(clean_test_path + "/" + file)
 
         top5_series = df.iloc[0].sort_values(ascending=False)[:5]  # top 5 settings
         bottom5_series = df.iloc[0].sort_values(ascending=True)[:5]  # bottom 5 settings
@@ -54,8 +61,8 @@ def top5_plots():
             plt.show()
 
         """Plot of validation accuracies of top5 hyperparameter settings"""
-        df = pd.read_csv(valid_path + "/" + file)
-        top5_valid_series = df.iloc[0].sort_values(ascending=False)[:5]  # top 5 settings
+        df = pd.read_csv(clean_valid_path + "/" + file)
+        top5_valid_series = df.iloc[-1].sort_values(ascending=False)[:5]  # top 5 settings
 
         for i, col in enumerate(top5_valid_series.index):
             plt.plot(range(1, df.shape[0] + 1), df[col], linestyle='dashed', marker=markers[i], markevery=5)
@@ -95,7 +102,7 @@ def train_loss_vs_valid_acc():
     for optim in optims:
         fig, ax = plt.subplots(2, 2, sharey='all', figsize=(15,7))
 
-        valid_df = pd.read_csv(valid_path + "/" + '{}.csv'.format(optim))
+        valid_df = pd.read_csv(clean_valid_path + "/" + '{}.csv'.format(optim))
         train_df = pd.read_csv(train_path + "/" + '{}.csv'.format(optim))
         top3_series = valid_df.iloc[-1].sort_values(ascending=False)[:3]  # top 5 settings
         bottom3_series = valid_df.iloc[-1].sort_values(ascending=True)[:3]  # bottom 5 settings
@@ -108,7 +115,7 @@ def train_loss_vs_valid_acc():
         two_scales(ax[1, 0], ax2, range(1, valid_df.shape[0] + 1),
                                        valid_df, train_df, bottom3_series)
 
-        valid_df_Lookahead = pd.read_csv(valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
+        valid_df_Lookahead = pd.read_csv(clean_valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
         train_df_Lookahead = pd.read_csv(train_path + "/" + 'Lookahead-{}.csv'.format(optim))
         top3_LA_series = valid_df_Lookahead.iloc[-1].sort_values(ascending=False)[:3]  # top 5 settings
         bottom3_LA_series = valid_df_Lookahead.iloc[-1].sort_values(ascending=True)[:3]  # bottom 5 settings
@@ -160,9 +167,9 @@ def lr_aggregation_summaryplot():
     fig.set_figheight(20)
     fig.set_figwidth(13)
     fig.suptitle('LR Aggregation')
-    for file in os.listdir(valid_path):
+    for file in os.listdir(clean_valid_path):
         r, c = get_indices(file)
-        df = pd.read_csv(valid_path + "/" + file)
+        df = pd.read_csv(clean_valid_path + "/" + file)
         for i, lr in enumerate(learning_rates):
 
             df2 = pd.DataFrame()
@@ -189,8 +196,8 @@ def lr_aggregation_pairplot():
         fig, ax = plt.subplots(1, 2, sharey='all')
         fig.set_figheight(5)
         fig.set_figwidth(10)
-        df = pd.read_csv(valid_path + "/" + '{}.csv'.format(optim))
-        df_Lookahead = pd.read_csv(valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
+        df = pd.read_csv(clean_valid_path + "/" + '{}.csv'.format(optim))
+        df_Lookahead = pd.read_csv(clean_valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
         for i, lr in enumerate(learning_rates):
             df2 = pd.DataFrame()
             df2_Lookahead = pd.DataFrame()
@@ -223,8 +230,8 @@ def la_steps_aggregation():
     la_steps_list = [5,10,15]
 
     for optim in optims:
-        df_nolook = pd.read_csv(valid_path + "/" + '{}.csv'.format(optim))
-        df = pd.read_csv(valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
+        df_nolook = pd.read_csv(clean_valid_path + "/" + '{}.csv'.format(optim))
+        df = pd.read_csv(clean_valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
         for i, la_steps in enumerate(la_steps_list):
             df2 = pd.DataFrame()
             for col in df.columns:
@@ -252,8 +259,8 @@ def la_alpha_aggregation():
     la_alphas = [0.5, 0.75, 0.9]
 
     for optim in optims:
-        df_nolook = pd.read_csv(valid_path + "/" + '{}.csv'.format(optim))
-        df = pd.read_csv(valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
+        df_nolook = pd.read_csv(clean_valid_path + "/" + '{}.csv'.format(optim))
+        df = pd.read_csv(clean_valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
         for i, la_alpha in enumerate(la_alphas):
             df2 = pd.DataFrame()
             for col in df.columns:
@@ -271,9 +278,73 @@ def la_alpha_aggregation():
         plt.title('Lookahead-{}'.format(optim))
         plt.show()
 
+
+def valid_acc():
+    """Plot of model accuracies validated on clean,fgsm and pgd images of top3 hyperparameter settings"""
+
+    for file in os.listdir(clean_valid_path):
+        if not file.startswith('Lookahead'):
+            fig, ax = plt.subplots(3, 2, figsize=(12,10))
+
+            df_clean = pd.read_csv(clean_valid_path + "/" + file)
+            df_fgsm = pd.read_csv(fgsm_valid_path + "/" + file)
+            df_pgd = pd.read_csv(pgd_valid_path + "/" + file)
+
+            df_LA_clean = pd.read_csv(clean_valid_path + "/Lookahead-" + file)
+            df_LA_fgsm = pd.read_csv(fgsm_valid_path + "/Lookahead-" + file)
+            df_LA_pgd = pd.read_csv(pgd_valid_path + "/Lookahead-" + file)
+
+
+            # top 3 settings regarding acc on clean images
+            top3_clean_valid_series = df_clean.iloc[-1].sort_values(ascending=False)[:3]
+            top3_LA_clean_valid_series = df_LA_clean.iloc[-1].sort_values(ascending=False)[:3]
+            # top 3 settings regarding acc on fgsm perturbed images
+            top3_fgsm_valid_series = df_fgsm.iloc[-1].sort_values(ascending=False)[:3]
+            top3_LA_fgsm_valid_series = df_LA_fgsm.iloc[-1].sort_values(ascending=False)[:3]
+            # top 3 settings regarding acc on pgd perturbed images
+            top3_pgd_valid_series = df_pgd.iloc[-1].sort_values(ascending=False)[:3]
+            top3_LA_pgd_valid_series = df_LA_pgd.iloc[-1].sort_values(ascending=False)[:3]
+
+            for i, col in enumerate(top3_clean_valid_series.index):
+                ax[0,0].plot(range(1, df_clean.shape[0] + 1), df_clean[col], marker=markers[i], markevery=5)
+            for i, col in enumerate(top3_LA_clean_valid_series.index):
+                ax[0, 1].plot(range(1, df_LA_clean.shape[0] + 1), df_LA_clean[col], marker=markers[i], markevery=5)
+
+            for i, col in enumerate(top3_fgsm_valid_series.index):
+                ax[1,0].plot(range(1, df_fgsm.shape[0] + 1), df_fgsm[col], marker=markers[i], markevery=5)
+            for i, col in enumerate(top3_LA_fgsm_valid_series.index):
+                ax[1, 1].plot(range(1, df_LA_fgsm.shape[0] + 1), df_LA_fgsm[col], marker=markers[i], markevery=5)
+
+            for i, col in enumerate(top3_pgd_valid_series.index):
+                ax[2,0].plot(range(1, df_pgd.shape[0] + 1), df_pgd[col], marker=markers[i], markevery=5)
+            for i, col in enumerate(top3_LA_pgd_valid_series.index):
+                ax[2,1].plot(range(1, df_LA_pgd.shape[0] + 1), df_LA_pgd[col], marker=markers[i], markevery=5)
+
+            for i in range(3):
+                for j in range(2):
+                    ax[i,j].set_ylim([0,1.1])
+
+            ax[0,0].legend(parameter_formatting(top3_clean_valid_series.index), loc='lower right')
+            ax[0,1].legend(parameter_formatting(top3_LA_clean_valid_series.index), loc='lower right')
+            ax[1,0].legend(parameter_formatting(top3_fgsm_valid_series.index), loc='lower right')
+            ax[1,1].legend(parameter_formatting(top3_LA_fgsm_valid_series.index), loc='lower right')
+            ax[2,0].legend(parameter_formatting(top3_pgd_valid_series.index), loc='lower right')
+            ax[2,1].legend(parameter_formatting(top3_LA_pgd_valid_series.index), loc='lower right')
+
+            ax[2,0].set_xlabel('Epochs')
+            ax[2, 1].set_xlabel('Epochs')
+            ax[0, 0].set_ylabel('Clean Accuracy')
+            ax[1, 0].set_ylabel('FGSM Accuracy')
+            ax[2, 0].set_ylabel('PGD Accuracy')
+            ax[0,0].set_title('{}'.format(file.replace('.csv', '')))
+            ax[0,1].set_title('Lookahead-{}'.format(file.replace('.csv', '')))
+            plt.show()
+
+
 #la_alpha_aggregation()
 #la_steps_aggregation()
 #lr_aggregation_pairplot()
 #lr_aggregation_summaryplot()
 #top5_plots()
 #train_loss_vs_valid_acc()
+valid_acc()
