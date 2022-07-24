@@ -7,7 +7,7 @@ import matplotlib.ticker as mtick
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
-dataset = 'CIFAR10'
+dataset = 'MNIST'
 adv_train = True
 clean_test_path = "{}/adv_test_results".format(dataset) if adv_train else "{}/clean_test_results".format(dataset)
 fgsm_test_path = "{}/adv_fgsm_test_results".format(dataset) if adv_train else "{}/clean_fgsm_test_results".format(dataset)
@@ -324,12 +324,13 @@ def valid_acc():
                 for j in range(2):
                     ax[i,j].set_ylim([0,1.1])
 
-            ax[0,0].legend(parameter_formatting(top3_clean_valid_series.index), loc='lower right')
-            ax[0,1].legend(parameter_formatting(top3_LA_clean_valid_series.index), loc='lower right')
-            ax[1,0].legend(parameter_formatting(top3_fgsm_valid_series.index), loc='lower right')
-            ax[1,1].legend(parameter_formatting(top3_LA_fgsm_valid_series.index), loc='lower right')
-            ax[2,0].legend(parameter_formatting(top3_pgd_valid_series.index), loc='lower right')
-            ax[2,1].legend(parameter_formatting(top3_LA_pgd_valid_series.index), loc='lower right')
+            legend_loc = 'upper left' if dataset == 'CIFAR10' else 'lower right'
+            ax[0,0].legend(parameter_formatting(top3_clean_valid_series.index), loc=legend_loc)
+            ax[0,1].legend(parameter_formatting(top3_LA_clean_valid_series.index), loc=legend_loc)
+            ax[1,0].legend(parameter_formatting(top3_fgsm_valid_series.index), loc=legend_loc)
+            ax[1,1].legend(parameter_formatting(top3_LA_fgsm_valid_series.index), loc=legend_loc)
+            ax[2,0].legend(parameter_formatting(top3_pgd_valid_series.index), loc=legend_loc)
+            ax[2,1].legend(parameter_formatting(top3_LA_pgd_valid_series.index), loc=legend_loc)
 
             ax[2,0].set_xlabel('Epochs')
             ax[2, 1].set_xlabel('Epochs')

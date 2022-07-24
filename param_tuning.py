@@ -70,12 +70,12 @@ def main():
                                 lr, la_steps, la_alpha))], axis=1)
                         if settings.fgsm_att:
                             fgsm_scores = pd.concat(
-                                [fgsm_scores, pd.Series(results.fgsm, name='lr={}'.format(
-                                    lr))], axis=1)
+                                [fgsm_scores, pd.Series(results.fgsm, name='lr={},steps={},alpha={}'.format(
+                                    lr, la_steps, la_alpha))], axis=1)
                         if settings.pgd_att:
                             pgd_scores = pd.concat(
-                                [pgd_scores, pd.Series(results.pgd, name='lr={}'.format(
-                                    lr))], axis=1)
+                                [pgd_scores, pd.Series(results.pgd, name='lr={},steps={},alpha={}'.format(
+                                    lr, la_steps, la_alpha))], axis=1)
             else:
                 settings.LA = False
 
