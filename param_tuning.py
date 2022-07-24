@@ -22,9 +22,7 @@ from cleverhans.torch.attacks.projected_gradient_descent import (
 def main():
     settings = EasyDict(nb_epochs=project_utils.query_int('Number of epochs?'),
                         adv_train=project_utils.yes_no_check('Adversarial Training?'),
-                        dataset=project_utils.query_dataset(),
-                        fgsm_att=project_utils.yes_no_check('FGSM Attack?'),
-                        pgd_att=project_utils.yes_no_check('PGD Attack?'))  # specify general settings
+                        dataset=project_utils.query_dataset())
     settings.device = torch.device(project_utils.query_int('Select GPU [0,3]:')) if \
         torch.cuda.is_available() else torch.device('cpu')
 
@@ -40,9 +38,9 @@ def main():
 
         for lr in [1e-2, 3e-3, 1e-3, 3e-4, 1e-4, 3e-5]:
             settings.lr = lr
-            if optim.startswith('LA-'):  # check if Lookahead is used
+            if optim.startswith('Lookahead-'):  # check if Lookahead is used
                 settings.LA = True
-                inner_optim = optim[3:]  # delete 'LA-' prefix
+                inner_optim = optim[10:]  # delete 'Lookahead-' prefix
 
                 for la_steps in [5, 10]:
                     settings.la_steps = la_steps
@@ -68,14 +66,14 @@ def main():
                         scores = pd.concat(
                             [scores, pd.Series(results.clean, name='lr={},steps={},alpha={}'.format(
                                 lr, la_steps, la_alpha))], axis=1)
-                        if settings.fgsm_att:
-                            fgsm_scores = pd.concat(
-                                [fgsm_scores, pd.Series(results.fgsm, name='lr={},steps={},alpha={}'.format(
-                                    lr, la_steps, la_alpha))], axis=1)
-                        if settings.pgd_att:
-                            pgd_scores = pd.concat(
-                                [pgd_scores, pd.Series(results.pgd, name='lr={},steps={},alpha={}'.format(
-                                    lr, la_steps, la_alpha))], axis=1)
+
+                        fgsm_scores = pd.concat(
+                            [fgsm_scores, pd.Series(results.fgsm, name='lr={},steps={},alpha={}'.format(
+                                lr, la_steps, la_alpha))], axis=1)
+
+                        pgd_scores = pd.concat(
+                            [pgd_scores, pd.Series(results.pgd, name='lr={},steps={},alpha={}'.format(
+                                lr, la_steps, la_alpha))], axis=1)
             else:
                 settings.LA = False
 
@@ -96,20 +94,16 @@ def main():
                 scores = pd.concat(
                     [scores, pd.Series(results.clean, name='lr={}'.format(
                         lr))], axis=1)
-                if settings.fgsm_att:
-                    fgsm_scores = pd.concat(
-                        [fgsm_scores, pd.Series(results.fgsm, name='lr={}'.format(
-                            lr))], axis=1)
-                if settings.pgd_att:
-                    pgd_scores = pd.concat(
-                        [pgd_scores, pd.Series(results.pgd, name='lr={}'.format(
-                            lr))], axis=1)
+                fgsm_scores = pd.concat(
+                    [fgsm_scores, pd.Series(results.fgsm, name='lr={}'.format(
+                        lr))], axis=1)
+                pgd_scores = pd.concat(
+                    [pgd_scores, pd.Series(results.pgd, name='lr={}'.format(
+                        lr))], axis=1)
 
         save_test_results(settings, optimizer, scores)
-        if settings.fgsm_att:
-            save_test_results(settings, optimizer, fgsm_scores, attack='fgsm')
-        if settings.pgd_att:
-            save_test_results(settings, optimizer, pgd_scores, attack='pgd')
+        save_test_results(settings, optimizer, fgsm_scores, attack='fgsm')
+        save_test_results(settings, optimizer, pgd_scores, attack='pgd')
 
 
 def set_inner_optim(optim, lr, model):
@@ -200,10 +194,8 @@ def train(settings, data, model, optimizer):
 
     save_train_results(settings, optimizer, results=train_results)
     save_valid_results(settings, optimizer, scores=clean_valid_results)
-    if settings.fgsm_att:
-        save_valid_results(settings, optimizer, fgsm_valid_results, attack='fgsm')
-    if settings.pgd_att:
-        save_valid_results(settings, optimizer, pgd_valid_results, attack='pgd')
+    save_valid_results(settings, optimizer, fgsm_valid_results, attack='fgsm')
+    save_valid_results(settings, optimizer, pgd_valid_results, attack='pgd')
 
 
 def evaluation(settings, test_loader, model):
@@ -225,17 +217,15 @@ def evaluation(settings, test_loader, model):
         report.nb_test += y.size(0)  # counts how many examples are in the batch
         report.correct += y_pred.eq(y).sum().item()  # counts how many examples in the batch are predicted correctly
 
-        if settings.fgsm_att:
-            x_fgm = fast_gradient_method(model, x, 0.3, np.inf)
-            _, y_pred_fgm = model(x_fgm).max(1)  # model prediction on FGM adversarial examples
+        x_fgm = fast_gradient_method(model, x, 0.3, np.inf)
+        _, y_pred_fgm = model(x_fgm).max(1)  # model prediction on FGM adversarial examples
 
-            report.correct_fgm += y_pred_fgm.eq(y).sum().item()  # counts correctly predicted fgsm examples
+        report.correct_fgm += y_pred_fgm.eq(y).sum().item()  # counts correctly predicted fgsm examples
 
-        if settings.pgd_att:
-            x_pgd = projected_gradient_descent(model, x, 0.3, 0.01, 40, np.inf)
-            _, y_pred_pgd = model(x_pgd).max(1)  # model prediction on PGD adversarial examples
+        x_pgd = projected_gradient_descent(model, x, 0.3, 0.01, 40, np.inf)
+        _, y_pred_pgd = model(x_pgd).max(1)  # model prediction on PGD adversarial examples
 
-            report.correct_pgd += y_pred_pgd.eq(y).sum().item()  # counts correctly predicted pgd examples
+        report.correct_pgd += y_pred_pgd.eq(y).sum().item()  # counts correctly predicted pgd examples
 
     results = EasyDict()
 

@@ -230,13 +230,11 @@ def g_settings():
     returns: settings (EasyDict): dict with settings"""
 
     if yes_no_check('Run on standard settings?'):
-        settings = EasyDict(nb_epochs=50, adv_train=True, fgsm_att=True, pgd_att=True)
+        settings = EasyDict(nb_epochs=50, adv_train=True)
     else:
         settings = EasyDict(
             nb_epochs=query_int('Number of epochs'),
-            adv_train=yes_no_check('Adversarial Training?'),
-            fgsm_att=yes_no_check('FGSM Attack during evaluation?'),
-            pgd_att=yes_no_check('PGD Attack during evaluation')
+            adv_train=yes_no_check('Adversarial Training?')
         )
     return settings
 
