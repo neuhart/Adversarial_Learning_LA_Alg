@@ -8,15 +8,7 @@ import pandas as pd
 
 
 def main():
-    settings = project_utils.g_settings()  # specify general settings
-    settings.device = torch.device(project_utils.query_int('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device(
-        'cpu')
-
-    settings.dataset = 'CIFAR10'
     data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.resnet_transform())
-
-    # query which optimizers to use for training
-    optims_list = project_utils.get_optims()
 
     clean_scores = pd.DataFrame()
     if settings.fgsm_att:
@@ -56,5 +48,13 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    settings = project_utils.g_settings()  # specify general settings
+    settings.device = torch.device(
+        project_utils.query_int('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device(
+        'cpu')
 
+    settings.dataset = 'CIFAR10'
+    # query which optimizers to use for training
+    optims_list = project_utils.get_optims()
+    for i in range(project_utils.query_int('Number of runs')):
+        main()
