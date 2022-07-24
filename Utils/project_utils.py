@@ -81,8 +81,7 @@ def save_test_results(settings, scores, attack=None):
     saves results to csv-file
     Arguments:
         settings(EasyDict): easydict dictionary containing settings and hyperparameters
-        scores(pd.Dataframe): Dataframe containing the accuracy scores for each
-        optimizer if a pgd attack has been executed, else None
+        scores(pd.Dataframe): Dataframe containing the accuracy scores for each optimizer
         attack(str): states which attack was used for evaluation, clean=No attack
 
     """
