@@ -7,37 +7,38 @@ import pandas as pd
 
 
 def main():
-    data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.standard_transform())
+    for i in range(project_utils.query_int('Number of runs')):
+        data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.standard_transform())
 
-    clean_scores = pd.DataFrame()
-    fgsm_scores = pd.DataFrame()
-    pgd_scores = pd.DataFrame()
+        clean_scores = pd.DataFrame()
+        fgsm_scores = pd.DataFrame()
+        pgd_scores = pd.DataFrame()
 
-    for optim in optims_list:
-        net = models.MNIST_CNN()
-        net.to(settings.device)  # transfers to gpu if available
+        for optim in optims_list:
+            net = models.MNIST_CNN()
+            net.to(settings.device)  # transfers to gpu if available
 
-        # Determine which optimizer to use
-        optimizer = project_utils.set_optim(settings, optim=optim, model=net)
+            # Determine which optimizer to use
+            optimizer = project_utils.set_optim(settings, optim=optim, model=net)
 
-        # Train model
-        net.train()
-        training.train(settings, data, net, optimizer)
+            # Train model
+            net.train()
+            training.train(settings, data, net, optimizer)
 
-        # Evaluation
-        net.eval()
-        results = evaluation.evaluation(settings, data.test, net)
+            # Evaluation
+            net.eval()
+            results = evaluation.evaluation(settings, data.test, net)
 
-        clean_scores = pd.concat([clean_scores, pd.Series(results, name=project_utils.get_optim_name(optimizer))],
-                                 axis=1)
-        fgsm_scores = pd.concat([fgsm_scores, pd.Series(results.fgsm_att,
-                                                            name=project_utils.get_optim_name(optimizer))], axis=1)
-        pgd_scores = pd.concat([pgd_scores, pd.Series(results.pgd_att,
-                                                          name=project_utils.get_optim_name(optimizer))], axis=1)
+            clean_scores = pd.concat([clean_scores, pd.Series(results, name=project_utils.get_optim_name(optimizer))],
+                                     axis=1)
+            fgsm_scores = pd.concat([fgsm_scores, pd.Series(results.fgsm_att,
+                                                                name=project_utils.get_optim_name(optimizer))], axis=1)
+            pgd_scores = pd.concat([pgd_scores, pd.Series(results.pgd_att,
+                                                              name=project_utils.get_optim_name(optimizer))], axis=1)
 
-    project_utils.save_test_results(settings, clean_scores)
-    project_utils.save_test_results(settings, fgsm_scores, attack='fgsm')
-    project_utils.save_test_results(settings, pgd_scores, attack='pgd')
+        project_utils.save_test_results(settings, clean_scores)
+        project_utils.save_test_results(settings, fgsm_scores, attack='fgsm')
+        project_utils.save_test_results(settings, pgd_scores, attack='pgd')
 
 
 if __name__ == "__main__":
@@ -48,8 +49,7 @@ if __name__ == "__main__":
     # query which optimizers to use for training
     optims_list = project_utils.get_optims()
 
-    for i in range(project_utils.query_int('Number of runs')):
-        main()
+
 
 
 
