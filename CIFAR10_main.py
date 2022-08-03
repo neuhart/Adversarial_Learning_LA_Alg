@@ -8,8 +8,9 @@ import pandas as pd
 
 
 def main():
+    data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.resnet_transform())
+
     for i in range(project_utils.query_int('Number of runs')):
-        data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.resnet_transform())
 
         clean_scores = pd.DataFrame()
         fgsm_scores = pd.DataFrame()
