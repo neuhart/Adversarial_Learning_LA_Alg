@@ -51,4 +51,4 @@ if __name__ == "__main__":
     settings.dataset = 'MNIST'
     # query which optimizers to use for training
     optims_list = project_utils.get_optims()
-
+    main()
