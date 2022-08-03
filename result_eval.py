@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from Utils import project_utils
 import os
 import seaborn as sns
+import matplotlib.ticker as mtick
+import numpy as np
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
@@ -11,9 +13,11 @@ adv_results = project_utils.yes_no_check('Evaluate adversarial results?')
 
 if adv_results:
     train_path = "results/{}/adv_train_results".format(dataset)
+    valid_path = "results/{}/adv_valid_results".format(dataset)
     test_filename = "results/{}/adv_test_results.csv".format(dataset)
 else:
     train_path = "results/{}/clean_train_results".format(dataset)
+    valid_path = "results/{}/clean_valid_results".format(dataset)
     test_filename = "results/{}/clean_test_results.csv".format(dataset)
 
 
@@ -28,17 +32,31 @@ def get_avg_train_result():
     return avg
 
 
-def plot_train_results(df):
-    """Plots train results
+def get_avg_valid_result():
+    """Returns average of validation results"""
+    avg = pd.DataFrame()
+
+    for file in os.listdir(valid_path):
+        df = pd.read_csv(valid_path+"/"+file)
+        avg = pd.concat([avg, df.mean(axis=1).rename(file.replace('.csv', ''))], axis=1)
+    return avg
+
+
+def plot_results(df, df2):
+    """Plots validation accuracy
     Arguments:
         df(pandas.Dataframe): Dataframe containing columns of training loss
         per optimizer
     """
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
     for i, col in enumerate(df.columns):
-        plt.plot(range(1,df.shape[0]+1), df[col], linestyle='dashed', marker=markers[i], markevery=10)
-    plt.yscale('log')
-    plt.xlabel('Epochs')
-    plt.ylabel('Training Loss')
+        ax.plot(range(1,df2.shape[0]+1), df2[col], linestyle='dashed', marker=markers[i], markevery=5)
+    ax.set_xlabel('Epochs')
+    ax.set_ylabel('Validation Accuracy')
+    ax.set_ylim(0, 1.1)
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
     plt.legend(df.columns)
     plt.show()
 
@@ -77,6 +95,7 @@ def slow_weights_plot():
 
 
 avg_train_results = get_avg_train_result()
-plot_train_results(avg_train_results)
+avg_valid_results = get_avg_valid_result()
+plot_results(avg_train_results, avg_valid_results)
 avg_test_results = get_avg_test_result()
 plot_test_results(avg_test_results)

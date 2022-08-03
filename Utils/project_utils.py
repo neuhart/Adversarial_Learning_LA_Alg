@@ -72,7 +72,7 @@ def save_train_results(settings, optimizer, results):
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(results, name="Column {}".format(len(df.columns)+1))], axis=1)
+    df = pd.concat([df, pd.Series(results, name="{} C-{}".format(get_opt_hyperprams(settings,get_optim_name(optimizer)),len(df.columns)+1))], axis=1)
     df.to_csv(filename, index=False)
 
 
@@ -184,6 +184,7 @@ def set_optim(settings, optim, model):
         model(torch.nn.Module): model providing the parameters to be optimized
     """
     hyperparams = get_opt_hyperprams(settings, optim)
+
     if optim == 'Lookahead-SGD':
         optimizer = Lookahead.Lookahead(
             torch.optim.SGD(model.parameters(), lr=hyperparams[0]), la_steps=hyperparams[1], la_alpha=hyperparams[2])
