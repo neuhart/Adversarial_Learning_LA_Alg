@@ -246,8 +246,10 @@ def get_opt_hyperprams(settings, optim):
     Return:
         opt_hyperparams(tuple)
     """
-
-    path = 'Hyperparam_tuning/{}/adv_pgd_test_results/{}.csv'.format(settings.dataset, optim)
+    if settings.adv_train:
+        path = 'Hyperparam_tuning/{}/adv_pgd_test_results/{}.csv'.format(settings.dataset, optim)
+    else:
+        path = 'Hyperparam_tuning/{}/clean_pgd_test_results/{}.csv'.format(settings.dataset, optim)
     df = pd.read_csv(path)
     opt_hyperparams = df.idxmax(axis=1)[0]  # string containing best hyperparameter settings
     if optim.startswith('Lookahead'):
