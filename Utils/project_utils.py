@@ -139,7 +139,7 @@ def save_valid_results(settings, optimizer, scores, attack=None):
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(scores, name="Column {}".format(len(df.columns) + 1))], axis=1)
+    df = pd.concat([df, pd.Series(scores, name="{} C-{}".format(get_opt_hyperprams(settings,get_optim_name(optimizer)),len(df.columns)+1))], axis=1)
     df.to_csv(filename, index=False)
 
 
@@ -249,7 +249,10 @@ def get_opt_hyperprams(settings, optim):
     if settings.adv_train:
         path = 'Hyperparam_tuning/{}/adv_pgd_test_results/{}.csv'.format(settings.dataset, optim)
     else:
-        path = 'Hyperparam_tuning/{}/clean_pgd_test_results/{}.csv'.format(settings.dataset, optim)
+        # have to take accuracy on clean examples instead of adversarial examples (PGD) because acc on adversarial
+        # examples of collapsed models (i.e., models that only predict one class) might be higher than
+        # well-performing models
+        path = 'Hyperparam_tuning/{}/clean_test_results/{}.csv'.format(settings.dataset, optim)
     df = pd.read_csv(path)
     opt_hyperparams = df.idxmax(axis=1)[0]  # string containing best hyperparameter settings
     if optim.startswith('Lookahead'):
