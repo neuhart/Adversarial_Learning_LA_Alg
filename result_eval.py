@@ -21,17 +21,6 @@ else:
     test_filename = "results/{}/clean_test_results.csv".format(dataset)
 
 
-def get_avg_train_result():
-    """Returns average of train results"""
-    avg = pd.DataFrame()
-
-    for file in os.listdir(train_path):
-        df = pd.read_csv(train_path+"/"+file)
-
-        avg = pd.concat([avg, df.mean(axis=1).rename(file.replace('.csv', ''))], axis=1)
-    return avg
-
-
 def get_avg_valid_result():
     """Returns average of validation results"""
     avg = pd.DataFrame()
@@ -42,7 +31,7 @@ def get_avg_valid_result():
     return avg
 
 
-def plot_results(df, df2):
+def plot_results(df):
     """Plots validation accuracy
     Arguments:
         df(pandas.Dataframe): Dataframe containing columns of training loss
@@ -52,7 +41,7 @@ def plot_results(df, df2):
     ax = fig.add_subplot(111)
 
     for i, col in enumerate(df.columns):
-        ax.plot(range(1,df2.shape[0]+1), df2[col], linestyle='dashed', marker=markers[i], markevery=5)
+        ax.plot(range(1,df.shape[0]+1), df[col], linestyle='dashed', marker=markers[i], markevery=5)
     ax.set_xlabel('Epochs')
     ax.set_ylabel('Validation Accuracy')
     ax.set_ylim(0, 1.1)
@@ -94,8 +83,7 @@ def slow_weights_plot():
     """
 
 
-avg_train_results = get_avg_train_result()
 avg_valid_results = get_avg_valid_result()
-plot_results(avg_train_results, avg_valid_results)
+plot_results(avg_valid_results)
 avg_test_results = get_avg_test_result()
 plot_test_results(avg_test_results)
