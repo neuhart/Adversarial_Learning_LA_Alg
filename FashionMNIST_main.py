@@ -9,7 +9,7 @@ import pandas as pd
 import torch.nn as nn
 
 def main():
-    data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.resnet_transform())
+    data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.standard_transform())
 
     for i in range(project_utils.query_int('Number of runs')):
 
