@@ -6,7 +6,7 @@ from Models import models, data_transformations
 import training
 import evaluation
 import pandas as pd
-
+import torch.nn as nn
 
 def main():
     data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.resnet_transform())
@@ -18,7 +18,8 @@ def main():
         pgd_scores = pd.DataFrame()
 
         for optim in optims_list:
-            net = torchvision.models.resnet18()
+            net = torchvision.models.resnet18(num_classes=10)
+            net.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
             net.to(settings.device)  # transfers to gpu if available
 
             # Determine which optimizer to use
