@@ -72,7 +72,7 @@ def save_train_results(settings, optimizer, results):
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(results, name="Column {}".format(len(df.columns)+1))], axis=1)
+    df = pd.concat([df, pd.Series(results, name="{} C-{}".format(get_opt_hyperprams(settings,get_optim_name(optimizer)),len(df.columns)+1))], axis=1)
     df.to_csv(filename, index=False)
 
 
@@ -81,8 +81,7 @@ def save_test_results(settings, scores, attack=None):
     saves results to csv-file
     Arguments:
         settings(EasyDict): easydict dictionary containing settings and hyperparameters
-        scores(pd.Dataframe): Dataframe containing the accuracy scores for each
-        optimizer if a pgd attack has been executed, else None
+        scores(pd.Dataframe): Dataframe containing the accuracy scores for each optimizer
         attack(str): states which attack was used for evaluation, clean=No attack
 
     """
@@ -115,22 +114,24 @@ def save_valid_results(settings, optimizer, scores, attack=None):
         scores(list): list of test accuraries computed after every epoch
         attack(str): states which attack was used for evaluation, clean=No attack
         """
-    # create directories if necessary
-    Path("results/{}/adv_valid_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
-    Path("results/{}/clean_valid_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
 
     if settings.adv_train:
         if attack is not None:
+            # create directories if necessary
+            Path("results/{}/adv_{}_valid_results".format(settings.dataset, attack)).mkdir(parents=True, exist_ok=True)
             filename = 'results/{}/adv_{}_valid_results/{}.csv'.format(
                 settings.dataset, attack, get_optim_name(optimizer))
         else:
+            Path("results/{}/adv_valid_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
             filename = 'results/{}/adv_valid_results/{}.csv'.format(settings.dataset,
                                                                     get_optim_name(optimizer))
     else:
         if attack is not None:
+            Path('results/{}/clean_{}_valid_results'.format(settings.dataset, attack)).mkdir(parents=True, exist_ok=True)
             filename = 'results/{}/clean_{}_valid_results/{}.csv'.format(
                 settings.dataset, attack, get_optim_name(optimizer))
         else:
+            Path("results/{}/clean_valid_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
             filename = 'results/{}/clean_valid_results/{}.csv'.format(
                 settings.dataset, get_optim_name(optimizer))
     try:
@@ -138,7 +139,7 @@ def save_valid_results(settings, optimizer, scores, attack=None):
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(scores, name="Column {}".format(len(df.columns) + 1))], axis=1)
+    df = pd.concat([df, pd.Series(scores, name="{} C-{}".format(get_opt_hyperprams(settings,get_optim_name(optimizer)),len(df.columns)+1))], axis=1)
     df.to_csv(filename, index=False)
 
 
@@ -162,43 +163,53 @@ def get_optims():
     returns: optims_list (list): list of optimizers to be used"""
 
     implemented_optims = ['SGD', 'Adam', 'OGDA', 'ExtraAdam', 'ExtraSGD',
-                          'LA-SGD', 'LA-Adam', 'LA-OGDA', 'LA-ExtraSGD', 'LA-ExtraAdam']
+                          'Lookahead-SGD', 'Lookahead-Adam', 'Lookahead-OGDA',
+                          'Lookahead-ExtraSGD', 'Lookahead-ExtraAdam']
     print('Separate by ","!', 'Type "A" for all optimizers!')
     optims_list = input('Select optimizers \n{}:'.format(implemented_optims))
     if optims_list == 'A':
         return implemented_optims
     optims_list = optims_list.split(',')  # separate by ',' and convert to list
+    optims_list = list(map(lambda i: i.replace('LA-', 'Lookahead-'), optims_list))  # replaces abbreviation
     for optim in optims_list:
         assert optim in implemented_optims, '{} not implemented'.format(optim)
     return optims_list
 
 
-def set_optim(optim, model):
+def set_optim(settings, optim, model):
     """Sets optimizer
     Arguments:
+        settings(EasyDict): easydict dictionary containing settings and hyperparameters
         optim(str): name of optimizer to use
         model(torch.nn.Module): model providing the parameters to be optimized
     """
-    if optim == 'LA-SGD':
-        optimizer = Lookahead.Lookahead(torch.optim.SGD(model.parameters(), lr=1e-3))
-    elif optim == 'LA-Adam':
-        optimizer = Lookahead.Lookahead(torch.optim.Adam(model.parameters(), lr=1e-3))
-    elif optim == 'LA-ExtraSGD':
-        optimizer = Lookahead.Lookahead(extragradient.ExtraSGD(model.parameters(), lr=1e-5))
-    elif optim == 'LA-ExtraAdam':
-        optimizer = Lookahead.Lookahead(extragradient.ExtraAdam(model.parameters(), lr=1e-3))
-    elif optim == 'LA-OGDA':
-        optimizer = Lookahead.Lookahead(OGDA.OGDA(model.parameters(), lr=1e-4))
+    hyperparams = get_opt_hyperprams(settings, optim)
+
+    if optim == 'Lookahead-SGD':
+        optimizer = Lookahead.Lookahead(
+            torch.optim.SGD(model.parameters(), lr=hyperparams[0]), la_steps=hyperparams[1], la_alpha=hyperparams[2])
+    elif optim == 'Lookahead-Adam':
+        optimizer = Lookahead.Lookahead(
+            torch.optim.Adam(model.parameters(), lr=hyperparams[0]), la_steps=hyperparams[1], la_alpha=hyperparams[2])
+    elif optim == 'Lookahead-ExtraSGD':
+        optimizer = Lookahead.Lookahead(
+            extragradient.ExtraSGD(model.parameters(), lr=hyperparams[0]), la_steps=hyperparams[1], la_alpha=hyperparams[2])
+    elif optim == 'Lookahead-ExtraAdam':
+        optimizer = Lookahead.Lookahead(
+            extragradient.ExtraAdam(model.parameters(), lr=hyperparams[0]), la_steps=hyperparams[1], la_alpha=hyperparams[2])
+    elif optim == 'Lookahead-OGDA':
+        optimizer = Lookahead.Lookahead(
+            OGDA.OGDA(model.parameters(), lr=hyperparams[0]), la_steps=hyperparams[1], la_alpha=hyperparams[2])
     elif optim == 'Adam':
-        optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+        optimizer = torch.optim.Adam(model.parameters(), lr=hyperparams[0])
     elif optim == 'ExtraAdam':
-        optimizer = extragradient.ExtraAdam(model.parameters(), lr=1e-3)
+        optimizer = extragradient.ExtraAdam(model.parameters(), lr=hyperparams[0])
     elif optim == 'SGD':
-        optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+        optimizer = torch.optim.SGD(model.parameters(), lr=hyperparams[0])
     elif optim == 'OGDA':
-        optimizer = OGDA.OGDA(model.parameters(), lr=1e-4)
+        optimizer = OGDA.OGDA(model.parameters(), lr=hyperparams[0])
     elif optim == 'ExtraSGD':
-        optimizer = extragradient.ExtraSGD(model.parameters(), lr=1e-5)
+        optimizer = extragradient.ExtraSGD(model.parameters(), lr=hyperparams[0])
     else:
         raise 'Wrong optimizer'
 
@@ -218,12 +229,36 @@ def g_settings():
     returns: settings (EasyDict): dict with settings"""
 
     if yes_no_check('Run on standard settings?'):
-        settings = EasyDict(nb_epochs=50, adv_train=True, fgsm_att=False, pgd_att=False)
+        settings = EasyDict(nb_epochs=50, adv_train=True)
     else:
         settings = EasyDict(
             nb_epochs=query_int('Number of epochs'),
-            adv_train=yes_no_check('Adversarial Training?'),
-            fgsm_att=yes_no_check('FGSM Attack during testing?'),
-            pgd_att=yes_no_check('PGD Attack during testing')
+            adv_train=yes_no_check('Adversarial Training?')
         )
     return settings
+
+
+def get_opt_hyperprams(settings, optim):
+    """Returns optimal hyperparameters found by gridsearch
+    Arguments:
+        settings(EasyDict): easydict dictionary containing settings and hyperparameters
+        optim(str): Name of optimizer for which hyperparams need to be fetched
+    Return:
+        opt_hyperparams(tuple)
+    """
+    if settings.adv_train:
+        path = 'Hyperparam_tuning/{}/adv_pgd_test_results/{}.csv'.format(settings.dataset, optim)
+    else:
+        # have to take accuracy on clean examples instead of adversarial examples (PGD) because acc on adversarial
+        # examples of collapsed models (i.e., models that only predict one class) might be higher than
+        # well-performing models
+        path = 'Hyperparam_tuning/{}/clean_test_results/{}.csv'.format(settings.dataset, optim)
+    df = pd.read_csv(path)
+    opt_hyperparams = df.idxmax(axis=1)[0]  # string containing best hyperparameter settings
+    if optim.startswith('Lookahead'):
+        opt_hyperparams = opt_hyperparams.split(',')  # split and convert to list
+        # get hyperparameter values
+        opt_hyperparams = (float(opt_hyperparams[0][3:]), int(opt_hyperparams[1][6:]), float(opt_hyperparams[2][6:]))
+    else:
+        opt_hyperparams = (float(opt_hyperparams[3:]), 0, 0)  # complemented with two 0's to keep the same format
+    return opt_hyperparams

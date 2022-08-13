@@ -22,8 +22,8 @@ def train(settings, data, model, optimizer):
 
     train_results = []
     valid_clean_results = []
-    if settings.fgsm_att: valid_fgsm_results = []
-    if settings.pgd_att: valid_pgd_results = []
+    valid_fgsm_results = []
+    valid_pgd_results = []
 
     for epoch in range(1, settings.nb_epochs + 1):
         start_t = time.time()
@@ -67,15 +67,13 @@ def train(settings, data, model, optimizer):
         model.eval()
         validation_results = evaluation(settings, data.test, model)
         valid_clean_results.append(validation_results.clean)
-        if settings.fgsm_att: valid_fgsm_results.append(validation_results.fgsm_att)
-        if settings.pgd_att: valid_pgd_results.append(validation_results.pgd_att)
+        valid_fgsm_results.append(validation_results.fgsm_att)
+        valid_pgd_results.append(validation_results.pgd_att)
         model.train()
 
     project_utils.save_train_results(settings, optimizer, results=train_results)
     project_utils.save_valid_results(settings, optimizer, scores=valid_clean_results)
-    if settings.fgsm_att:
-        project_utils.save_valid_results(settings, optimizer, scores=valid_fgsm_results, attack='fgsm')
-    if settings.pgd_att:
-        project_utils.save_valid_results(settings, optimizer, scores=valid_fgsm_results, attack='pgd')
+    project_utils.save_valid_results(settings, optimizer, scores=valid_fgsm_results, attack='fgsm')
+    project_utils.save_valid_results(settings, optimizer, scores=valid_fgsm_results, attack='pgd')
 
 
