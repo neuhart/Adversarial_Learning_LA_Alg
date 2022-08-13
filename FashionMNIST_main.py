@@ -1,4 +1,6 @@
 import torch
+import torchvision.models
+
 from Utils import data_utils, project_utils
 from Models import models, data_transformations
 import training
@@ -7,7 +9,7 @@ import pandas as pd
 
 
 def main():
-    data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.standard_transform())
+    data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=data_transformations.resnet_transform())
 
     for i in range(project_utils.query_int('Number of runs')):
 
@@ -16,7 +18,7 @@ def main():
         pgd_scores = pd.DataFrame()
 
         for optim in optims_list:
-            net = models.MNIST_CNN()
+            net = torchvision.models.resnet18()
             net.to(settings.device)  # transfers to gpu if available
 
             # Determine which optimizer to use
