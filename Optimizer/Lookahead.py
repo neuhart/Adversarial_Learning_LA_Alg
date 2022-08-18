@@ -1,11 +1,9 @@
 from collections import defaultdict
-#  The functionality of both dictionaries and defaultdict are almost same except for the fact that defaultdict
-#  never raises a KeyError. It provides a default value for the key that does not exists.
 import torch
 from torch.optim.optimizer import Optimizer
 
 
-class Lookahead(Optimizer):  # subclass of Optimizer class
+class Lookahead(Optimizer):
     r"""
     Copyright (c) 2020 Michael Zhang, James Lucas, Geoffrey Hinton, Jimmy Ba
     PyTorch implementation of the lookahead wrapper.

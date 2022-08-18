@@ -3,7 +3,7 @@ from torch.optim import Optimizer
 
 
 class OGDA(Optimizer):
-    """Optimistic Gradient Descent Algorithm"""
+    """Optimistic Gradient Descent Ascent Algorithm"""
 
     def __init__(self, params, lr=1e-3):
         self.prev_grad = []
