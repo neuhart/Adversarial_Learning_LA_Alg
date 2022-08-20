@@ -76,35 +76,6 @@ def save_train_results(settings, optimizer, results):
     df.to_csv(filename, index=False)
 
 
-def save_test_results(settings, scores, attack=None):
-    """
-    saves results to csv-file
-    Arguments:
-        settings(EasyDict): easydict dictionary containing settings and hyperparameters
-        scores(pd.Dataframe): Dataframe containing the accuracy scores for each optimizer
-        attack(str): states which attack was used for evaluation, clean=No attack
-
-    """
-    if settings.adv_train:
-        if attack is not None:
-            filename = 'results/{}/adv_{}_test_results.csv'.format(settings.dataset, attack)
-        else:
-            filename = 'results/{}/adv_test_results.csv'.format(settings.dataset)
-    else:
-        if attack is not None:
-            filename = 'results/{}/clean_{}_test_results.csv'.format(settings.dataset, attack)
-        else:
-            filename = 'results/{}/clean_test_results.csv'.format(settings.dataset)
-
-    try:
-        df = pd.read_csv(filename)
-    except:
-        df = pd.DataFrame()
-
-    df = pd.concat([df, scores], axis=0)
-    df.to_csv(filename, index=False)
-
-
 def save_valid_results(settings, optimizer, scores, attack=None):
     """
     saves validation results to csv-file
@@ -222,20 +193,6 @@ def get_optim_name(optimizer):
     if optimizer_name == 'Lookahead':
         optimizer_name += '-' + optimizer.optimizer.__class__.__name__
     return optimizer_name
-
-
-def g_settings():
-    """queries hyperparameters and general settings
-    returns: settings (EasyDict): dict with settings"""
-
-    if yes_no_check('Run on standard settings?'):
-        settings = EasyDict(nb_epochs=50, adv_train=True)
-    else:
-        settings = EasyDict(
-            nb_epochs=query_int('Number of epochs'),
-            adv_train=yes_no_check('Adversarial Training?')
-        )
-    return settings
 
 
 def get_opt_hyperprams(settings, optim):
