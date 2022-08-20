@@ -38,3 +38,4 @@ ExtraSGD,Lookahead-SGD,Lookahead-Adam,SGD,Adam,OGDA,ExtraAdam,Lookahead-OGDA,Loo
 ,,,0.3364,,,,,,
 ,,,,,,,0.3514,0.3052,0.3906
 ,,,0.3238,,,,,,
+,,,,,,,0.338,0.2562,0.3754
