@@ -17,7 +17,7 @@ def main():
         pgd_scores = pd.DataFrame()
 
         for optim in optims_list:
-            net = torchvision.models.resnet34()
+            net = torchvision.models.resnet34(num_classes=10)
             net.to(settings.device)  # transfers to gpu if available
 
             # Determine which optimizer to use
