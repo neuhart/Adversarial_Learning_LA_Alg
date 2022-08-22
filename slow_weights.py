@@ -110,7 +110,7 @@ def save_valid_results(settings, optimizer, scores, weights, epoch):
     Arguments:
         settings(EasyDict): easydict dictionary containing settings and hyperparameters
         optimizer(torch.optim.Optimizer): optimizer used for training the model
-        scores(list): list of test accuraries computed after every epoch
+        scores(list): list of test accuracies computed after every epoch
         weights(str): states on which weights (i.e. fast or slow) validation has been performed
         epoch(int): current epoch of the training phase
         """
