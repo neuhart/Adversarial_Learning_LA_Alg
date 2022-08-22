@@ -38,7 +38,7 @@ def main():
         net.to(settings.device)  # transfers to gpu if available
 
         # Determine which optimizer to use
-        optimizer = project_utils.set_optim(optim=optim, model=net)
+        optimizer = project_utils.set_optim(settings=settings, optim=optim, model=net)
 
         # Train model
         net.train()
