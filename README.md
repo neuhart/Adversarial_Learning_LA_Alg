@@ -1,5 +1,5 @@
 # Adversarial Learning with Lookahead
-This is the repository used for the code of my master's thesis "Adversarial Learning with Lookahead". <br>
+This is the repository used for  my master's thesis "Adversarial Learning with Lookahead". <br>
 
 ## Scope of the Thesis
 ### Adversarial Examples:
@@ -25,7 +25,7 @@ algorithms used in the domain of machine learning.
 
 ## Experiments
 The Experiments were organized as follows: <br>
-Numerical Experiments via Adversarial Training on three different standard machine learing datasets, MNIST, Fashion MNIST and CIFAR-10. The performance of several different optimizers was compared: SGD, Adam, ExtraSGD, ExtraAdam, OGDA as well as five instances of Lookahead each with one of the before mentioned optimizers as its inner optimizer. 
+Numerical Experiments via Adversarial Training on three different standard machine learing datasets, MNIST, Fashion MNIST and CIFAR-10. The performance of several different optimizers was compared: SGD, Adam, ExtraSGD, ExtraAdam, OGDA as well as five instances of Lookahead each equipped with one of the before mentioned optimizers as its inner optimizer. 
 
 ### Hyperparameter Tuning
 - The hyperparameter for each optimizer were tuned in  <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/param_tuning.py">param_tuning.py</a>
