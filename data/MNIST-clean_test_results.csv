@@ -1,2 +1,0 @@
-SGD.1,Adam.1,OGDA.1,ExtraAdam.1,ExtraSGD,Lookahead-SGD.2,Lookahead-Adam.1,Lookahead-OGDA.1,Lookahead-ExtraSGD,Lookahead-ExtraAdam
-0.9917,0.9942,0.9858,0.9942,0.9029,0.9898,0.9938,0.9815,0.8585,0.9943
