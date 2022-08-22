@@ -18,8 +18,12 @@ def parameter_formatting(hyperparameter_string):
 
 
 for optim in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGDA', 'Lookahead-ExtraSGD', 'Lookahead-ExtraAdam']:
-    fast_weights_valid_path = "{}/adv_valid_results/{}-fast-weights.csv".format(dataset, optim) if adv_train else "{}/clean_valid_results/{}_fast-weights.csv".format(dataset, optim)
-    slow_weights_valid_path = "{}/adv_valid_results/{}-slow-weights.csv".format(dataset, optim) if adv_train else "{}/clean_valid_results/{}_slow-weights.csv".format(dataset, optim)
+    if adv_train:
+        fast_weights_valid_path = "{}/adv_valid_results/{}-fast-weights.csv".format(dataset, optim)
+        slow_weights_valid_path = "{}/adv_valid_results/{}-slow-weights.csv".format(dataset, optim)
+    else:
+        fast_weights_valid_path = "{}/clean_valid_results/{}_fast-weights.csv".format(dataset, optim)
+        slow_weights_valid_path = "{}/clean_valid_results/{}_slow-weights.csv".format(dataset, optim)
 
     df1 = pd.read_csv(fast_weights_valid_path)
     df2= pd.read_csv(slow_weights_valid_path)
