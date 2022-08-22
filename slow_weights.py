@@ -79,7 +79,7 @@ def train(settings, data, model, optimizer):
             loss.backward()
             optimizer.step()
 
-            if epoch in [15,20,25]:
+            if epoch in [15, 20, 25, 30, 35, 45, 50]:
                 # Validation on slow weights
                 optimizer._backup_and_load_cache()
                 model.eval()
@@ -92,7 +92,7 @@ def train(settings, data, model, optimizer):
                 fast_weights_valid_results.append(evaluation(settings, data.test, model).clean)
                 model.train()
 
-        if epoch in [15,20,25]:
+        if epoch in [15, 20, 25, 30, 35, 45, 50]:
             save_valid_results(settings, optimizer, scores=slow_weights_valid_results, weights='slow', epoch=epoch)
             save_valid_results(settings, optimizer, scores=fast_weights_valid_results, weights='fast', epoch=epoch)
 
