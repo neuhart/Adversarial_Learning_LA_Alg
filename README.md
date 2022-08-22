@@ -35,7 +35,7 @@ Numerical Experiments via Adversarial Training on three different standard machi
 - Adversarial training for each dataset for each optimizer was done in <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/main_file.py">main_file.py</a>
 - The actual training loop and model validation were outsourced to <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/training.py">training.py</a> and <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/evaluation.py">evaluation.py</a> , respectively.
 - The <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/Utils">Utils</a> folder contains the <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/Utils/data_utils.py">data_utils.py</a> file used to load and transform the datasets, and 
-the <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/Utils/project_utils.py">project_utils.oy</a> file where helper functions are stored to ensure better readability of the main code.
+the <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/Utils/project_utils.py">project_utils.py</a> file where helper functions are stored to ensure better readability of the main code.
 
 ### Optimizer
 The code for the optimizers used for the experiments can be found in the <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/Optimizer">Optimizer</a> folder.
