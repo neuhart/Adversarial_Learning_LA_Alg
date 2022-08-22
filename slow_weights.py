@@ -30,7 +30,7 @@ def main():
 
     # query which optimizers to use for training
     optims_list = project_utils.get_optims()
-    if any([0 if optim.startswith('LA-') else 1 for optim in optims_list]):
+    if any([0 if optim.startswith('Lookahead') else 1 for optim in optims_list]):
         raise 'Only implemented for Lookahead'
 
     for optim in optims_list:
