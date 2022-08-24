@@ -14,9 +14,6 @@ from cleverhans.torch.utils import optimize_linear
 X = '0-1 box'
 Theta = '0-1 box'
 
-
-
-
 class NN(torch.nn.Module):
     def __init__(self):  # method thats called when a new NN instance is created
         super(NN, self).__init__()

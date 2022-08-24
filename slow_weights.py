@@ -61,7 +61,9 @@ def train(settings, data, model, optimizer):
         fast_weights_valid_results = []
         
         start_t = time.time()
+        i = 0
         for x, y in data.train:
+            i += 1
             x, y = x.to(settings.device), y.to(settings.device)
             if settings.adv_train:
                 x = projected_gradient_descent(model, x, 0.3, 0.01, 40, np.inf)
@@ -79,20 +81,21 @@ def train(settings, data, model, optimizer):
             loss.backward()
             optimizer.step()
 
-            if epoch in [15, 20, 25, 30, 35, 45, 50]:
-                # Validation on slow weights
-                optimizer._backup_and_load_cache()
-                model.eval()
-                slow_weights_valid_results.append(evaluation(settings, data.test, model).clean)
-                model.train()
-                optimizer._clear_and_load_backup()
+            if epoch in [15, 25, 50]:
+                if i <= 20:
+                    # Validation on slow weights
+                    optimizer._backup_and_load_cache()
+                    model.eval()
+                    slow_weights_valid_results.append(evaluation(settings, data.test, model).clean)
+                    model.train()
+                    optimizer._clear_and_load_backup()
 
-                # Validation on fast weights
-                model.eval()
-                fast_weights_valid_results.append(evaluation(settings, data.test, model).clean)
-                model.train()
+                    # Validation on fast weights
+                    model.eval()
+                    fast_weights_valid_results.append(evaluation(settings, data.test, model).clean)
+                    model.train()
 
-        if epoch in [15, 20, 25, 30, 35, 45, 50]:
+        if epoch in [15, 25, 50]:
             save_valid_results(settings, optimizer, scores=slow_weights_valid_results, weights='slow', epoch=epoch)
             save_valid_results(settings, optimizer, scores=fast_weights_valid_results, weights='fast', epoch=epoch)
 
