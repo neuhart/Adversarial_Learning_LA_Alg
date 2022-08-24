@@ -3,7 +3,7 @@ This is the repository used for  my master's thesis "Adversarial Learning with L
 
 ## Scope of the Thesis
 ### Adversarial Examples:
-Adversarial Examples are deliberately perturbed versions of inputs crafted by adversaries with the goal to fool the classifier under attack. Example: 
+Adversarial Examples are deliberately perturbed versions of inputs crafted by adversaries with the goal of fooling the classifier under attack. Example: 
 <img src="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/Images/MNIST_5_plots_miscl_as_2_withLabels.png" height="250" width="500" align="center"> <br>
 The image on the left depicting the number ’5’ is unperturbed and is classified correctly by a neural network classifier. Using the PGD attack, the classifier is
 misled into predicting the number ’2’ instead. On the other hand, most humans would still be able to recognize the perturbed version as a ’5’.
@@ -28,7 +28,7 @@ The Experiments were organized as follows: <br>
 Numerical Experiments via Adversarial Training on three different standard machine learing datasets, MNIST, Fashion MNIST and CIFAR-10. The performance of several different optimizers was compared: SGD, Adam, ExtraSGD, ExtraAdam, OGDA as well as five instances of Lookahead each equipped with one of the before mentioned optimizers as its inner optimizer. 
 
 ### Hyperparameter Tuning
-- The hyperparameter for each optimizer were tuned in  <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/param_tuning.py">param_tuning.py</a>
+- The hyperparameters for each optimizer were tuned in  <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/param_tuning.py">param_tuning.py</a>
 - The results (training loss & validation accuracy) were compared in <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/Hyperparam_tuning/hyper_param_tuning_eval.py">hyper_param_tuning_eval.py</a>
 
 ### Adversarial Training
@@ -44,7 +44,11 @@ The code for the optimizers used for the experiments can be found in the <a href
 The neural networks used for the experiments can be found in the <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/Models">Models</a> folder together with the required data transformations for each model.
 
 ### Results
-- The results of the experiments (training loss, validation accuracy) are stord in the <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/results"><results/a> folder
-- The code for visualizations of the results of the experiments can be found in <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/result_eval.py"></a>
+- The results of the experiments (training loss, validation accuracy) are stord in the <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/results">results</a> folder
+- results files with the prefix "adv" contain data about adversarially trained networks, e.g.:<a href="adv_fgsm_valid_results">adv_fgsm_valid_results</a>
+- file names containing 'train' correspond to training loss data (per epoch, sum of training loss for whole training set), e.g.: <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/results/CIFAR10/adv_train_results">adv_train_results</a>
+- file names containing 'valid' correspond to validation accuracy data (per epoch, ratio of correct predictions and number of test inputs), e.g.: <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/results/CIFAR10/adv_valid_results">adv_valid_results</a>
+- validation files with the words 'fgsm' or 'pgd' in their names contain evluations on adversarial examples generated with the fgsm or pgd attack, respectively), e.g. <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/results/CIFAR10/adv_pgd_valid_results">adv_pgd_valid_results</a>
+- The code for visualizations of the results of the experiments can be found in <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/result_eval.py">result_eval.py</a>
 
 <a href="url"></a>
