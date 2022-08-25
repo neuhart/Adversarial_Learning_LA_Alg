@@ -62,11 +62,15 @@ def save_train_results(settings, optimizer, results):
         results(list): list of train losses computed after every epoch
     """
     # create directories if necessary
-    Path("results/{}/adv_train_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
-    Path("results/{}/clean_train_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
+    Path("{}/{}/adv_train_results".format(settings.save_to_folder, settings.dataset)).mkdir(parents=True, exist_ok=True)
+    Path("{}/{}/clean_train_results".format(settings.save_to_folder, settings.dataset)).mkdir(parents=True, exist_ok=True)
 
-    filename = 'results/{}/adv_train_results/{}.csv'.format(settings.dataset, get_optim_name(optimizer)) if \
-        settings.adv_train else 'results/{}/clean_train_results/{}.csv'.format(settings.dataset, get_optim_name(optimizer))
+    if settings.adv_train:
+        filename = '{}/{}/adv_train_results/{}.csv'.format(
+            settings.save_to_folder, settings.dataset, get_optim_name(optimizer))
+    else:
+        filename = '{}/{}/clean_train_results/{}.csv'.format(
+            settings.save_to_folder, settings.dataset, get_optim_name(optimizer))
     try:
         df = pd.read_csv(filename)
     except:
@@ -89,22 +93,26 @@ def save_valid_results(settings, optimizer, scores, attack=None):
     if settings.adv_train:
         if attack is not None:
             # create directories if necessary
-            Path("results/{}/adv_{}_valid_results".format(settings.dataset, attack)).mkdir(parents=True, exist_ok=True)
-            filename = 'results/{}/adv_{}_valid_results/{}.csv'.format(
-                settings.dataset, attack, get_optim_name(optimizer))
+            Path("{}/{}/adv_{}_valid_results".format(
+                settings.save_to_folder, settings.dataset, attack)).mkdir(parents=True, exist_ok=True)
+            filename = '{}/{}/adv_{}_valid_results/{}.csv'.format(
+                settings.save_to_folder, settings.dataset, attack, get_optim_name(optimizer))
         else:
-            Path("results/{}/adv_valid_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
-            filename = 'results/{}/adv_valid_results/{}.csv'.format(settings.dataset,
-                                                                    get_optim_name(optimizer))
+            Path("{}/{}/adv_valid_results".format(
+                settings.save_to_folder, settings.dataset)).mkdir(parents=True, exist_ok=True)
+            filename = '{}/{}/adv_valid_results/{}.csv'.format(
+                settings.save_to_folder, settings.dataset, get_optim_name(optimizer))
     else:
         if attack is not None:
-            Path('results/{}/clean_{}_valid_results'.format(settings.dataset, attack)).mkdir(parents=True, exist_ok=True)
-            filename = 'results/{}/clean_{}_valid_results/{}.csv'.format(
-                settings.dataset, attack, get_optim_name(optimizer))
+            Path('{}}/{}/clean_{}_valid_results'.format(
+                settings.save_to_folder, settings.dataset, attack)).mkdir(parents=True, exist_ok=True)
+            filename = '{}/{}/clean_{}_valid_results/{}.csv'.format(
+                settings.save_to_folder, settings.dataset, attack, get_optim_name(optimizer))
         else:
-            Path("results/{}/clean_valid_results".format(settings.dataset)).mkdir(parents=True, exist_ok=True)
-            filename = 'results/{}/clean_valid_results/{}.csv'.format(
-                settings.dataset, get_optim_name(optimizer))
+            Path("{}/{}/clean_valid_results".format(
+                settings.save_to_folder, settings.dataset)).mkdir(parents=True, exist_ok=True)
+            filename = '{}/{}/clean_valid_results/{}.csv'.format(
+                settings.save_to_folder, settings.dataset, get_optim_name(optimizer))
     try:
         df = pd.read_csv(filename)
     except:

@@ -74,12 +74,13 @@ def set_inner_optim(optim, lr, model):
 
 
 if __name__ == "__main__":
-    settings = EasyDict(nb_epochs=project_utils.query_int('Number of epochs?'),
+    settings = EasyDict(dataset=project_utils.query_dataset(),
+                        optim_list=project_utils.get_optims(),
                         adv_train=project_utils.yes_no_check('Adversarial Training?'),
-                        dataset=project_utils.query_dataset(),
+                        nb_epochs=project_utils.query_int('Number of epochs?'),
                         device=torch.device(project_utils.query_int('Select GPU [0,3]:')) if \
                         torch.cuda.is_available() else torch.device('cpu'),
-                        optim_list=project_utils.get_optims()
+                        save_to_folder='Hyperparam_tuning'
                         )
     settings = models.set_model_and_transform(settings)
     main()
