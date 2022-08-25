@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
-import data_transformations
+from Models import data_transformations
 
 
 class MNIST_CNN(torch.nn.Module):
