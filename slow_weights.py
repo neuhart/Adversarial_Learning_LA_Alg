@@ -82,7 +82,7 @@ def train(settings, data, model, optimizer):
             optimizer.step()
 
             if epoch in [15, 25, 50]:
-                if i <= 20:
+                if i <= 100:
                     # Validation on slow weights
                     optimizer._backup_and_load_cache()
                     model.eval()

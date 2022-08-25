@@ -1,9 +1,8 @@
 import torch
 from Utils import data_utils, project_utils
-from Models import models, data_transformations
+from Models import models
 import training
 from easydict import EasyDict
-import torchvision
 
 
 def main():
@@ -33,14 +32,6 @@ if __name__ == "__main__":
         dataset=project_utils.query_dataset(),
         optim_list=project_utils.get_optims()
     )
-    if settings.dataset == 'MNIST':
-        settings.model = models.MNIST_CNN()
-        settings.transform=data_transformations.standard_transform()
-    elif settings.dataset == 'FashionMNIST':
-        settings.transform = data_transformations.standard_transform()
-        settings.model = models.MNIST_CNN()
-    elif settings.dataset == 'CIFAR10':
-        settings.transform = data_transformations.resnet_transform()
-        settings.model = torchvision.models.resnet18()
+    settings = models.set_model_and_transform(settings)  # instantiate model & set transform
 
     main()
