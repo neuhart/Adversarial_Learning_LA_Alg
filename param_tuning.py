@@ -13,40 +13,41 @@ def main():
     Saves train loss and validation accduracy to the Hyperparam_tuning folder."""
     data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=settings.transform)
 
-    for optim in settings.optim_list:
-        for lr in [1e-2, 3e-3, 1e-3, 3e-4, 1e-4, 3e-5]:
-            settings.lr = lr
-            if optim.startswith('Lookahead-'):  # check if Lookahead is used
-                inner_optim = optim[10:]  # delete 'Lookahead-' prefix
+    for i in range(settings.nb_runs):
+        for optim in settings.optim_list:
+            for lr in [1e-2, 3e-3, 1e-3, 3e-4, 1e-4, 3e-5]:
+                settings.lr = lr
+                if optim.startswith('Lookahead-'):  # check if Lookahead is used
+                    inner_optim = optim[10:]  # delete 'Lookahead-' prefix
 
-                for la_steps in [5, 10]:
-                    settings.la_steps = la_steps
-                    for la_alpha in [0.5, 0.75, 0.9]:
-                        settings.la_alpha = la_alpha
+                    for la_steps in [5, 10]:
+                        settings.la_steps = la_steps
+                        for la_alpha in [0.5, 0.75, 0.9]:
+                            settings.la_alpha = la_alpha
 
-                        # select correct neural network
-                        net = settings.model
-                        net.to(settings.device)
+                            # select correct neural network
+                            net = settings.model
+                            net.to(settings.device)
 
-                        # Determine which optimizer to use
-                        optimizer = Lookahead(
-                            set_inner_optim(inner_optim, lr=lr, model=net), la_steps=la_steps, la_alpha=la_alpha)
+                            # Determine which optimizer to use
+                            optimizer = Lookahead(
+                                set_inner_optim(inner_optim, lr=lr, model=net), la_steps=la_steps, la_alpha=la_alpha)
 
-                        # Train model
-                        net.train()
-                        training.train(settings, data, net, optimizer)
+                            # Train model
+                            net.train()
+                            training.train(settings, data, net, optimizer)
 
-            else:
+                else:
 
-                net = settings.model
-                net.to(settings.device)  # transfers to gpu if available
+                    net = settings.model
+                    net.to(settings.device)  # transfers to gpu if available
 
-                # Determine which optimizer to use
-                optimizer = set_inner_optim(optim, lr=lr, model=net)
+                    # Determine which optimizer to use
+                    optimizer = set_inner_optim(optim, lr=lr, model=net)
 
-                # Train model
-                net.train()
-                training.train(settings, data, net, optimizer)
+                    # Train model
+                    net.train()
+                    training.train(settings, data, net, optimizer)
 
 
 def set_inner_optim(optim, lr, model):
@@ -77,6 +78,7 @@ if __name__ == "__main__":
     settings = EasyDict(dataset=project_utils.query_dataset(),
                         optim_list=project_utils.get_optims(),
                         adv_train=project_utils.yes_no_check('Adversarial Training?'),
+                        nb_runs=project_utils.query_int('Number of runs?'),
                         nb_epochs=project_utils.query_int('Number of epochs?'),
                         device=torch.device(project_utils.query_int('Select GPU [0,3]:')) if \
                         torch.cuda.is_available() else torch.device('cpu'),

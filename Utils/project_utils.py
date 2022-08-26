@@ -104,7 +104,7 @@ def save_valid_results(settings, optimizer, scores, attack=None):
                 settings.save_to_folder, settings.dataset, get_optim_name(optimizer))
     else:
         if attack is not None:
-            Path('{}}/{}/clean_{}_valid_results'.format(
+            Path('{}/{}/clean_{}_valid_results'.format(
                 settings.save_to_folder, settings.dataset, attack)).mkdir(parents=True, exist_ok=True)
             filename = '{}/{}/clean_{}_valid_results/{}.csv'.format(
                 settings.save_to_folder, settings.dataset, attack, get_optim_name(optimizer))
