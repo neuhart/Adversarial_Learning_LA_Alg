@@ -76,7 +76,7 @@ def save_train_results(settings, optimizer, results):
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(results, name="{} C-{}".format(settings.hyperprams, len(df.columns)+1))], axis=1)
+    df = pd.concat([df, pd.Series(results, name="{} C-{}".format(settings.hyperparams, len(df.columns)+1))], axis=1)
     df.to_csv(filename, index=False)
 
 

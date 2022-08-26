@@ -32,16 +32,17 @@ for optim in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGDA', 'Lookahead-Extr
 
     for col in range(slow_df.shape[1]):
         slow_series = slow_df.iloc[:,col]
+        k = int(slow_series.name.split(';')[1].split('=')[1])  # get Lookahead steps parameter
 
         # slow weights
-        ax[col].plot([4*i+4 for i in range(10)],  slow_series[(slow_series.index + 1) % 5 == 0][:10], 'r',  linestyle='dashed', marker='x')
+        ax[col].plot([(k-1)*i+(k-1) for i in range(10)],  slow_series[(slow_series.index + 1) % k == 0][:10], 'r',  linestyle='dashed', marker='x')
 
         # fast weights
-        ax[col].plot(range(1,5), fast_df.iloc[0:4, col], 'b')
+        ax[col].plot(range(1,k), fast_df.iloc[0:k-1, col], 'b')
         for j in range(1,10):
-            ax[col].plot(range(j*4,4*j+5), fast_df.iloc[5*j-1:5*j-1+5, col], 'b')
+            ax[col].plot(range(j*(k-1),(k-1)*j+k), fast_df.iloc[k*j-1:k*j-1+k, col], 'b')
 
-        ax[0].legend(['fast-weights', 'slow-weights'])
+        ax[0].legend(['slow-weights', 'fast-weights'])
         fig.suptitle(optim)
         ax[col].set_title(parameter_formatting(slow_series.name))
         ax[col].set_ylabel('Accuracy')
