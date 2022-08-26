@@ -14,36 +14,34 @@ def main():
     data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=settings.transform)
 
     for i in range(settings.nb_runs):
-        for optim in settings.optim_list:
+        for optim_name in settings.optim_list:
             for lr in [1e-2, 3e-3, 1e-3, 3e-4, 1e-4, 3e-5]:
-                settings.lr = lr
-                if optim.startswith('Lookahead-'):  # check if Lookahead is used
-                    inner_optim = optim[10:]  # delete 'Lookahead-' prefix
+                if optim_name.startswith('Lookahead-'):  # check if Lookahead is used
+                    inner_optim_name = optim_name[10:]  # delete 'Lookahead-' prefix
 
                     for la_steps in [5, 10]:
-                        settings.la_steps = la_steps
                         for la_alpha in [0.5, 0.75, 0.9]:
-                            settings.la_alpha = la_alpha
+                            settings.hyperparams = (lr, la_steps, la_alpha)
 
                             # select correct neural network
                             net = settings.model
                             net.to(settings.device)
 
-                            # Determine which optimizer to use
-                            optimizer = Lookahead(
-                                set_inner_optim(inner_optim, lr=lr, model=net), la_steps=la_steps, la_alpha=la_alpha)
+                            # Instantiate optimizer
+                            optimizer = Lookahead(set_inner_optim(
+                                inner_optim_name, lr=lr, model=net), la_steps=la_steps, la_alpha=la_alpha)
 
                             # Train model
                             net.train()
                             training.train(settings, data, net, optimizer)
 
                 else:
-
+                    settings.hyperparams = (lr, 0, 0)
                     net = settings.model
                     net.to(settings.device)  # transfers to gpu if available
 
                     # Determine which optimizer to use
-                    optimizer = set_inner_optim(optim, lr=lr, model=net)
+                    optimizer = set_inner_optim(optim_name, lr=lr, model=net)
 
                     # Train model
                     net.train()

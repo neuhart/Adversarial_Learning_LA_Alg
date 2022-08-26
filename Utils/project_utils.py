@@ -76,7 +76,7 @@ def save_train_results(settings, optimizer, results):
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(results, name="{} C-{}".format(get_opt_hyperprams(settings,get_optim_name(optimizer)),len(df.columns)+1))], axis=1)
+    df = pd.concat([df, pd.Series(results, name="{} C-{}".format(settings.hyperprams, len(df.columns)+1))], axis=1)
     df.to_csv(filename, index=False)
 
 
@@ -118,7 +118,7 @@ def save_valid_results(settings, optimizer, scores, attack=None):
     except:
         df = pd.DataFrame()
 
-    df = pd.concat([df, pd.Series(scores, name="{} C-{}".format(get_opt_hyperprams(settings,get_optim_name(optimizer)),len(df.columns)+1))], axis=1)
+    df = pd.concat([df, pd.Series(scores, name="{} C-{}".format(settings.hyperparams, len(df.columns)+1))], axis=1)
     df.to_csv(filename, index=False)
 
 
@@ -203,24 +203,24 @@ def get_optim_name(optimizer):
     return optimizer_name
 
 
-def get_opt_hyperprams(settings, optim):
+def get_opt_hyperprams(settings, optim_name):
     """Returns optimal hyperparameters found by gridsearch
     Arguments:
         settings(EasyDict): easydict dictionary containing settings and hyperparameters
-        optim(str): Name of optimizer for which hyperparams need to be fetched
+        optim_name(str): Name of optimizer for which hyperparams need to be fetched
     Return:
         opt_hyperparams(tuple)
     """
     if settings.adv_train:
-        path = 'Hyperparam_tuning/{}/adv_pgd_test_results/{}.csv'.format(settings.dataset, optim)
+        path = 'Hyperparam_tuning/{}/adv_pgd_test_results/{}.csv'.format(settings.dataset, optim_name)
     else:
         # have to take accuracy on clean examples instead of adversarial examples (PGD) because acc on adversarial
         # examples of collapsed models (i.e., models that only predict one class) might be higher than
         # well-performing models
-        path = 'Hyperparam_tuning/{}/clean_test_results/{}.csv'.format(settings.dataset, optim)
+        path = 'Hyperparam_tuning/{}/clean_test_results/{}.csv'.format(settings.dataset, optim_name)
     df = pd.read_csv(path)
     opt_hyperparams = df.idxmax(axis=1)[0]  # string containing best hyperparameter settings
-    if optim.startswith('Lookahead'):
+    if optim_name.startswith('Lookahead'):
         opt_hyperparams = opt_hyperparams.split(',')  # split and convert to list
         # get hyperparameter values
         opt_hyperparams = (float(opt_hyperparams[0][3:]), int(opt_hyperparams[1][6:]), float(opt_hyperparams[2][6:]))

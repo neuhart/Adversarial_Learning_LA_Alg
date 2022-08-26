@@ -14,7 +14,8 @@ def main():
             net = settings.model
             net.to(settings.device)  # transfers to gpu if available
 
-            # Determine which optimizer to use
+            settings.hyperparams = project_utils.get_opt_hyperprams(settings, optim_name)
+            # Instantiate optimizer
             optimizer = project_utils.set_optim(settings, optim=optim_name, model=net)
 
             # Train model (including validation)
