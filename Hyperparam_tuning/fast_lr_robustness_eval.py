@@ -88,6 +88,52 @@ def lr_aggregation_pairplot():
         plt.show()
 
 
+def lr_avg_acc():
+    """
+    Plots PGD validation accurcary for all optimizers for each (fast) learning rate on a given data set averaged over
+    hyperparameters k and alpha) used in the gridsearch (see param_tuning.py) and saves results (mean+std figures to csv and plots to png)
+    """
+    if attack is None:
+        source_path = clean_valid_path
+    elif attack == 'fgsm':
+        source_path = fgsm_valid_path
+    elif attack == 'pgd':
+        source_path = pgd_valid_path
+    else:
+        raise 'Attack "{}" not implemented'.format(attack)
+
+    for optim_name in optims:
+        fig, ax = plt.subplots(1)
+        df = pd.read_csv(source_path+'/' + optim_name + '.csv')
+        df_LA = pd.read_csv(source_path+'/Lookahead-' + optim_name + '.csv')
+
+        mean_series, std_series = tsplot(ax, df, markers[0], 5)
+
+        if attack is None:
+            Path("Analysis/{}/LR_robustness/adv_valid_results_mean_std".format(dataset)).mkdir(parents=True, exist_ok=True)
+            filename = "Analysis/{}/LR_robustness/adv_valid_results_mean_std/{}.csv".format(dataset, optim_name)
+        else:
+            Path("Analysis/{}/LR_robustness/adv_{}_valid_results_mean_std".format(dataset, attack)).mkdir(parents=True, exist_ok=True)
+            filename = "Analysis/{}/LR_robustness/adv_{}_valid_results_mean_std/{}.csv".format(
+                dataset, attack, optim_name)
+        pd.concat([mean_series,std_series], axis=1).to_csv(filename, index=False)
+
+        mean_series, std_series = tsplot(ax, df_LA, markers[1], 5)
+        if attack is None:
+            filename_LA = "Analysis/{}/LR_robustness/adv_valid_results_mean_std/{}.csv".format(dataset, 'LA-' + optim_name)
+        else:
+            filename_LA = "Analysis/{}/LR_robustness/adv_{}_valid_results_mean_std/{}.csv".format(
+                dataset, attack, 'LA-' + optim_name)
+        pd.concat([mean_series,std_series], axis=1).to_csv(filename_LA, index=False)
+
+        ax.legend([optim_name, 'LA-' + optim_name])
+        ax.set_ylim(0, 1.0)
+        ax.set_ylabel('Accuracy')
+        ax.set_xlabel('Epoch')
+        plt.savefig(filename[:-3]+'png')
+        plt.show()
+
+
 if __name__ == "__main__":
     lr_aggregation_pairplot()
     # lr_aggregation_summaryplot()
