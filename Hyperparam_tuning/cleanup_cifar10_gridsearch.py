@@ -7,7 +7,7 @@ adv_train = True
 test_path = "{}/adv_test_results".format(dataset) if adv_train else "{}/clean_test_results".format(dataset)
 valid_path = "{}/adv_valid_results".format(dataset) if adv_train else "{}/clean_valid_results".format(dataset)
 train_path = "{}/adv_train_results".format(dataset) if adv_train else "{}/clean_train_results".format(dataset)
-optims = ['SGD', 'Adam', 'OGDA', 'ExtraSGD', 'ExtraAdam']
+optims = ['SGD', 'Adam', 'OGD', 'ExtraSGD', 'ExtraAdam']
 
 
 def remove_duplicate_1(file, path):

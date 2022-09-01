@@ -17,7 +17,7 @@ def parameter_formatting(hyperparameter_string):
     return hyperparameter_string.replace('alpha', '\u03B1').replace('steps','k').replace('lr','\u03B3')
 
 
-for optim in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGDA', 'Lookahead-ExtraSGD', 'Lookahead-ExtraAdam']:
+for optim in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGD', 'Lookahead-ExtraSGD', 'Lookahead-ExtraAdam']:
     if adv_train:
         fast_weights_valid_path = "{}/adv_valid_results/{}-fast-weights.csv".format(dataset, optim)
         slow_weights_valid_path = "{}/adv_valid_results/{}-slow-weights.csv".format(dataset, optim)

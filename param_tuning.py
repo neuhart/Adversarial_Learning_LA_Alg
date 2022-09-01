@@ -1,6 +1,6 @@
 from Utils import data_utils, project_utils
 from Optimizer.Lookahead import Lookahead
-from Optimizer.OGDA import OGDA
+from Optimizer.OGD import OGD
 from Optimizer.extragradient import ExtraSGD, ExtraAdam
 from easydict import EasyDict
 import torch
@@ -65,8 +65,8 @@ def set_inner_optim(optim, lr, model):
         optimizer = ExtraSGD(model.parameters(), lr=lr)
     elif optim == 'ExtraAdam':
         optimizer = ExtraAdam(model.parameters(), lr=lr)
-    elif optim == 'OGDA':
-        optimizer = OGDA(model.parameters(), lr=lr)
+    elif optim == 'OGD':
+        optimizer = OGD(model.parameters(), lr=lr)
     else:
         raise 'Wrong optimizer'
     return optimizer

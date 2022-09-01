@@ -4,15 +4,17 @@ import os
 import seaborn as sns
 import numpy as np
 import matplotlib.ticker as mtick
+from pathlib import Path
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
-dataset = 'MNIST'
+dataset = 'CIFAR10'
 adv_train = True
 clean_test_path = "{}/adv_test_results".format(dataset) if adv_train else "{}/clean_test_results".format(dataset)
 fgsm_test_path = "{}/adv_fgsm_test_results".format(dataset) if adv_train else "{}/clean_fgsm_test_results".format(dataset)
 pgd_test_path = "{}/adv_pgd_test_results".format(dataset) if adv_train else "{}/clean_pgd_test_results".format(dataset)
 
+attack = None
 clean_valid_path = "{}/adv_valid_results".format(dataset) if adv_train else "{}/clean_valid_results".format(dataset)
 fgsm_valid_path = "{}/adv_fgsm_valid_results".format(dataset) if adv_train else "{}/clean_fgsm_valid_results".format(dataset)
 pgd_valid_path = "{}/adv_pgd_valid_results".format(dataset) if adv_train else "{}/clean_pgd_valid_results".format(dataset)
@@ -22,7 +24,7 @@ train_path = "{}/adv_train_results".format(dataset) if adv_train else "{}/clean_
 top_settings = pd.DataFrame()
 results= pd.DataFrame()
 barplots = False
-optims = ['SGD', 'Adam', 'OGDA', 'ExtraSGD', 'ExtraAdam']
+optims = ['SGD', 'Adam', 'OGD', 'ExtraSGD', 'ExtraAdam']
 
 
 def parameter_formatting(index):
@@ -143,7 +145,7 @@ def get_indices(file):
         row = 4
     elif 'ExtraSGD' in file:
         row = 3
-    elif 'OGDA' in file:
+    elif 'OGD' in file:
         row = 2
     elif 'Adam' in file:
         row = 1
@@ -342,10 +344,72 @@ def valid_acc():
             plt.show()
 
 
-#la_alpha_aggregation()
-#la_steps_aggregation()
-#lr_aggregation_pairplot()
-#lr_aggregation_summaryplot()
-#top5_plots()
-#train_loss_vs_valid_acc()
-valid_acc()
+def total_avg_acc():
+    if attack is None:
+        source_path = clean_valid_path
+    elif attack == 'fgsm':
+        source_path = fgsm_valid_path
+    elif attack == 'pgd':
+        source_path = pgd_valid_path
+
+    for optim_name in optims:
+        fig, ax = plt.subplots(1)
+        df = pd.read_csv(source_path+'/' + optim_name + '.csv')
+        df_LA = pd.read_csv(source_path+'/Lookahead-' + optim_name + '.csv')
+
+        mean_series, std_series = tsplot(ax, df, markers[0], 5)
+
+        if attack is None:
+            Path("Analysis/{}/adv_valid_results_mean_std".format(dataset)).mkdir(parents=True, exist_ok=True)
+            filename = "Analysis/{}/adv_valid_results_mean_std/{}.csv".format(dataset, optim_name)
+        else:
+            Path("Analysis/{}/adv_{}_valid_results_mean_std".format(dataset, attack)).mkdir(parents=True, exist_ok=True)
+            filename = "Analysis/{}/adv_{}_valid_results_mean_std/{}.csv".format(
+                dataset, attack, optim_name)
+        pd.concat([mean_series,std_series], axis=1).to_csv(filename, index=False)
+
+        mean_series, std_series = tsplot(ax, df_LA, markers[1], 5)
+        if attack is None:
+            filename_LA = "Analysis/{}/adv_valid_results_mean_std/{}.csv".format(dataset, 'LA-' + optim_name)
+        else:
+            filename_LA = "Analysis/{}/adv_{}_valid_results_mean_std/{}.csv".format(
+                dataset, attack, 'LA-' + optim_name)
+        pd.concat([mean_series,std_series], axis=1).to_csv(filename_LA, index=False)
+
+        ax.legend([optim_name, 'LA-' + optim_name])
+        ax.set_ylim(0, 1.0)
+        ax.set_ylabel('Accuracy')
+        ax.set_xlabel('Epoch')
+        plt.savefig(filename[:-3]+'png')
+        plt.show()
+
+
+def tsplot(ax, data, marker, markevery, **kw):
+    """Plots Mean Validation Accuracy with Standard deviation
+    Arguments:
+        ax(pyplot.axis): object where the plot is to be stored
+        data(pd.Dataframe): Dataframe containing the data
+        marker(str): pyplot marker
+        markevery(int): determines the gap between every mark
+    Returns:
+        mean, std: mean and standard deviation of data
+    """
+    x = np.arange(1,data.shape[0]+1)
+    mean = np.mean(data, axis=1).rename('Mean')
+    std = np.std(data, axis=1).rename('Std')
+    print('mean: {} \n standard deviation: {}'.format(mean, std))
+    cis = (mean - std, mean + std)
+    ax.fill_between(x, cis[0], cis[1], alpha=0.2, **kw)
+    ax.plot(x,mean, marker=marker, markevery=markevery)
+    ax.margins(x=0)
+    return mean, std
+
+# la_alpha_aggregation()
+# la_steps_aggregation()
+# lr_aggregation_pairplot()
+# lr_aggregation_summaryplot()
+# top5_plots()
+# train_loss_vs_valid_acc()
+# valid_acc()
+
+total_avg_acc()

@@ -25,7 +25,7 @@ algorithms used in the domain of machine learning.
 
 ## Experiments
 The Experiments were organized as follows: <br>
-Numerical Experiments via Adversarial Training on three different standard machine learing datasets, MNIST, Fashion MNIST and CIFAR-10. The performance of several different optimizers was compared: SGD, Adam, ExtraSGD, ExtraAdam, OGDA as well as five instances of Lookahead each equipped with one of the before mentioned optimizers as its inner optimizer. 
+Numerical Experiments via Adversarial Training on three different standard machine learing datasets, MNIST, Fashion MNIST and CIFAR-10. The performance of several different optimizers was compared: SGD, Adam, ExtraSGD, ExtraAdam, OGD as well as five instances of Lookahead each equipped with one of the before mentioned optimizers as its inner optimizer. 
 
 ### Hyperparameter Tuning
 - The hyperparameters for each optimizer were tuned in  <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/param_tuning.py">param_tuning.py</a>

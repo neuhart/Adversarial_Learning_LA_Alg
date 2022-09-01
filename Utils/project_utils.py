@@ -5,7 +5,7 @@ import pandas as pd
 import torch
 import torchvision
 from easydict import EasyDict
-from Optimizer import Lookahead, extragradient, OGDA
+from Optimizer import Lookahead, extragradient, OGD
 
 
 def imshow(dataloader, batch_size, classes, inv_transform=None):
@@ -141,8 +141,8 @@ def get_optims():
     """queries optimizers
     returns: optims_list (list): list of optimizers to be used"""
 
-    implemented_optims = ['SGD', 'Adam', 'OGDA', 'ExtraAdam', 'ExtraSGD',
-                          'Lookahead-SGD', 'Lookahead-Adam', 'Lookahead-OGDA',
+    implemented_optims = ['SGD', 'Adam', 'OGD', 'ExtraAdam', 'ExtraSGD',
+                          'Lookahead-SGD', 'Lookahead-Adam', 'Lookahead-OGD',
                           'Lookahead-ExtraSGD', 'Lookahead-ExtraAdam']
     print('Separate by ","!', 'Type "A" for all optimizers!')
     optims_list = input('Select optimizers \n{}:'.format(implemented_optims))
@@ -176,17 +176,17 @@ def set_optim(settings, optim, model):
     elif optim == 'Lookahead-ExtraAdam':
         optimizer = Lookahead.Lookahead(
             extragradient.ExtraAdam(model.parameters(), lr=hyperparams[0]), la_steps=hyperparams[1], la_alpha=hyperparams[2])
-    elif optim == 'Lookahead-OGDA':
+    elif optim == 'Lookahead-OGD':
         optimizer = Lookahead.Lookahead(
-            OGDA.OGDA(model.parameters(), lr=hyperparams[0]), la_steps=hyperparams[1], la_alpha=hyperparams[2])
+            OGD.OGD(model.parameters(), lr=hyperparams[0]), la_steps=hyperparams[1], la_alpha=hyperparams[2])
     elif optim == 'Adam':
         optimizer = torch.optim.Adam(model.parameters(), lr=hyperparams[0])
     elif optim == 'ExtraAdam':
         optimizer = extragradient.ExtraAdam(model.parameters(), lr=hyperparams[0])
     elif optim == 'SGD':
         optimizer = torch.optim.SGD(model.parameters(), lr=hyperparams[0])
-    elif optim == 'OGDA':
-        optimizer = OGDA.OGDA(model.parameters(), lr=hyperparams[0])
+    elif optim == 'OGD':
+        optimizer = OGD.OGD(model.parameters(), lr=hyperparams[0])
     elif optim == 'ExtraSGD':
         optimizer = extragradient.ExtraSGD(model.parameters(), lr=hyperparams[0])
     else:

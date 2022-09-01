@@ -2,7 +2,7 @@ import torch
 from torch.optim import Optimizer
 
 
-class OGDA(Optimizer):
+class OGD(Optimizer):
     """Optimistic Gradient Descent Algorithm"""
 
     def __init__(self, params, lr=1e-3):
