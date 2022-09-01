@@ -3,7 +3,7 @@ This is the repository used for  my master's thesis "Adversarial Learning with L
 
 ## Scope of the Thesis
 ### Adversarial Examples:
-Adversarial Examples are deliberately perturbed versions of inputs crafted by adversaries with the goal of fooling the classifier under attack. Example: 
+Adversarial Examples are deliberately perturbed versions of inputs crafted by adversaries with the goal of fooling the classifier under attack. Example:<br> 
 <img src="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/Images/MNIST_5_plots_miscl_as_2_withLabels.png" height="250" width="500" align="center"> <br>
 The image on the left depicting the number ’5’ is unperturbed and is classified correctly by a neural network classifier. Using the PGD attack, the classifier is
 misled into predicting the number ’2’ instead. On the other hand, most humans would still be able to recognize the perturbed version as a ’5’.
@@ -42,7 +42,8 @@ The code for the optimizers used for the experiments can be found in the <a href
 
 ### Models 
 The neural networks used for the experiments can be found in the <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/Models">Models</a> folder together with the required data transformations for each model.
-
+<br>
+<img src="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/Images/MNIST_CNN.png" height="250" width="600" align="center"> <br>
 ### Results
 - The results of the experiments (training loss, validation accuracy) are stord in the <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/results">results</a> folder
 - results files with the prefix "adv" contain data about adversarially trained networks, e.g.:<a href="adv_fgsm_valid_results">adv_fgsm_valid_results</a>
