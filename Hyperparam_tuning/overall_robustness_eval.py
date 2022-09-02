@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 from Utils.visualization_utils import *
-
+import os
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
@@ -20,7 +20,7 @@ pgd_valid_path = "{}/adv_pgd_valid_results".format(dataset) if adv_train else "{
 optims = ['SGD', 'Adam', 'OGD', 'ExtraSGD', 'ExtraAdam']
 
 
-def total_avg_acc():
+def plot_total_avg_acc():
     """
     Plots PGD validation accurcary for all optimizers on a given data set averaged over ALL hyperparameter settings
     used in the gridsearch (see param_tuning.py) and saves results (mean+std figures to csv and plots to png)
@@ -66,5 +66,22 @@ def total_avg_acc():
         plt.show()
 
 
+def compute_avg_std():
+    """
+    Computes the average standard deviation (over all epochs) of each model trained with a different optimizer
+    """
+    for optim_name in optims:
+        file_name = "Analysis/{}/overall_robustness/adv_{}_valid_results_mean_std/{}.csv".format(
+            dataset, attack, optim_name)
+        df = pd.read_csv(file_name)
+        file_name_LA = "Analysis/{}/overall_robustness/adv_{}_valid_results_mean_std/LA-{}.csv".format(
+            dataset, attack, optim_name)
+        df_LA = pd.read_csv(file_name_LA)
+        print('Average std for {}:'.format(optim_name), df['Std'].mean())
+        print('Average std for LA-{}:'.format(optim_name), df_LA['Std'].mean())
+
+
+
 if __name__ == "__main__":
-    total_avg_acc()
+    # plot_total_avg_acc()
+    compute_avg_std()
