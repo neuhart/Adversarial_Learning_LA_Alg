@@ -50,6 +50,6 @@ def set_model_and_transform(settings):
         settings.model = MNIST_CNN()
     elif settings.dataset == 'CIFAR10':
         settings.transform = data_transformations.resnet_transform()
-        settings.model = torchvision.models.resnet18()
+        settings.model = torchvision.models.resnet18(num_classes=10)
 
     return settings

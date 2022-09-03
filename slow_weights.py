@@ -34,7 +34,7 @@ def main():
         raise 'Only implemented for Lookahead'
 
     for optim in optims_list:
-        net = torchvision.models.resnet18() if settings.dataset == 'CIFAR10' else models.MNIST_CNN()
+        net = torchvision.models.resnet18(num_classes=10) if settings.dataset == 'CIFAR10' else models.MNIST_CNN()
         net.to(settings.device)  # transfers to gpu if available
 
         # Determine which optimizer to use
@@ -64,6 +64,20 @@ def train(settings, data, model, optimizer):
         i = 0
         for x, y in data.train:
             i += 1
+            if epoch in [15, 25, 50]:
+                if i <= 100:
+                    # Validation on slow weights
+                    optimizer._backup_and_load_cache()
+                    model.eval()
+                    slow_weights_valid_results.append(evaluation(settings, data.test, model).pgd_att)
+                    model.train()
+                    optimizer._clear_and_load_backup()
+
+                    # Validation on fast weights
+                    model.eval()
+                    fast_weights_valid_results.append(evaluation(settings, data.test, model).pgd_att)
+                    model.train()
+
             x, y = x.to(settings.device), y.to(settings.device)
             if settings.adv_train:
                 x = projected_gradient_descent(model, x, 0.3, 0.01, 40, np.inf)
@@ -80,20 +94,6 @@ def train(settings, data, model, optimizer):
             loss = loss_fn(model(x), y)
             loss.backward()
             optimizer.step()
-
-            if epoch in [15, 25, 50]:
-                if i <= 100:
-                    # Validation on slow weights
-                    optimizer._backup_and_load_cache()
-                    model.eval()
-                    slow_weights_valid_results.append(evaluation(settings, data.test, model).clean)
-                    model.train()
-                    optimizer._clear_and_load_backup()
-
-                    # Validation on fast weights
-                    model.eval()
-                    fast_weights_valid_results.append(evaluation(settings, data.test, model).clean)
-                    model.train()
 
         if epoch in [15, 25, 50]:
             save_valid_results(settings, optimizer, scores=slow_weights_valid_results, weights='slow', epoch=epoch)

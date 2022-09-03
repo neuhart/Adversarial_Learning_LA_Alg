@@ -28,7 +28,7 @@ for optim in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGD', 'Lookahead-Extra
     fast_df = pd.read_csv(fast_weights_valid_path)
     slow_df= pd.read_csv(slow_weights_valid_path)
 
-    fig, ax = plt.subplots(1, 3, sharey='all', figsize=(15,5))
+    fig, ax = plt.subplots(1, 3, sharey='all', figsize=(15, 5))
 
     for col in range(slow_df.shape[1]):
         slow_series = slow_df.iloc[:,col]
@@ -40,7 +40,7 @@ for optim in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGD', 'Lookahead-Extra
         # fast weights
         ax[col].plot(range(1,k), fast_df.iloc[0:k-1, col], 'b')
         for j in range(1,10):
-            ax[col].plot(range(j*(k-1),(k-1)*j+k), fast_df.iloc[k*j-1:k*j-1+k, col], 'b')
+            ax[col].plot(range(j*(k-1), (k-1)*j+k), fast_df.iloc[k*j-1:k*j-1+k, col], 'b')
 
         ax[0].legend(['slow-weights', 'fast-weights'])
         fig.suptitle(optim)
