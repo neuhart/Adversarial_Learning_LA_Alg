@@ -1,10 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import math
+from pathlib import Path
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
 dataset = 'CIFAR10'
-adv_train=True
 
 
 def parameter_formatting(hyperparameter_string):
@@ -17,13 +17,10 @@ def parameter_formatting(hyperparameter_string):
     return hyperparameter_string.replace('alpha', '\u03B1').replace('steps','k').replace('lr','\u03B3')
 
 
-for optim in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGD', 'Lookahead-ExtraSGD', 'Lookahead-ExtraAdam']:
-    if adv_train:
-        fast_weights_valid_path = "{}/adv_valid_results/{}-fast-weights.csv".format(dataset, optim)
-        slow_weights_valid_path = "{}/adv_valid_results/{}-slow-weights.csv".format(dataset, optim)
-    else:
-        fast_weights_valid_path = "{}/clean_valid_results/{}_fast-weights.csv".format(dataset, optim)
-        slow_weights_valid_path = "{}/clean_valid_results/{}_slow-weights.csv".format(dataset, optim)
+for optim_name in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGD', 'Lookahead-ExtraSGD', 'Lookahead-ExtraAdam']:
+
+    fast_weights_valid_path = "{}/adv_valid_results/{}-fast-weights.csv".format(dataset, optim_name)
+    slow_weights_valid_path = "{}/adv_valid_results/{}-slow-weights.csv".format(dataset, optim_name)
 
     fast_df = pd.read_csv(fast_weights_valid_path)
     slow_df= pd.read_csv(slow_weights_valid_path)
@@ -35,16 +32,21 @@ for optim in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGD', 'Lookahead-Extra
         k = int(slow_series.name.split(';')[1].split('=')[1])  # get Lookahead steps parameter
 
         # slow weights
-        ax[col].plot([(k-1)*i+(k-1) for i in range(10)],  slow_series[(slow_series.index + 1) % k == 0][:10], 'r',  linestyle='dashed', marker='x')
+        ls = [slow_weight_update*(k-1) for slow_weight_update in range(1, math.floor(slow_df.shape[0]/k)+1)]  # [0] +
+        ax[col].plot(ls, slow_series[(slow_series.index +1) % k == 0], 'r', marker='x', linestyle='dashed')
 
         # fast weights
-        ax[col].plot(range(1,k), fast_df.iloc[0:k-1, col], 'b')
-        for j in range(1,10):
-            ax[col].plot(range(j*(k-1), (k-1)*j+k), fast_df.iloc[k*j-1:k*j-1+k, col], 'b')
+        ax[col].plot(range(1,k-1), fast_df.iloc[0:k-2, col], 'b')
+        for j in range(1,math.floor(fast_df.shape[0]/k)):
+            ax[col].plot(range(j*(k-1), j*(k-1)+(k)), fast_df.iloc[k*j-1:k*j-1+(k), col], 'b')
+
 
         ax[0].legend(['slow-weights', 'fast-weights'])
-        fig.suptitle(optim)
+        fig.suptitle(optim_name.replace('Lookahead','LA'))
         ax[col].set_title(parameter_formatting(slow_series.name))
         ax[col].set_ylabel('Accuracy')
         ax[col].set_xlabel('fast-weights update')
+
+    Path("Analysis/{}/adv_pgd_valid_slow".format(dataset)).mkdir(parents=True, exist_ok=True)
+    plt.savefig("Analysis/{}/adv_pgd_valid_slow/{}.png".format(dataset, optim_name.replace('Lookahead', 'LA')))
     plt.show()
