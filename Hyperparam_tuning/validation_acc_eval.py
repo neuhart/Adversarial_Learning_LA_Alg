@@ -97,38 +97,34 @@ def train_loss_vs_valid_acc():
     """
 
     for optim in optims:
-        fig, ax = plt.subplots(2, 2, sharey='all', figsize=(15,7))
+        fig, ax = plt.subplots(2, sharey='all', figsize=(10,10))
 
-        valid_df = pd.read_csv(clean_valid_path + "/" + '{}.csv'.format(optim))
+        valid_df = pd.read_csv(pgd_valid_path + "/" + '{}.csv'.format(optim))
         train_df = pd.read_csv(train_path + "/" + '{}.csv'.format(optim))
         top3_series = valid_df.iloc[-1].sort_values(ascending=False)[:3]  # top 5 settings
-        bottom3_series = valid_df.iloc[-1].sort_values(ascending=True)[:3]  # bottom 5 settings
-
-        ax2 = ax[0, 0].twinx()
-        two_scales(ax[0, 0], ax2, range(1, valid_df.shape[0] + 1),
+        ax2 = ax[0].twinx()
+        two_scales(ax[0], ax2, range(1, valid_df.shape[0] + 1),
                                          valid_df, train_df, top3_series)
+        ax2.set_ylabel('Training Loss')
 
-        ax2 = ax[1, 0].twinx()
-        two_scales(ax[1, 0], ax2, range(1, valid_df.shape[0] + 1),
-                                       valid_df, train_df, bottom3_series)
-
-        valid_df_Lookahead = pd.read_csv(clean_valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
+        valid_df_Lookahead = pd.read_csv(pgd_valid_path + "/" + 'Lookahead-{}.csv'.format(optim))
         train_df_Lookahead = pd.read_csv(train_path + "/" + 'Lookahead-{}.csv'.format(optim))
         top3_LA_series = valid_df_Lookahead.iloc[-1].sort_values(ascending=False)[:3]  # top 5 settings
-        bottom3_LA_series = valid_df_Lookahead.iloc[-1].sort_values(ascending=True)[:3]  # bottom 5 settings
 
-        ax2 = ax[0, 1].twinx()
-        two_scales(ax[0,1], ax2, range(1, valid_df_Lookahead.shape[0] + 1),
+        ax2 = ax[1].twinx()
+        two_scales(ax[1], ax2, range(1, valid_df_Lookahead.shape[0] + 1),
                    valid_df_Lookahead, train_df_Lookahead, top3_LA_series)
+
+
         ax2.set_ylabel('Training Loss')
-        ax2 = ax[1, 1].twinx()
-        two_scales(ax[1, 1], ax2, range(1, valid_df_Lookahead.shape[0] + 1),
-                   valid_df_Lookahead, train_df_Lookahead, bottom3_LA_series)
-        ax2.set_ylabel('Training Loss')
-        ax[0,0].set_title('{}'.format(optim))
-        ax[0,1].set_title('Lookahead-{}'.format(optim))
-        ax[0,0].set_ylabel('Validation Accuracy')
-        ax[1, 0].set_ylabel('Validation Accuracy')
-        ax[1,0].set_xlabel('Epochs')
-        ax[1,1].set_xlabel('Epochs')
+        ax[0].set_title('{}'.format(optim))
+        ax[1].set_title('Lookahead-{}'.format(optim))
+        ax[0].set_ylabel('PGD Validation Accuracy')
+        ax[1].set_ylabel('PGD Validation Accuracy')
+        ax[0].set_xlabel('Epochs')
+        ax[1].set_xlabel('Epochs')
+        Path("Analysis/{}/adv_top3/".format(dataset)).mkdir(parents=True, exist_ok=True)
+        plt.savefig("Analysis/{}/adv_top3/{}.png".format(dataset, optim))
         plt.show()
+
+train_loss_vs_valid_acc()

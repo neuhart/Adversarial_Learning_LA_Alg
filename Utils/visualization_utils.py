@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.ticker as mtick
+markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
 
 def parameter_formatting(index):
