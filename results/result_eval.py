@@ -4,7 +4,7 @@ import numpy as np
 import os
 import matplotlib.ticker as mtick
 from pathlib import Path
-
+from Utils.visualization_utils import tsplot
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
 dataset = 'CIFAR10'
@@ -25,7 +25,7 @@ else:
 def plot_avg_valid_results():
     """Plots validation accuracy"""
     avg = pd.DataFrame()
-    inner_optims = ['SGD', 'Adam', 'OGD', 'ExtraSGD' , 'ExtraAdam']
+    inner_optims = ['SGD', 'Adam', 'OGD', 'ExtraSGD', 'ExtraAdam']
 
     for optim in inner_optims:
         df = pd.read_csv(valid_path + "/" + optim + ".csv")
@@ -35,13 +35,15 @@ def plot_avg_valid_results():
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        plt.plot(np.arange(1,df.shape[0]+1), df.mean(axis=1), marker='x', markevery=5)
-        plt.plot(np.arange(1,df_LA.shape[0]+1), df_LA.mean(axis=1), marker='o', markevery=5)
+        tsplot(ax, df, marker='x',markevery=5)
+        tsplot(ax, df_LA, marker='o', markevery=5)
+
         ax.set_xlabel('Epochs')
         ax.set_ylabel('{} Validation Accuracy'.format(attack.upper()) if attack is not None else "Validation Accuracy")
         ax.set_ylim(0, 1.1)
         ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
         plt.legend([optim, "LA-{}".format(optim)])
+        plt.savefig("Analysis/{}/{}.png".format(dataset, optim))
         plt.show()
         """
         implement with standard deviation
