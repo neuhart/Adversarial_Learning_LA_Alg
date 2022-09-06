@@ -7,7 +7,7 @@ from pathlib import Path
 from Utils.visualization_utils import tsplot
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
-dataset = 'CIFAR10'
+dataset = 'FashionMNIST'
 attack = 'pgd'
 
 if attack is None:
@@ -45,9 +45,7 @@ def plot_avg_valid_results():
         plt.legend([optim, "LA-{}".format(optim)])
         plt.savefig("Analysis/{}/{}.png".format(dataset, optim))
         plt.show()
-        """
-        implement with standard deviation
-        """
+
     avg.to_csv("Analysis/{}/avg_{}_valid_acc.csv".format(dataset, attack), index=False)
 
 
