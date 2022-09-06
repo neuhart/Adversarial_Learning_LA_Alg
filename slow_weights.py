@@ -17,13 +17,14 @@ from easydict import EasyDict
 
 def main():
     settings = EasyDict(
-            nb_epochs=project_utils.query_int('Number of epochs'),
-            adv_train=project_utils.yes_no_check('Adversarial Training?'),
-            device=torch.device(project_utils.query_int('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device('cpu') ,
-            dataset=project_utils.query_dataset(),
-            fgsm_att=False,
-            pgd_att=False
-    )# specify general settings
+        nb_epochs=project_utils.query_int('Number of epochs'),
+        adv_train=project_utils.yes_no_check('Adversarial Training?'),
+        device=torch.device(
+            project_utils.query_int('Select GPU [0,3]:')) if torch.cuda.is_available() else torch.device('cpu'),
+        dataset=project_utils.query_dataset(),
+        fgsm_att=False,
+        pgd_att=False
+    )  # specify general settings
 
     transform = data_transformations.resnet_transform() if settings.dataset == 'CIFAR10' else data_transformations.standard_transform()
     data = data_utils.ld_dataset(dataset_name=settings.dataset, transform=transform)
@@ -57,26 +58,25 @@ def train(settings, data, model, optimizer):
     loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
 
     for epoch in range(1, settings.nb_epochs + 1):
-        slow_weights_valid_results = []
         fast_weights_valid_results = []
-        
+
         start_t = time.time()
         i = 0
         for x, y in data.train:
             i += 1
-            if epoch in [15, 25, 50]:
+            if epoch in [15, 25]:
                 if i <= 100:
-                    # Validation on slow weights
-                    optimizer._backup_and_load_cache()
-                    model.eval()
-                    slow_weights_valid_results.append(evaluation(settings, data.test, model).pgd_att)
-                    model.train()
-                    optimizer._clear_and_load_backup()
+                    torch.save(model.state_dict(), "slow_weight_evaluation/{}_model.pt".format(
+                        project_utils.get_optim_name(optimizer)))
 
-                    # Validation on fast weights
-                    model.eval()
-                    fast_weights_valid_results.append(evaluation(settings, data.test, model).pgd_att)
-                    model.train()
+                    eval_model = torchvision.models.resnet18(num_classes=10)
+                    eval_model.load_state_dict(torch.load("slow_weight_evaluation/{}_model.pt".format(
+                        project_utils.get_optim_name(optimizer))))
+                    eval_model.to(settings.device)
+                    # Validation
+                    eval_model.eval()
+                    fast_weights_valid_results.append(evaluation(settings, data.test, eval_model).pgd_att)
+                    eval_model.train()
 
             x, y = x.to(settings.device), y.to(settings.device)
             if settings.adv_train:
@@ -95,14 +95,13 @@ def train(settings, data, model, optimizer):
             loss.backward()
             optimizer.step()
 
-        if epoch in [15, 25, 50]:
-            save_valid_results(settings, optimizer, scores=slow_weights_valid_results, weights='slow', epoch=epoch)
+        if epoch in [15, 25]:
             save_valid_results(settings, optimizer, scores=fast_weights_valid_results, weights='fast', epoch=epoch)
 
         end_t = time.time()
         print(
             "epoch: {}/{} computed in {:.3f} seconds".format(
-                epoch, settings.nb_epochs, end_t-start_t
+                epoch, settings.nb_epochs, end_t - start_t
             )
         )
 
