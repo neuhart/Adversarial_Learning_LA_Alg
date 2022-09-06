@@ -47,7 +47,7 @@ for optim_name in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGD', 'Lookahead-
         ax[col].set_xlabel('fast-weights update')
 
     Path("Analysis/{}/adv_pgd_valid_slow".format(dataset)).mkdir(parents=True, exist_ok=True)
-    #plt.savefig("Analysis/{}/adv_pgd_valid_slow/{}.png".format(dataset, optim_name.replace('Lookahead', 'LA')))
+    plt.savefig("Analysis/{}/adv_pgd_valid_slow/{}.png".format(dataset, optim_name.replace('Lookahead', 'LA')))
     plt.show()
 
 
