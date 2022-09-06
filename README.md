@@ -1,5 +1,5 @@
 # Adversarial Learning with Lookahead
-This is the repository used for  my master's thesis "Adversarial Learning with Lookahead". <br>
+This is the repository used for my master's thesis "Adversarial Learning with Lookahead". <br>
 
 ## Scope of the Thesis
 ### Adversarial Examples:
@@ -25,7 +25,12 @@ algorithms used in the domain of machine learning.
 
 ## Experiments
 The Experiments were organized as follows: <br>
-Numerical Experiments via Adversarial Training on three different standard machine learing datasets, MNIST, Fashion MNIST and CIFAR-10. The performance of several different optimizers was compared: SGD, Adam, ExtraSGD, ExtraAdam, OGD as well as five instances of Lookahead each equipped with one of the before mentioned optimizers as its inner optimizer. 
+Numerical Experiments via Adversarial Training on three different standard machine learing datasets, MNIST, Fashion MNIST and CIFAR-10. The performance of several different optimizers was compared: SGD, Adam, ExtraSGD, ExtraAdam, OGD as well as five instances of Lookahead each equipped with one of the before mentioned optimizers as its inner optimizer.
+### Datasets 
+- <a href="https://pytorch.org/vision/stable/generated/torchvision.datasets.MNIST.html#torchvision.datasets.MNIST">MNIST</a>
+- <a href="https://pytorch.org/vision/stable/generated/torchvision.datasets.FashionMNIST.html#torchvision.datasets.FashionMNIST">FashionMNIST</a>
+- <a href="https://pytorch.org/vision/stable/generated/torchvision.datasets.CIFAR10.html#torchvision.datasets.CIFAR10">CIFAR-10</a>
+
 ### Optimizer
 The following optimizers were used for the experiments:
 - SGD & Adam (<a href="https://pytorch.org/docs/stable/optim.html">Pytorch</a>)
@@ -34,9 +39,14 @@ The following optimizers were used for the experiments:
 - Lookahead (<a href="https://github.com/michaelrzhang/lookahead">Zhang et al.</a>)
 
 ### Models 
-The neural networks used for the experiments can be found in the <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/Models">Models</a> folder together with the required data transformations for each model.
+The neural networks used for the experiments:
+- CIFAR-10:  <a href="https://pytorch.org/vision/stable/models/generated/torchvision.models.resnet18.html#torchvision.models.resnet18">Resnet-18</a>
+- MNIST & FashionMNIST: <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/tree/main/Models">MNIST CNN</a>
 <br>
 <img src="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/Images/MNIST_CNN.png" height="250" width="600" align="center"> <br>
+
+### Attacks
+For Adversarial Training, I used the PGD attack, and for model evaluation I used both the FGSM and PGD attack (<a href="https://github.com/cleverhans-lab/cleverhans">cleverhans</a>)
 
 ### Hyperparameter Tuning
 - The hyperparameters for each optimizer were tuned in  <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/param_tuning.py">param_tuning.py</a>
