@@ -2,6 +2,7 @@
 This is the repository used for my master's thesis "Adversarial Learning with Lookahead". <br>
 
 ## Scope of the Thesis
+The main focus of the practical part of my thesis was to compare the performance of LA for the purpose of Adversarial Training with other (standard) optimizers such as SGD or Adam. I analyzed my results and discussed them afterwards. Here the most important concepts used in this thesis:
 ### Adversarial Examples:
 Adversarial Examples are deliberately perturbed versions of inputs crafted by adversaries with the goal of fooling the classifier under attack. Example:<br> 
 <img src="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/Images/MNIST_5_plots_miscl_as_2_withLabels.png" height="250" width="500" align="center"> <br>
@@ -46,7 +47,7 @@ The neural networks used for the experiments:
 <img src="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/Images/MNIST_CNN.png" height="250" width="600" align="center"> <br>
 
 ### Attacks
-For Adversarial Training, I used the PGD attack, and for model evaluation I used both the FGSM and PGD attack (<a href="https://github.com/cleverhans-lab/cleverhans">cleverhans</a>)
+For Adversarial Training, I used the PGD attack, and for model evaluation, I used both the FGSM and PGD attack (<a href="https://github.com/cleverhans-lab/cleverhans">cleverhans</a>).
 
 ### Hyperparameter Tuning
 - The hyperparameters for each optimizer were tuned in  <a href="https://github.com/neuhart/Adversarial_Learning_LA_Alg/blob/main/param_tuning.py">param_tuning.py</a>
