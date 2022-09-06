@@ -20,25 +20,24 @@ def parameter_formatting(hyperparameter_string):
 for optim_name in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGD', 'Lookahead-ExtraSGD', 'Lookahead-ExtraAdam']:
 
     fast_weights_valid_path = "{}/adv_valid_results/{}-fast-weights.csv".format(dataset, optim_name)
-    slow_weights_valid_path = "{}/adv_valid_results/{}-slow-weights.csv".format(dataset, optim_name)
-
     fast_df = pd.read_csv(fast_weights_valid_path)
-    slow_df= pd.read_csv(slow_weights_valid_path)
 
-    fig, ax = plt.subplots(1, 3, sharey='all', figsize=(15, 5))
+    fig, ax = plt.subplots(1, 2, sharey='all', figsize=(15, 5))
 
-    for col in range(slow_df.shape[1]):
-        slow_series = slow_df.iloc[:,col]
-        k = int(slow_series.name.split(';')[1].split('=')[1])  # get Lookahead steps parameter
+    for col in range(fast_df.shape[1]):
+        fast_series= fast_df.iloc[:,col]
+        k = int(fast_series.name.split(';')[1].split('=')[1])  # get Lookahead steps parameter
+        slow_series = fast_series[fast_series.index % k == 0]
 
         # slow weights
-        ls = [slow_weight_update*(k-1) for slow_weight_update in range(1, math.floor(slow_df.shape[0]/k)+1)]  # [0] +
-        ax[col].plot(ls, slow_series[(slow_series.index +1) % k == 0], 'r', marker='x', linestyle='dashed')
+        ls = [slow_weight_update*(k-1) for slow_weight_update in range(0, math.floor(fast_df.shape[0]/k))]  # [0] +
+        ax[col].plot(ls, slow_series,
+                     'r', marker='x', linestyle='dashed')
 
         # fast weights
-        ax[col].plot(range(1,k-1), fast_df.iloc[0:k-2, col], 'b')
+        ax[col].plot(range(0,k), fast_series.iloc[0:k], 'b')
         for j in range(1,math.floor(fast_df.shape[0]/k)):
-            ax[col].plot(range(j*(k-1), j*(k-1)+(k)), fast_df.iloc[k*j-1:k*j-1+(k), col], 'b')
+           ax[col].plot(range(j*(k-1), j*(k-1)+k), fast_series.iloc[j*k:j*k+k], 'b')
 
 
         ax[0].legend(['slow-weights', 'fast-weights'])
@@ -48,5 +47,7 @@ for optim_name in ['Lookahead-SGD','Lookahead-Adam','Lookahead-OGD', 'Lookahead-
         ax[col].set_xlabel('fast-weights update')
 
     Path("Analysis/{}/adv_pgd_valid_slow".format(dataset)).mkdir(parents=True, exist_ok=True)
-    plt.savefig("Analysis/{}/adv_pgd_valid_slow/{}.png".format(dataset, optim_name.replace('Lookahead', 'LA')))
+    #plt.savefig("Analysis/{}/adv_pgd_valid_slow/{}.png".format(dataset, optim_name.replace('Lookahead', 'LA')))
     plt.show()
+
+
