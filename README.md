@@ -10,7 +10,7 @@ The image on the left depicting the number ’5’ is unperturbed and is classif
 misled into predicting the number ’2’ instead. On the other hand, most humans would still be able to recognize the perturbed version as a ’5’.
 ### Adversarial Training:
 Adversarial training is a defense strategy in the domain of adversarial learning in which the defender incorporates adversarial
-examples into the learning process of the model by either re-training the model on the adversarial examples or training the model solely on them in the first place. 
+examples into the learning process of the model by either re-training the model on the adversarial examples or training the model solely on them in the first place (see also <a href="https://arxiv.org/abs/1706.06083">Madry et al.</a>). 
 <br>
 ### Lookahead
 The Lookahead optimizer proposed by <a href="https://www.cs.toronto.edu/~hinton/absps/lookahead.pdf">Zhang et al.</a> is an optimization algorithm that
