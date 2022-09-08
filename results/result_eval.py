@@ -8,8 +8,8 @@ from pathlib import Path
 from Utils.visualization_utils import tsplot
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
-dataset = 'CIFAR10'
-attack = None
+dataset = 'MNIST'
+attack = 'pgd'
 
 if attack is None:
     train_path = "{}/adv_train_results".format(dataset)
@@ -47,7 +47,7 @@ def plot_avg_valid_results():
         ax.set_xlabel('Epochs', fontsize=18)
         ax.set_ylabel('{} Validation Accuracy'.format(attack.upper()) if attack is not None else "Validation Accuracy",
                       fontsize=18)
-        ax.set_ylim(0, 1.1)
+        # ax.set_ylim(0, 1.1)
         ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
         font = {'size': 15}
         matplotlib.rc('font', **font)

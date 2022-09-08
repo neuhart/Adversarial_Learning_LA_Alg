@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from Utils.visualization_utils import *
 import os
+import matplotlib
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
@@ -58,10 +59,13 @@ def plot_total_avg_acc():
                 dataset, attack, 'LA-' + optim_name)
         pd.concat([mean_series,std_series], axis=1).to_csv(filename_LA, index=False)
 
-        ax.legend([optim_name, 'LA-' + optim_name])
-        ax.set_ylim(0, 1.0)
-        ax.set_ylabel('Accuracy')
-        ax.set_xlabel('Epoch')
+        ax.legend([optim_name, 'LA-' + optim_name], prop={'size': 15})
+        # ax.set_ylim(0, 1.0)
+        ax.set_ylabel('PGD Validation Accuracy', fontsize=18)
+        ax.set_xlabel('Epoch', fontsize=18)
+        font = {'size': 15}
+        matplotlib.rc('font', **font)
+        matplotlib.pyplot.tight_layout()
         plt.savefig(filename[:-3]+'png')
         plt.show()
 
@@ -83,5 +87,5 @@ def compute_avg_std():
 
 
 if __name__ == "__main__":
-    # plot_total_avg_acc()
+    plot_total_avg_acc()
     compute_avg_std()
