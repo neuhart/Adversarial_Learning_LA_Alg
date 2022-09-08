@@ -8,7 +8,7 @@ from Utils.visualization_utils import tsplot
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
 dataset = 'CIFAR10'
-attack = 'pgd'
+attack = None
 
 if attack is None:
     train_path = "{}/adv_train_results".format(dataset)
@@ -48,11 +48,18 @@ def plot_avg_valid_results():
         ax.set_ylim(0, 1.1)
         ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
         plt.legend([optim, "LA-{}".format(optim)])
-        plt.savefig("Analysis/{}/{}.png".format(dataset, optim))
+        if attack is not None:
+            plt.savefig("Analysis/{}/avg_{}_valid_acc/{}.png".format(dataset, attack, optim))
+        else:
+            plt.savefig("Analysis/{}/avg_valid_acc/{}.png".format(dataset, optim))
         plt.show()
 
-    avg.to_csv("Analysis/{}/avg_{}_valid_acc.csv".format(dataset, attack), index=False)
-    std.to_csv("Analysis/{}/std_{}_valid_acc.csv".format(dataset, attack), index=False)
+    if attack is not None:
+        avg.to_csv("Analysis/{}/avg_{}_valid_acc/avg.csv".format(dataset, attack), index=False)
+        std.to_csv("Analysis/{}/avg_{}_valid_acc/std.csv".format(dataset, attack), index=False)
+    else:
+        avg.to_csv("Analysis/{}/avg_valid_acc/avg.csv".format(dataset), index=False)
+        std.to_csv("Analysis/{}/avg_valid_acc/std.csv".format(dataset), index=False)
 
 
 if __name__ == "__main__":
