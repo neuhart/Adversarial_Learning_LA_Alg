@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import matplotlib.ticker as mtick
+from matplotlib.ticker import FuncFormatter
 import matplotlib
 from pathlib import Path
 from Utils.visualization_utils import tsplot
@@ -48,7 +48,7 @@ def plot_avg_valid_results():
         ax.set_ylabel('{} Validation Accuracy'.format(attack.upper()) if attack is not None else "Validation Accuracy",
                       fontsize=18)
         # ax.set_ylim(0, 1.1)
-        ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
         font = {'size': 15}
         matplotlib.rc('font', **font)
         matplotlib.pyplot.tight_layout()
