@@ -4,6 +4,7 @@ from pathlib import Path
 from Utils.visualization_utils import *
 import os
 import matplotlib
+from matplotlib.ticker import FuncFormatter
 
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
@@ -63,6 +64,7 @@ def plot_total_avg_acc():
         # ax.set_ylim(0, 1.0)
         ax.set_ylabel('PGD Validation Accuracy', fontsize=18)
         ax.set_xlabel('Epoch', fontsize=18)
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
         font = {'size': 15}
         matplotlib.rc('font', **font)
         matplotlib.pyplot.tight_layout()
