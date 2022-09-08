@@ -64,7 +64,7 @@ def tsplot(ax, data, marker, markevery, **kw):
     x = np.arange(1,data.shape[0]+1)
     mean = np.mean(data, axis=1).rename('Mean')
     std = np.std(data, axis=1).rename('Std')
-    print('mean: {} \n standard deviation: {}'.format(mean, std))
+    print('mean: {} \n standard deviation: {}'.format(mean, std), type(mean))
     cis = (mean - std, mean + std)
     ax.fill_between(x, cis[0], cis[1], alpha=0.2, **kw)
     ax.plot(x,mean, marker=marker, markevery=markevery)

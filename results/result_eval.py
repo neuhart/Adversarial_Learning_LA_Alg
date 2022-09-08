@@ -7,7 +7,7 @@ from pathlib import Path
 from Utils.visualization_utils import tsplot
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
-dataset = 'FashionMNIST'
+dataset = 'CIFAR10'
 attack = 'pgd'
 
 if attack is None:
@@ -25,6 +25,7 @@ else:
 def plot_avg_valid_results():
     """Plots validation accuracy"""
     avg = pd.DataFrame()
+    std = pd.DataFrame()
     inner_optims = ['SGD', 'Adam', 'OGD', 'ExtraSGD', 'ExtraAdam']
 
     for optim in inner_optims:
@@ -33,8 +34,12 @@ def plot_avg_valid_results():
         avg = pd.concat([avg, df.mean(axis=1).rename(optim)], axis=1)
         avg = pd.concat([avg, df_LA.mean(axis=1).rename("LA-{}".format(optim))], axis=1)
 
+        std = pd.concat([std, np.std(df, axis=1).rename(optim)], axis=1)
+        std = pd.concat([std, np.std(df_LA, axis=1).rename("LA-{}".format(optim))], axis=1)
+
         fig = plt.figure()
         ax = fig.add_subplot(111)
+
         tsplot(ax, df, marker='x',markevery=5)
         tsplot(ax, df_LA, marker='o', markevery=5)
 
@@ -47,6 +52,7 @@ def plot_avg_valid_results():
         plt.show()
 
     avg.to_csv("Analysis/{}/avg_{}_valid_acc.csv".format(dataset, attack), index=False)
+    std.to_csv("Analysis/{}/std_{}_valid_acc.csv".format(dataset, attack), index=False)
 
 
 if __name__ == "__main__":
