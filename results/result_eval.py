@@ -8,7 +8,7 @@ from pathlib import Path
 from Utils.visualization_utils import tsplot
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
-dataset = 'MNIST'
+dataset = 'CIFAR10'
 attack = 'pgd'
 
 if attack is None:
