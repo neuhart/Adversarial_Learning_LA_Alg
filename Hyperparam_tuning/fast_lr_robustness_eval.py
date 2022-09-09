@@ -2,10 +2,11 @@ import matplotlib.pyplot as plt
 import os
 from pathlib import Path
 from Utils.visualization_utils import *
-
+from Utils import project_utils
+from easydict import EasyDict
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
-dataset = 'FashionMNIST'
+dataset = 'CIFAR10'
 adv_train = True
 clean_test_path = "{}/adv_test_results".format(dataset) if adv_train else "{}/clean_test_results".format(dataset)
 fgsm_test_path = "{}/adv_fgsm_test_results".format(dataset) if adv_train else "{}/clean_fgsm_test_results".format(dataset)
@@ -148,7 +149,78 @@ def lr_avg_acc():
         plt.show()
 
 
+def lr_acc():
+    """
+    Plots the PGD validation accuracy for variable fast learning rate but with fixed k and \alpha (i.e., take the tuned
+    values for k and \alpha)
+    """
+    learning_rates = [1e-2, 3e-3, 1e-3, 3e-4, 1e-4, 3e-5]
+
+    if attack is None:
+        source_path = clean_valid_path
+    elif attack == 'fgsm':
+        source_path = fgsm_valid_path
+    elif attack == 'pgd':
+        source_path = pgd_valid_path
+    else:
+        raise 'Attack "{}" not implemented'.format(attack)
+
+    for optim_name in optims:
+        if adv_train:
+            path = '{}/adv_pgd_test_results/{}.csv'.format(dataset, 'Lookahead-' + optim_name)
+        else:
+            # have to take accuracy on clean examples instead of adversarial examples (PGD) because acc on adversarial
+            # examples of collapsed models (i.e., models that only predict one class) might be higher than
+            # well-performing models
+            path = '{}/clean_test_results/{}.csv'.format(dataset, 'Lookahead-' + optim_name)
+        df = pd.read_csv(path)
+        opt_hyper_str = df.idxmax(axis=1)[0]  # string containing best hyperparameter settings
+
+        opt_hyper_str = opt_hyper_str.split(',')  # split and convert to list
+        # get hyperparameter values
+        opt_hyper_params_LA = (
+        float(opt_hyper_str[0][3:]), int(opt_hyper_str[1][6:]), float(opt_hyper_str[2][6:]))
+
+        fig, ax = plt.subplots(1,2)
+        fig.set_figheight(5)
+        fig.set_figwidth(15)
+
+        df = pd.read_csv(source_path+'/' + optim_name + '.csv')
+        df_LA = pd.read_csv(source_path+'/Lookahead-' + optim_name + '.csv')
+        for i, lr in enumerate(learning_rates):
+            df_2 = df.copy()
+            for col in df_2.columns:
+                if 'lr={}'.format(lr) in col:
+                    ax[0].plot(np.arange(1, df_2.shape[0] + 1), df_2[col], marker=markers[i], markevery=5)
+
+            series_LA = df_LA["lr={},steps={},alpha={}".format(lr, opt_hyper_params_LA[1], opt_hyper_params_LA[2])]
+            ax[1].plot(np.arange(1, df_2.shape[0] + 1),series_LA, marker=markers[i], markevery=5)
+
+        if attack is None:
+            Path("Analysis/{}/LR_robustness_optimal_k_alpha/adv_valid_results_mean_std".format(dataset)).mkdir(parents=True,
+                                                                                               exist_ok=True)
+            filename= "Analysis/{}/LR_robustness_optimal_k_alpha/adv_valid_results_mean_std/{}.csv".format(
+                dataset, optim_name)
+
+        else:
+            Path("Analysis/{}/LR_robustness_optimal_k_alpha/adv_{}_valid_results_mean_std".format(dataset, attack)).mkdir(parents=True,
+                                                                                                          exist_ok=True)
+            filename = "Analysis/{}/LR_robustness_optimal_k_alpha/adv_{}_valid_results_mean_std/{}.csv".format(
+                dataset, attack, optim_name)
+
+        ax[1].legend(learning_rates)
+        ax[0].set_title('{}'.format(optim_name))
+        ax[1].set_title('LA-{}'.format(optim_name))
+        ax[0].set_ylabel('PGD Validation Accuracy')
+        ax[1].set_ylabel('PGD Validation Accuracy')
+        for a in ax:
+            a.set_xlabel('Epoch')
+        plt.savefig(filename[:-4]+'.png')
+        plt.show()
+
+
 if __name__ == "__main__":
     # lr_aggregation_pairplot()
     # lr_aggregation_summaryplot()
-    lr_avg_acc()
+    # lr_avg_acc()
+    lr_acc()
