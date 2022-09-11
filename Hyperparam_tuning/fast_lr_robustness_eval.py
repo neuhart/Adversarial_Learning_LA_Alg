@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 import os
 from pathlib import Path
 from Utils.visualization_utils import *
-from Utils import project_utils
-from easydict import EasyDict
+import matplotlib
+from matplotlib.ticker import FuncFormatter
+
 markers=('o', 'x', '^', '<', '>', '*', 'h', 'H', 'D', 'd', 'P', 'X', '8', 's', 'p')
 
 dataset = 'CIFAR10'
@@ -208,13 +209,18 @@ def lr_acc():
             filename = "Analysis/{}/LR_robustness_optimal_k_alpha/adv_{}_valid_results_mean_std/{}.csv".format(
                 dataset, attack, optim_name)
 
-        ax[1].legend(learning_rates)
+        ax[1].legend(learning_rates, prop={'size': 15})
         ax[0].set_title('{}'.format(optim_name))
         ax[1].set_title('LA-{}'.format(optim_name))
-        ax[0].set_ylabel('PGD Validation Accuracy')
-        ax[1].set_ylabel('PGD Validation Accuracy')
+        ax[0].set_ylabel('PGD Validation Accuracy', fontsize=18)
+        ax[1].set_ylabel('PGD Validation Accuracy', fontsize=18)
+
         for a in ax:
-            a.set_xlabel('Epoch')
+            a.set_xlabel('Epoch', fontsize=18)
+            a.yaxis.set_major_formatter(FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
+        font = {'size': 15}
+        matplotlib.rc('font', **font)
+        matplotlib.pyplot.tight_layout()
         plt.savefig(filename[:-4]+'.png')
         plt.show()
 
